@@ -1,21 +1,21 @@
-const { merge } = require("webpack-merge");
+const { merge } = require('webpack-merge');
 // eslint-disable-next-line import/extensions
-const common = require("./webpack.common.js");
+const common = require('./webpack.common.js');
 
 module.exports = merge(common, {
-  mode: "development",
-  devtool: "inline-source-map",
+  mode: 'development',
+  devtool: 'inline-source-map',
   output: {
-    filename: "[name].[chunkhash].js",
-    publicPath: "/",
+    filename: '[name].[chunkhash].js',
+    publicPath: '/'
   },
   devServer: {
-    host: "local.weedstrue.com",
+    host: 'local.weedstrue.com',
     port: 8000,
     https: true,
-    static: "./dist",
+    static: './dist',
     hot: true,
-    historyApiFallback: true,
+    historyApiFallback: true
   },
-  optimization: { splitChunks: { chunks: "all" } },
+  optimization: { splitChunks: { chunks: 'all' } }
 });
