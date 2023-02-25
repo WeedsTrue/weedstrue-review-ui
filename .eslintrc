@@ -1,0 +1,73 @@
+{
+  "parser": "@babel/eslint-parser",
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    }
+  },
+  "extends": [
+    "airbnb",
+    "plugin:prettierx/default",
+    "plugin:prettierx/react"
+  ],
+  "plugins": ["react", "@babel", "prettierx"],
+  "rules": {
+    "space-before-function-paren": 0,
+    "object-curly-newline": [1, { "multiline": true }],
+    "semi": [2, "always"],
+    "linebreak-style": [2, "windows"],
+    "import/prefer-default-export": 0,
+    "comma-dangle": [2, "never"],
+    "no-unused-expressions": 0,
+    "no-unused-vars": 1,
+    "no-nested-ternary": 0,
+    "no-restricted-syntax": 0,
+    "prettierx/options": [1, {"endOfLine":"auto"}],
+    "react/destructuring-assignment": [2, "always"],
+    "react/jsx-filename-extension": 0,
+    "react/no-unused-prop-types": 1,
+    "react/default-props-match-prop-types": 0,
+    "react/boolean-prop-naming": 1,
+    "react/button-has-type": 1,
+    "react/no-did-mount-set-state": 1,
+    "react/no-did-update-set-state": 1,
+    "react/no-typos": 1,
+    "react/require-default-props": 0,
+    "react/sort-comp": 1,
+    "react/forbid-prop-types": 0,
+    "react/function-component-definition": 0,
+    "import/no-extraneous-dependencies": 0,
+    "react/sort-prop-types": [
+      1,
+      {
+        "requiredFirst": true
+      }
+    ],
+    "react/jsx-sort-props": 1,
+    "react/jsx-sort-default-props": 1,
+    "react/jsx-wrap-multilines": [
+      1,
+      {
+        "return": "parens-new-line",
+        "declaration": "parens-new-line",
+        "arrow": "parens-new-line",
+        "condition": "parens-new-line",
+        "logical": "parens-new-line",
+        "prop": false
+      }
+    ],
+    "react/jsx-props-no-spreading": 0,
+    "jsx-a11y/click-events-have-key-events": 0,
+    "jsx-a11y/label-has-associated-control": 0,
+    "jsx-a11y/interactive-supports-focus": 0,
+  },
+  "globals": {
+    "localStorage": true,
+    "shallow": true
+  },
+  "env": {
+    "jest": true,
+    "browser": true,
+    "node": true
+  }
+}

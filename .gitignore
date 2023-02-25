@@ -1,0 +1,7 @@
+/dist
+/node_modules
+/src/components/semantic/dist
+
+npm-debug.log
+.DS_Store
+.vs
