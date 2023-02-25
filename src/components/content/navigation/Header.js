@@ -1,0 +1,141 @@
+import React, { useContext } from 'react';
+import {
+  Header as MantineHeader,
+  Avatar,
+  Text,
+  Group,
+  Menu,
+  Button
+} from '@mantine/core';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { ChevronDown, Logout } from 'tabler-icons-react';
+import { links } from './links';
+import { mq } from '../../../config/theme';
+import { Context as AuthContext } from '../../../providers/AuthProvider';
+
+const Header = () => {
+  const navigate = useNavigate();
+  const { state, logout } = useContext(AuthContext);
+  const { pathname } = useLocation();
+
+  return (
+    <MantineHeader
+      fixed
+      height={60}
+      sx={{ flex: 1, display: 'flex', padding: 5 }}
+    >
+      <Group sx={{ flex: 1, flexWrap: 'nowrap' }}>
+        <Group
+          sx={{
+            gap: 20,
+            flex: 1,
+            flexWrap: 'nowrap'
+          }}
+        >
+          <Group sx={{ flex: 1 }}>
+            <Link
+              style={{
+                textDecoration: 'none',
+                color: 'black'
+              }}
+              to="/lanes"
+            >
+              <Group
+                sx={{
+                  gap: 10,
+                  flexWrap: 'nowrap'
+                }}
+              >
+                <Avatar radius="xl" variant="outline">
+                  WST
+                </Avatar>
+                <Text
+                  sx={mq({ fontSize: 20, display: ['none', 'block'] })}
+                  weight={700}
+                >
+                  WeedsTrue
+                </Text>
+              </Group>
+            </Link>
+          </Group>
+          <Group sx={{ flex: 3, gap: 100 }}>
+            {links.public.map(link => (
+              <Text
+                component={Link}
+                key={link.to}
+                sx={{
+                  padding: '5px 10px',
+                  fontSize: 18,
+                  lineHeight: '18px',
+                  fontWeight: link.isSelected(pathname) ? 700 : 500,
+                  borderBottom: link.isSelected(pathname)
+                    ? 'solid 1px black'
+                    : 'none',
+                  '&:hover': {
+                    fontWeight: 700,
+                    borderBottom: 'solid 2px black'
+                  }
+                }}
+                to={link.to}
+              >
+                {link.label}
+              </Text>
+            ))}
+          </Group>
+        </Group>
+        <Group sx={{ marginRight: 5 }}>
+          {state.isAuthenticated ? (
+            <Menu shadow="md" width={200}>
+              <Menu.Target>
+                <Button
+                  rightIcon={<ChevronDown />}
+                  sx={mq({})}
+                  variant="outline"
+                >
+                  <Group sx={{ gap: 10 }}>
+                    <Avatar color="blue" radius={100} size={29} src={null}>
+                      <Text>
+                        {state.userData?.firstName[0].toUpperCase()}
+                        {state.userData?.lastName[0].toUpperCase()}
+                      </Text>
+                    </Avatar>
+                    <Text>My Account</Text>
+                  </Group>
+                </Button>
+              </Menu.Target>
+
+              <Menu.Dropdown>
+                {links.public.map(link => (
+                  <Menu.Item
+                    icon={link.icon}
+                    key={link.to}
+                    onClick={() => navigate(link.to)}
+                  >
+                    {link.label}
+                  </Menu.Item>
+                ))}
+
+                <Menu.Divider />
+                <Menu.Item icon={<Logout size={20} />} onClick={() => logout()}>
+                  Logout
+                </Menu.Item>
+              </Menu.Dropdown>
+            </Menu>
+          ) : (
+            <Button
+              component="a"
+              href="/login"
+              sx={mq({ width: ['unset', 'unset', 125] })}
+            >
+              Sign In
+            </Button>
+          )}
+        </Group>
+      </Group>
+    </MantineHeader>
+  );
+};
+
+Header.propTypes = {};
+
+export default Header;
