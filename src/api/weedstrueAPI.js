@@ -3,7 +3,7 @@ import { getAuthToken, refreshAuthToken } from './auth';
 import { PRODUCTION } from '../config/constants';
 
 const weedstrueAPI = axios.create({
-  baseURL: PRODUCTION ? '' : 'https://localhost:5001'
+  baseURL: PRODUCTION ? '' : 'https://localhost:7264'
 });
 
 weedstrueAPI.interceptors.request.use(

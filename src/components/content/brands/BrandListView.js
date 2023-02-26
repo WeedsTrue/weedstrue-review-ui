@@ -1,11 +1,11 @@
 import React, { useContext, useEffect, useRef } from 'react';
 import { Card } from '@mantine/core';
 import BrandList from './BrandList';
-import { Provider as ReviewsProvider } from '../../../providers/ReviewsProvider';
+import { Context as ReviewsContext } from '../../../providers/ReviewsProvider';
 
 const BrandListView = () => {
   const hasFetched = useRef(false);
-  const { state, fetchBrands } = useContext(ReviewsProvider);
+  const { state, fetchBrands } = useContext(ReviewsContext);
 
   useEffect(() => {
     fetchBrands();
@@ -13,7 +13,7 @@ const BrandListView = () => {
   }, []);
 
   return (
-    <Card>
+    <Card sx={{ margin: '20px auto', width: '100%', maxWidth: 900 }}>
       <BrandList
         brands={state.brands.value}
         isLoading={!hasFetched.current || state.brands.loading}
