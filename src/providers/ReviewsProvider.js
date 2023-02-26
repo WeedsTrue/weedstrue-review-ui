@@ -2,7 +2,8 @@ import createProvider from './createProvider';
 import weedstrueAPI from '../api/weedstrueAPI';
 
 const initialState = {
-  brands: { value: [], loading: false, error: null }
+  brands: { value: [], loading: false, error: null },
+  brand: { value: null, loading: false, error: null }
 };
 
 const reducer = (state, action) => {
@@ -122,10 +123,33 @@ const fetchBrands = dispatch => async () => {
   }
 };
 
+const fetchBrand = dispatch => async uuid => {
+  try {
+    dispatch({
+      type: 'FETCHING',
+      stateName: 'brand'
+    });
+    const response = await weedstrueAPI.get(`/api/brands/${uuid}`);
+
+    dispatch({
+      type: 'SUCCESS',
+      stateName: 'brand',
+      payload: { value: response.data }
+    });
+  } catch (e) {
+    dispatch({
+      type: 'ERROR',
+      stateName: 'brand',
+      payload: 'Oops something went wrong.'
+    });
+  }
+};
+
 export const { Provider, Context } = createProvider(
   reducer,
   {
-    fetchBrands
+    fetchBrands,
+    fetchBrand
   },
   initialState
 );

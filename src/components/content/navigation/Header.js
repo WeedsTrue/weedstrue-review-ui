@@ -8,7 +8,7 @@ import {
   Button
 } from '@mantine/core';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { ChevronDown, Logout } from 'tabler-icons-react';
+import { ChevronDown, Leaf, Logout } from 'tabler-icons-react';
 import { links } from './links';
 import { mq } from '../../../config/theme';
 import { Context as AuthContext } from '../../../providers/AuthProvider';
@@ -42,13 +42,11 @@ const Header = () => {
             >
               <Group
                 sx={{
-                  gap: 10,
+                  gap: 1,
                   flexWrap: 'nowrap'
                 }}
               >
-                <Avatar radius="xl" variant="outline">
-                  WST
-                </Avatar>
+                <Leaf color="dodgerblue" size={40} />
                 <Text
                   sx={mq({ fontSize: 20, display: ['none', 'block'] })}
                   weight={700}
@@ -58,7 +56,7 @@ const Header = () => {
               </Group>
             </Link>
           </Group>
-          <Group sx={{ flex: 3, gap: 100 }}>
+          <Group sx={{ flex: 3, gap: 50 }}>
             {links.public.map(link => (
               <Text
                 component={Link}
