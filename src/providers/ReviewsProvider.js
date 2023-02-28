@@ -3,7 +3,9 @@ import weedstrueAPI from '../api/weedstrueAPI';
 
 const initialState = {
   brands: { value: [], loading: false, error: null },
-  brand: { value: null, loading: false, error: null }
+  brand: { value: null, loading: false, error: null },
+  products: { value: [], loading: false, error: null },
+  product: { value: null, loading: false, error: null }
 };
 
 const reducer = (state, action) => {
@@ -145,11 +147,57 @@ const fetchBrand = dispatch => async uuid => {
   }
 };
 
+const fetchProducts = dispatch => async () => {
+  try {
+    dispatch({
+      type: 'FETCHING',
+      stateName: 'products'
+    });
+    const response = await weedstrueAPI.get('/api/products');
+
+    dispatch({
+      type: 'SUCCESS',
+      stateName: 'products',
+      payload: { value: response.data }
+    });
+  } catch (e) {
+    dispatch({
+      type: 'ERROR',
+      stateName: 'products',
+      payload: 'Oops something went wrong.'
+    });
+  }
+};
+
+const fetchProduct = dispatch => async uuid => {
+  try {
+    dispatch({
+      type: 'FETCHING',
+      stateName: 'product'
+    });
+    const response = await weedstrueAPI.get(`/api/products/${uuid}`);
+
+    dispatch({
+      type: 'SUCCESS',
+      stateName: 'product',
+      payload: { value: response.data }
+    });
+  } catch (e) {
+    dispatch({
+      type: 'ERROR',
+      stateName: 'product',
+      payload: 'Oops something went wrong.'
+    });
+  }
+};
+
 export const { Provider, Context } = createProvider(
   reducer,
   {
+    fetchBrand,
     fetchBrands,
-    fetchBrand
+    fetchProduct,
+    fetchProducts
   },
   initialState
 );
