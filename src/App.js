@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useRef } from 'react';
 import { AppShell, Box, Loader, MantineProvider, Stack } from '@mantine/core';
-import { NotificationsProvider } from '@mantine/notifications';
+import { Notifications } from '@mantine/notifications';
 import {
   BrowserRouter as Router,
   Navigate,
@@ -71,12 +71,11 @@ export default () => (
   <AuthProvider>
     <ReviewsProvider>
       <MantineProvider theme={theme}>
-        <NotificationsProvider position="top-right">
-          <GlobalStyles />
-          <Router>
-            <App />
-          </Router>
-        </NotificationsProvider>
+        <Notifications position="top-right" />
+        <GlobalStyles />
+        <Router>
+          <App />
+        </Router>
       </MantineProvider>
     </ReviewsProvider>
   </AuthProvider>
