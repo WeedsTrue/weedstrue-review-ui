@@ -19,9 +19,16 @@ const DraftSelectItem = ({ userPost, isBeingEdited, onDelete, onSelect }) => {
       }}
     >
       <Notes color="grey" />
-      <Stack sx={{ flex: 1, gap: 5 }}>
+      <Stack sx={{ flex: 1, gap: 5, overflow: 'hidden' }}>
         <Text
-          sx={{ fontSize: 14, lineHeight: '16px' }}
+          sx={{
+            fontSize: 14,
+            lineHeight: '16px',
+            whiteSpace: 'pre',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            flex: 1
+          }}
           weight={isBeingEdited ? 700 : 'normal'}
         >
           {isBeingEdited ? `EDITING: ${userPost.title}` : userPost.title}
@@ -30,28 +37,30 @@ const DraftSelectItem = ({ userPost, isBeingEdited, onDelete, onSelect }) => {
           Draft Saved {dayjs(userPost.created).format('DD/MM/YYYY')}
         </Text>
       </Stack>
-      {confirmDelete ? (
-        <Text
-          color="red"
-          onClick={e => {
-            e.stopPropagation();
-            onDelete(userPost);
-          }}
-          weight={500}
-        >
-          {isBeingEdited ? 'Delete working draft?' : 'Confirm'}
-        </Text>
-      ) : (
-        <ActionIcon
-          onClick={e => {
-            e.stopPropagation();
-            setConfirmDelete(true);
-          }}
-          variant="transparent"
-        >
-          <Trash />
-        </ActionIcon>
-      )}
+      <Stack>
+        {confirmDelete ? (
+          <Text
+            color="red"
+            onClick={e => {
+              e.stopPropagation();
+              onDelete(userPost);
+            }}
+            weight={500}
+          >
+            {isBeingEdited ? 'Delete working draft?' : 'Confirm'}
+          </Text>
+        ) : (
+          <ActionIcon
+            onClick={e => {
+              e.stopPropagation();
+              setConfirmDelete(true);
+            }}
+            variant="transparent"
+          >
+            <Trash />
+          </ActionIcon>
+        )}
+      </Stack>
     </Group>
   );
 };
