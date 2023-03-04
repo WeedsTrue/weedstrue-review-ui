@@ -4,6 +4,7 @@ import weedstrueAPI from '../api/weedstrueAPI';
 const initialState = {
   brands: { value: [], loading: false, error: null },
   brand: { value: null, loading: false, error: null },
+  userPosts: { value: [], loading: false, error: null },
   products: { value: [], loading: false, error: null },
   product: { value: null, loading: false, error: null }
 };
@@ -191,13 +192,159 @@ const fetchProduct = dispatch => async uuid => {
   }
 };
 
+const fetchUserDrafts = dispatch => async uuid => {
+  try {
+    dispatch({
+      type: 'FETCHING',
+      stateName: 'userPosts'
+    });
+    const response = await weedstrueAPI.get('/api/userPosts/drafts');
+
+    dispatch({
+      type: 'SUCCESS',
+      stateName: 'userPosts',
+      payload: { value: response.data }
+    });
+  } catch (e) {
+    dispatch({
+      type: 'ERROR',
+      stateName: 'userPosts',
+      payload: 'Oops something went wrong.'
+    });
+  }
+};
+
+const createUserPost =
+  dispatch =>
+  async (
+    { title, content, draft, fkUserPostType, fkPostItem, postItemType },
+    onSuccessCallback,
+    onErrorCallback
+  ) => {
+    try {
+      dispatch({
+        type: 'FETCHING',
+        stateName: 'userPosts'
+      });
+      const response = await weedstrueAPI.post('/api/userPosts', {
+        title,
+        content,
+        draft,
+        fkUserPostType,
+        fkPostItem,
+        postItemType
+      });
+
+      dispatch({
+        type: 'APPEND',
+        stateName: 'userPosts',
+        payload: response.data
+      });
+      if (onSuccessCallback) {
+        onSuccessCallback(response.data);
+      }
+    } catch (e) {
+      const message = getErrorMessage(e);
+      dispatch({
+        type: 'ERROR',
+        stateName: 'userPosts',
+        payload: message
+      });
+      if (onErrorCallback) {
+        onErrorCallback(message);
+      }
+    }
+  };
+
+const updateUserPost =
+  dispatch =>
+  async (
+    pkUserPost,
+    { title, content, draft, fkUserPostType, fkPostItem, postItemType },
+    onSuccessCallback,
+    onErrorCallback
+  ) => {
+    try {
+      dispatch({
+        type: 'FETCHING',
+        stateName: 'userPosts'
+      });
+      const response = await weedstrueAPI.put(`/api/userPosts/${pkUserPost}`, {
+        title,
+        content,
+        draft,
+        fkUserPostType,
+        fkPostItem,
+        postItemType
+      });
+
+      dispatch({
+        type: 'REPLACE',
+        stateName: 'userPosts',
+        payload: {
+          filter: p => p.pkUserPost !== pkUserPost,
+          value: response.data
+        }
+      });
+      if (onSuccessCallback) {
+        onSuccessCallback(response.data);
+      }
+    } catch (e) {
+      const message = getErrorMessage(e);
+      dispatch({
+        type: 'ERROR',
+        stateName: 'userPosts',
+        payload: message
+      });
+      if (onErrorCallback) {
+        onErrorCallback(message);
+      }
+    }
+  };
+
+const deleteUserPost =
+  dispatch => async (pkUserPost, onSuccessCallback, onErrorCallback) => {
+    try {
+      dispatch({
+        type: 'FETCHING',
+        stateName: 'userPosts'
+      });
+      await weedstrueAPI.delete(`/api/userPosts/${pkUserPost}`);
+
+      dispatch({
+        type: 'REMOVE',
+        stateName: 'userPosts',
+        payload: {
+          filter: p => p.pkUserPost !== pkUserPost
+        }
+      });
+      if (onSuccessCallback) {
+        onSuccessCallback();
+      }
+    } catch (e) {
+      const message = getErrorMessage(e);
+      dispatch({
+        type: 'ERROR',
+        stateName: 'userPosts',
+        payload: message
+      });
+      if (onErrorCallback) {
+        onErrorCallback(message);
+      }
+    }
+  };
+
 export const { Provider, Context } = createProvider(
   reducer,
   {
+    createUserPost,
+    deleteUserPost,
     fetchBrand,
     fetchBrands,
     fetchProduct,
-    fetchProducts
+    fetchProducts,
+    fetchUserDrafts,
+    updateUserPost
   },
   initialState
 );

@@ -1,3 +1,4 @@
+import React from 'react';
 import { showNotification } from '@mantine/notifications';
 import { AlertCircle } from 'tabler-icons-react';
 const triggerNotification = (message, title, color) => {

@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useRef } from 'react';
-import { Card, Stack } from '@mantine/core';
+import { Stack } from '@mantine/core';
 import ProductList from './ProductList';
 import { Context as ReviewsContext } from '../../../providers/ReviewsProvider';
 
