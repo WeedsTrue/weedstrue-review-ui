@@ -4,6 +4,7 @@ import weedstrueAPI from '../api/weedstrueAPI';
 const initialState = {
   brands: { value: [], loading: false, error: null },
   brand: { value: null, loading: false, error: null },
+  comments: { value: [], loading: false, error: null },
   userPosts: { value: [], loading: false, error: null },
   userPost: { value: null, loading: false, error: null },
   products: { value: [], loading: false, error: null },
@@ -250,6 +251,12 @@ const fetchUserPost = dispatch => async uuid => {
       stateName: 'userPost',
       payload: { value: response.data }
     });
+
+    dispatch({
+      type: 'SUCCESS',
+      stateName: 'comments',
+      payload: { value: response.data.comments ?? [] }
+    });
   } catch (e) {
     dispatch({
       type: 'ERROR',
@@ -379,10 +386,83 @@ const deleteUserPost =
     }
   };
 
+const createComment =
+  dispatch =>
+  async (
+    { content, fkUserPost, fkCommentParent },
+    onSuccessCallback,
+    onErrorCallback
+  ) => {
+    try {
+      dispatch({
+        type: 'FETCHING',
+        stateName: 'comments'
+      });
+      const response = await weedstrueAPI.post('/api/userPosts/comments', {
+        content,
+        fkUserPost,
+        fkCommentParent
+      });
+
+      dispatch({
+        type: 'APPEND',
+        stateName: 'comments',
+        payload: response.data
+      });
+      if (onSuccessCallback) {
+        onSuccessCallback(response.data);
+      }
+    } catch (e) {
+      const message = getErrorMessage(e);
+      dispatch({
+        type: 'ERROR',
+        stateName: 'comments',
+        payload: message
+      });
+      if (onErrorCallback) {
+        onErrorCallback(message);
+      }
+    }
+  };
+
+const deleteComment =
+  dispatch => async (pkComment, onSuccessCallback, onErrorCallback) => {
+    try {
+      dispatch({
+        type: 'FETCHING',
+        stateName: 'comments'
+      });
+      await weedstrueAPI.delete(`/api/userPosts/comments/${pkComment}`);
+
+      dispatch({
+        type: 'REMOVE',
+        stateName: 'comments',
+        payload: {
+          filter: p => p.pkComment !== pkComment
+        }
+      });
+      if (onSuccessCallback) {
+        onSuccessCallback();
+      }
+    } catch (e) {
+      const message = getErrorMessage(e);
+      dispatch({
+        type: 'ERROR',
+        stateName: 'comments',
+        payload: message
+      });
+      if (onErrorCallback) {
+        onErrorCallback(message);
+      }
+    }
+  };
+
 export const { Provider, Context } = createProvider(
   reducer,
   {
+    createComment,
     createUserPost,
+    deleteComment,
     deleteUserPost,
     fetchBrand,
     fetchBrands,
