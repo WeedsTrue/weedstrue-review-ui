@@ -5,6 +5,7 @@ const initialState = {
   brands: { value: [], loading: false, error: null },
   brand: { value: null, loading: false, error: null },
   userPosts: { value: [], loading: false, error: null },
+  userPost: { value: null, loading: false, error: null },
   products: { value: [], loading: false, error: null },
   product: { value: null, loading: false, error: null }
 };
@@ -192,7 +193,7 @@ const fetchProduct = dispatch => async uuid => {
   }
 };
 
-const fetchUserDrafts = dispatch => async uuid => {
+const fetchUserDrafts = dispatch => async () => {
   try {
     dispatch({
       type: 'FETCHING',
@@ -209,6 +210,28 @@ const fetchUserDrafts = dispatch => async uuid => {
     dispatch({
       type: 'ERROR',
       stateName: 'userPosts',
+      payload: 'Oops something went wrong.'
+    });
+  }
+};
+
+const fetchUserPost = dispatch => async uuid => {
+  try {
+    dispatch({
+      type: 'FETCHING',
+      stateName: 'userPost'
+    });
+    const response = await weedstrueAPI.get(`/api/userPosts/${uuid}`);
+
+    dispatch({
+      type: 'SUCCESS',
+      stateName: 'userPost',
+      payload: { value: response.data }
+    });
+  } catch (e) {
+    dispatch({
+      type: 'ERROR',
+      stateName: 'userPost',
       payload: 'Oops something went wrong.'
     });
   }
@@ -344,6 +367,7 @@ export const { Provider, Context } = createProvider(
     fetchProduct,
     fetchProducts,
     fetchUserDrafts,
+    fetchUserPost,
     updateUserPost
   },
   initialState

@@ -2,6 +2,7 @@ import React from 'react';
 import {
   ActionIcon,
   Avatar,
+  Card,
   Group,
   Stack,
   Text,
@@ -15,39 +16,39 @@ import PostListItem from './PostListItem';
 const PostList = ({ userPosts, isLoading }) => {
   const navigate = useNavigate();
   return (
-    <Stack sx={{ gap: 20 }}>
-      <Group
-        sx={{
-          border: 'solid 1px lightgrey',
-          gap: 5,
-          padding: 10
-        }}
-      >
-        <Avatar
-          size={36}
-          styles={{ placeholderIcon: { height: '100%', width: '100%' } }}
-        />
-        <TextInput
-          onClick={() => navigate('submit')}
-          placeholder="Create Post"
-          styles={{
-            input: {
-              '&:hover': {
-                borderColor: 'dodgerblue'
-              }
-            }
-          }}
+    <Stack sx={{ flex: 1, gap: 15 }}>
+      <Card>
+        <Group
           sx={{
-            flex: 1
+            gap: 5
           }}
-        />
-        <ActionIcon component={Link} size={36} to="submit">
-          <Photo />
-        </ActionIcon>
-        <ActionIcon component={Link} size={36} to="submit">
-          <LinkIcon />
-        </ActionIcon>
-      </Group>
+        >
+          <Avatar
+            size={36}
+            styles={{ placeholderIcon: { height: '100%', width: '100%' } }}
+          />
+          <TextInput
+            onClick={() => navigate('submit')}
+            placeholder="Create Post"
+            styles={{
+              input: {
+                '&:hover': {
+                  borderColor: 'dodgerblue'
+                }
+              }
+            }}
+            sx={{
+              flex: 1
+            }}
+          />
+          <ActionIcon component={Link} size={36} to="submit">
+            <Photo />
+          </ActionIcon>
+          <ActionIcon component={Link} size={36} to="submit">
+            <LinkIcon />
+          </ActionIcon>
+        </Group>
+      </Card>
       {isLoading ? (
         <>
           <PostListItem />
@@ -56,11 +57,13 @@ const PostList = ({ userPosts, isLoading }) => {
           <PostListItem />
         </>
       ) : userPosts.length === 0 ? (
-        <Stack sx={{ padding: 60, border: 'solid 1px lightgrey' }}>
-          <Text sx={{ margin: 'auto' }} weight={500}>
-            No posts available
-          </Text>
-        </Stack>
+        <Card>
+          <Stack sx={{ padding: 60 }}>
+            <Text sx={{ margin: 'auto' }} weight={500}>
+              No posts available
+            </Text>
+          </Stack>
+        </Card>
       ) : (
         userPosts
           .sort((a, b) => new Date(b.created) - new Date(a.created))

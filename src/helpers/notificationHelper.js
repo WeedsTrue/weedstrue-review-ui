@@ -1,9 +1,9 @@
 import React from 'react';
-import { showNotification } from '@mantine/notifications';
+import { notifications } from '@mantine/notifications';
 import { AlertCircle } from 'tabler-icons-react';
 const triggerNotification = (message, title, color) => {
   const clr = color ?? 'red';
-  showNotification({
+  notifications.show({
     title: title ?? 'Error',
     message: message ?? 'Oops something went wrong.',
     color: clr,

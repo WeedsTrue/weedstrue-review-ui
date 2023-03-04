@@ -1,38 +1,53 @@
 import React from 'react';
-import { Rating, Stack, Text, Title } from '@mantine/core';
+import { Card, Rating, Stack, Text, Title } from '@mantine/core';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 
 const PostListItem = ({ userPost }) => {
   return (
-    <Stack
-      sx={{
-        border: 'solid 1px lightgrey',
-        padding: 10,
-        gap: 10,
-        overflow: 'hidden'
-      }}
-    >
-      <Title
-        order={4}
-        sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'pre' }}
-      >
-        {userPost.title}
-      </Title>
-      <Rating readOnly value={4} />
-      <Text
+    <Card>
+      <Stack
+        component={Link}
         sx={{
-          fontSize: 14,
+          gap: 10,
           overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          WebkitLineClamp: 3,
-          WebkitBoxOrient: 'vertical',
-          display: '-webkit-box',
-          whiteSpace: 'pre-wrap'
+          textDecoration: 'none',
+          color: '#000'
         }}
+        to={`/${userPost.postItemType}s/${userPost.postItemUuid}/posts/${
+          userPost.uuid
+        }/${userPost.title
+          .replace(/[^a-zA-Z' ']/g, '')
+          .split(' ')
+          .slice(0, 6)
+          .join('_')
+          .toLowerCase()}`}
       >
-        {userPost.content}
-      </Text>
-    </Stack>
+        <Title
+          order={4}
+          sx={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis'
+          }}
+        >
+          {userPost.title}
+        </Title>
+        <Rating readOnly value={4} />
+        <Text
+          sx={{
+            fontSize: 14,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            WebkitLineClamp: 3,
+            WebkitBoxOrient: 'vertical',
+            display: '-webkit-box',
+            whiteSpace: 'pre-wrap'
+          }}
+        >
+          {userPost.content}
+        </Text>
+      </Stack>
+    </Card>
   );
 };
 

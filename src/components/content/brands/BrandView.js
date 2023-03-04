@@ -4,6 +4,7 @@ import BrandDetails from './BrandDetails';
 import { triggerNotification } from '../../../helpers/notificationHelper';
 import { Context as ReviewsContext } from '../../../providers/ReviewsProvider';
 import CreatePost from '../posts/CreatePost';
+import PostDetails from '../posts/PostDetails';
 
 const BrandView = () => {
   const { uuid } = useParams();
@@ -26,6 +27,15 @@ const BrandView = () => {
           />
         }
         path="/submit"
+      />
+      <Route
+        element={
+          <PostDetails
+            isLoading={state.brand.loading}
+            postItem={state.brand.value}
+          />
+        }
+        path="/posts/:uuid/*"
       />
       <Route
         element={

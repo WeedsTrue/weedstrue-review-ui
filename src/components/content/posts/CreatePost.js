@@ -18,6 +18,8 @@ import { USER_POST_TYPE } from '../../../config/constants';
 import { triggerNotification } from '../../../helpers/notificationHelper';
 import { Context as ReviewsContext } from '../../../providers/ReviewsProvider';
 import FormSection from '../../common/FormSection';
+import BrandSidebarInfo from '../brands/BrandSidebarInfo';
+import ProductSidebarInfo from '../products/ProductSidebarInfo';
 
 const CreatePost = ({
   postItem,
@@ -125,7 +127,7 @@ const CreatePost = ({
     !isPostItemLoading && (
       <Group
         sx={{
-          gap: 30,
+          gap: 20,
           margin: '20px auto',
           width: '100%',
           maxWidth: 1100,
@@ -298,7 +300,13 @@ const CreatePost = ({
             </FormSection>
           </Card>
         </Stack>
-        <Stack sx={{ flex: 1 }}>{PostItemComponent}</Stack>
+        <Stack sx={{ flex: 1 }}>
+          {postType === 'brand' ? (
+            <BrandSidebarInfo brand={postItem} />
+          ) : (
+            postType === 'product' && <ProductSidebarInfo product={postItem} />
+          )}
+        </Stack>
         <DraftSelectModal
           isOpen={formState.isDraftSelectOpen}
           onClose={() =>
