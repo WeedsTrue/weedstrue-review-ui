@@ -1,6 +1,5 @@
 import React, { useContext, useEffect } from 'react';
 import { Group, Stack } from '@mantine/core';
-import { Navigate, Route, Routes } from 'react-router-dom';
 import PostList from '../components/content/posts/PostList';
 import { Context as ReviewsContext } from '../providers/ReviewsProvider';
 
@@ -20,7 +19,7 @@ const PostsView = () => {
         padding: 20
       }}
     >
-      <Stack sx={{ maxWidth: 900 }}>
+      <Stack sx={{ flex: 1, maxWidth: 900 }}>
         <PostList userPosts={state.userPosts.value} />
       </Stack>
     </Group>
