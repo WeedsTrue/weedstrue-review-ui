@@ -193,6 +193,28 @@ const fetchProduct = dispatch => async uuid => {
   }
 };
 
+const fetchUserPosts = dispatch => async () => {
+  try {
+    dispatch({
+      type: 'FETCHING',
+      stateName: 'userPosts'
+    });
+    const response = await weedstrueAPI.get('/api/userPosts');
+
+    dispatch({
+      type: 'SUCCESS',
+      stateName: 'userPosts',
+      payload: { value: response.data }
+    });
+  } catch (e) {
+    dispatch({
+      type: 'ERROR',
+      stateName: 'userPosts',
+      payload: 'Oops something went wrong.'
+    });
+  }
+};
+
 const fetchUserDrafts = dispatch => async () => {
   try {
     dispatch({
@@ -367,6 +389,7 @@ export const { Provider, Context } = createProvider(
     fetchProduct,
     fetchProducts,
     fetchUserDrafts,
+    fetchUserPosts,
     fetchUserPost,
     updateUserPost
   },

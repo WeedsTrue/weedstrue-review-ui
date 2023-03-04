@@ -17,6 +17,7 @@ import {
 } from './providers/AuthProvider';
 import { Provider as ReviewsProvider } from './providers/ReviewsProvider';
 import BrandsView from './views/BrandsView';
+import PostsView from './views/PostsView';
 import ProductsView from './views/ProductsView';
 
 const App = () => {
@@ -53,7 +54,7 @@ const App = () => {
           <Routes>
             <Route element={<BrandsView />} path="/brands/*" />
             <Route element={<ProductsView />} path="/products/*" />
-            <Route element={<ProductsView />} path="/" />
+            <Route element={<PostsView />} path="/" />
             {state.isAuthenticated ? <></> : <></>}
             <Route element={<Navigate replace to="/" />} path="*" />
           </Routes>
