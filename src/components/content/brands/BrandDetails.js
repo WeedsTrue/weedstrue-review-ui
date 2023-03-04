@@ -16,18 +16,17 @@ const BrandDetails = ({ brand, isLoading }) => {
       <Group
         id="testing"
         sx={{
-          margin: '10px auto',
-          width: '100%',
-          maxWidth: 1200,
           gap: 20,
-          placeItems: 'start'
+          placeItems: 'start',
+          justifyContent: 'center',
+          padding: 10
         }}
       >
-        <Stack style={{ flex: 5 }}>
+        <Stack style={{ flex: 1, maxWidth: 900 }}>
           <PostList userPosts={brand.userPosts} />
         </Stack>
 
-        <Stack style={{ flex: 2 }}>
+        <Stack style={{ flex: 1, maxWidth: 300 }}>
           <BrandSidebarInfo brand={brand} />
         </Stack>
       </Group>

@@ -20,16 +20,15 @@ const PostDetails = ({ postItem, isLoading }) => {
   return (
     <Group
       sx={{
-        margin: '20px auto',
-        flex: 1,
-        maxWidth: 1200,
+        padding: 20,
         gap: 20,
-        placeItems: 'start'
+        placeItems: 'start',
+        justifyContent: 'center'
       }}
     >
       {hasFetched.current && !state.userPost.loading && userPost && (
         <>
-          <Stack sx={{ gap: 40, flex: 5 }}>
+          <Stack sx={{ gap: 40, flex: 1, maxWidth: 900 }}>
             <Card shadow="xl" sx={{}}>
               <Stack sx={{ gap: 10 }}>
                 <Title
@@ -53,7 +52,7 @@ const PostDetails = ({ postItem, isLoading }) => {
               </Stack>
             </Card>
           </Stack>
-          <Stack style={{ flex: 2 }}>
+          <Stack style={{ flex: 1, maxWidth: 300 }}>
             {userPost.postItemType === 'product' ? (
               <ProductSidebarInfo product={postItem} />
             ) : (

@@ -15,18 +15,16 @@ const ProductDetails = ({ product, isLoading }) => {
       </Card>
       <Group
         sx={{
-          margin: ' auto',
-          width: '100%',
-          maxWidth: 1200,
           gap: 20,
-          placeItems: 'start'
+          placeItems: 'start',
+          justifyContent: 'center'
         }}
       >
-        <Stack style={{ flex: 5 }}>
+        <Stack style={{ flex: 1, maxWidth: 900 }}>
           <PostList userPosts={product.userPosts} />
         </Stack>
 
-        <Stack style={{ flex: 2 }}>
+        <Stack style={{ flex: 1, maxWidth: 300 }}>
           <ProductSidebarInfo product={product} />
         </Stack>
       </Group>

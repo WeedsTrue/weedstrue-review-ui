@@ -4,6 +4,13 @@ import { Archive } from 'tabler-icons-react';
 const links = {
   public: [
     {
+      label: 'Posts',
+      to: '/posts',
+      isGuestView: true,
+      icon: <Archive size={20} />,
+      isSelected: pathname => pathname === '/'
+    },
+    {
       label: 'Brands',
       to: '/brands',
       isGuestView: true,
