@@ -32,7 +32,7 @@ const App = () => {
 
   return (
     <AppShell
-      footer={<Footer />}
+      // footer={<Footer />}
       header={<Header />}
       padding={0}
       style={{
@@ -51,8 +51,8 @@ const App = () => {
       >
         {hasAttemptedToken.current && !state.loading ? (
           <Routes>
-            <Route element={<BrandsView />} path="brands/*" />
-            <Route element={<ProductsView />} path="products/*" />
+            <Route element={<BrandsView />} path="/brands/*" />
+            <Route element={<ProductsView />} path="/products/*" />
             <Route element={<ProductsView />} path="/" />
             {state.isAuthenticated ? <></> : <></>}
             <Route element={<Navigate replace to="/" />} path="*" />

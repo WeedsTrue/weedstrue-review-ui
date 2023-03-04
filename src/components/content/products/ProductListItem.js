@@ -1,9 +1,18 @@
 import React from 'react';
-import { Card, Rating, Stack, Tabs, Text, Title } from '@mantine/core';
+import {
+  Card,
+  Rating,
+  Skeleton,
+  Stack,
+  Text,
+  Title,
+  UnstyledButton
+} from '@mantine/core';
 import PropTypes from 'prop-types';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const ProductListItem = ({ product }) => {
+  const navigate = useNavigate();
   return product ? (
     <Card
       component={Link}
@@ -12,18 +21,25 @@ const ProductListItem = ({ product }) => {
       to={`/products/${product.uuid}`}
     >
       <Stack sx={{ flex: 1, padding: 10, alignItems: 'center', gap: 10 }}>
-        <Text
-          component={Link}
-          sx={{
-            fontSize: 14,
-            lineHeight: '14px',
-            color: 'dodgerblue',
-            '&:hover': { fontWeight: 500 }
+        <UnstyledButton
+          onClick={e => {
+            e.preventDefault();
+            e.stopPropagation();
+            navigate(`/brands/${product.brand.uuid}`);
           }}
-          to={`/brands/${product.brand.uuid}`}
         >
-          {product.brand.name}
-        </Text>
+          <Text
+            sx={{
+              fontSize: 14,
+              lineHeight: '14px',
+              color: 'dodgerblue',
+              '&:hover': { fontWeight: 500 }
+            }}
+          >
+            {product.brand.name}
+          </Text>
+        </UnstyledButton>
+
         <Title order={4} sx={{ textAlign: 'center' }}>
           {product.name}
         </Title>
@@ -31,7 +47,13 @@ const ProductListItem = ({ product }) => {
       </Stack>
     </Card>
   ) : (
-    <></>
+    <Card shadow="xl" sx={{ height: 350 }}>
+      <Stack sx={{ flex: 1, padding: 10, alignItems: 'center', gap: 15 }}>
+        <Skeleton height={14} width={100} />
+        <Skeleton height={18} width={200} />
+        <Skeleton height={18} width={100} />
+      </Stack>
+    </Card>
   );
 };
 
