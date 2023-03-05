@@ -1,5 +1,6 @@
 import createProvider from './createProvider';
 import weedstrueAPI from '../api/weedstrueAPI';
+import { USER_POST_EFFECT_TYPE } from '../config/effectConstants';
 
 const initialState = {
   brands: { value: [], loading: false, error: null },
@@ -269,7 +270,16 @@ const fetchUserPost = dispatch => async uuid => {
 const createUserPost =
   dispatch =>
   async (
-    { title, content, draft, fkUserPostType, fkPostItem, postItemType },
+    {
+      title,
+      content,
+      draft,
+      fkUserPostType,
+      fkPostItem,
+      postItemType,
+      effectTypes,
+      attributes
+    },
     onSuccessCallback,
     onErrorCallback
   ) => {
@@ -284,7 +294,9 @@ const createUserPost =
         draft,
         fkUserPostType,
         fkPostItem,
-        postItemType
+        postItemType,
+        effectTypes,
+        attributes
       });
 
       dispatch({
@@ -312,7 +324,16 @@ const updateUserPost =
   dispatch =>
   async (
     pkUserPost,
-    { title, content, draft, fkUserPostType, fkPostItem, postItemType },
+    {
+      title,
+      content,
+      draft,
+      fkUserPostType,
+      fkPostItem,
+      postItemType,
+      effectTypes,
+      attributes
+    },
     onSuccessCallback,
     onErrorCallback
   ) => {
@@ -327,7 +348,9 @@ const updateUserPost =
         draft,
         fkUserPostType,
         fkPostItem,
-        postItemType
+        postItemType,
+        effectTypes,
+        attributes
       });
 
       dispatch({

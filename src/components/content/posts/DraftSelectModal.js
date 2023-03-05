@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import {
   ActionIcon,
   Button,
@@ -25,19 +25,19 @@ const DraftSelectModal = ({
   return (
     <ResponsiveModal
       centered
+      lockScroll
       onClose={onClose}
       opened={isOpen}
       size={600}
-      style={{ padding: 0 }}
       styles={{
-        modal: {
+        body: {
           padding: '0px !important'
         }
       }}
-      transitionDuration={0}
+      sx={{ overflow: 'hidden' }}
       withCloseButton={false}
     >
-      <Stack sx={{ gap: 0 }}>
+      <Stack sx={{ gap: 0, flex: 1, overflow: 'hidden', maxWidth: 600 }}>
         <Group
           sx={{
             gap: 10,

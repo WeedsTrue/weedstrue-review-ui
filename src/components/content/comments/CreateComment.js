@@ -4,7 +4,12 @@ import PropTypes from 'prop-types';
 import { triggerNotification } from '../../../helpers/notificationHelper';
 import { Context as ReviewsContext } from '../../../providers/ReviewsProvider';
 
-const CreateComment = ({ fkUserPost, fkCommentParent, onSuccess }) => {
+const CreateComment = ({
+  fkUserPost,
+  fkCommentParent,
+  onSuccess,
+  onCancel
+}) => {
   const { createComment } = useContext(ReviewsContext);
   const [formState, setFormState] = useState({
     content: '',
@@ -56,6 +61,9 @@ const CreateComment = ({ fkUserPost, fkCommentParent, onSuccess }) => {
         }
         placeholder="What are your thoughts?"
         required
+        styles={{
+          input: { borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }
+        }}
         sx={{ flex: 1 }}
         value={formState.content}
       />
@@ -64,9 +72,24 @@ const CreateComment = ({ fkUserPost, fkCommentParent, onSuccess }) => {
           border: 'solid 1px lightgrey',
           borderTop: 'none',
           justifyContent: 'end',
-          padding: '5px 10px'
+          padding: '5px 10px',
+          borderBottomLeftRadius: '0.25rem',
+          borderBottomRightRadius: '0.25rem'
         }}
       >
+        {onCancel && (
+          <Button
+            disabled={formState.isLoading}
+            onClick={() => onCancel()}
+            radius="xl"
+            size="xs"
+            type="button"
+            variant="subtle"
+          >
+            Cancel
+          </Button>
+        )}
+
         <Button
           disabled={!formState.content}
           loading={formState.isLoading}
@@ -85,6 +108,7 @@ const CreateComment = ({ fkUserPost, fkCommentParent, onSuccess }) => {
 CreateComment.propTypes = {
   fkCommentParent: PropTypes.number,
   fkUserPost: PropTypes.number,
+  onCancel: PropTypes.func,
   onSuccess: PropTypes.func
 };
 

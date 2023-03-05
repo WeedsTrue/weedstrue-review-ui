@@ -3,14 +3,18 @@ import { ActionIcon, Group, Stack, Text } from '@mantine/core';
 import dayjs from 'dayjs';
 import PropTypes from 'prop-types';
 import { Notes, Trash } from 'tabler-icons-react';
+const relativeTime = require('dayjs/plugin/relativeTime');
 
 const DraftSelectItem = ({ userPost, isBeingEdited, onDelete, onSelect }) => {
+  dayjs.extend(relativeTime);
+
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   return (
     <Group
       onClick={() => onSelect(userPost)}
       sx={{
+        overflow: 'hidden',
         padding: '8px 16px',
         cursor: 'pointer',
         '&:hover': {
@@ -24,7 +28,7 @@ const DraftSelectItem = ({ userPost, isBeingEdited, onDelete, onSelect }) => {
           sx={{
             fontSize: 14,
             lineHeight: '16px',
-            whiteSpace: 'pre',
+            whiteSpace: 'nowrap',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             flex: 1
@@ -34,7 +38,7 @@ const DraftSelectItem = ({ userPost, isBeingEdited, onDelete, onSelect }) => {
           {isBeingEdited ? `EDITING: ${userPost.title}` : userPost.title}
         </Text>
         <Text sx={{ fontSize: 14, lineHeight: '16px' }}>
-          Draft Saved {dayjs(userPost.created).format('DD/MM/YYYY')}
+          Draft Saved {dayjs(userPost.created).fromNow()}
         </Text>
       </Stack>
       <Stack>
