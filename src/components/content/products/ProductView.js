@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
 import { Navigate, Route, Routes, useParams } from 'react-router-dom';
 import ProductDetails from './ProductDetails';
 import { triggerNotification } from '../../../helpers/notificationHelper';
@@ -7,12 +7,14 @@ import CreatePost from '../posts/CreatePost';
 import PostDetails from '../posts/PostDetails';
 
 const ProductView = () => {
+  const hasFetched = useRef(false);
   const { state, fetchProduct } = useContext(ReviewsContext);
   const { uuid } = useParams();
 
   useEffect(() => {
     if (uuid) {
       fetchProduct(uuid, () => {}, triggerNotification);
+      hasFetched.current = true;
     }
   }, [uuid]);
 
@@ -31,7 +33,7 @@ const ProductView = () => {
       <Route
         element={
           <PostDetails
-            isLoading={state.product.loading}
+            isLoading={!hasFetched.current || state.product.loading}
             postItem={state.product.value}
           />
         }
@@ -40,7 +42,7 @@ const ProductView = () => {
       <Route
         element={
           <ProductDetails
-            isLoading={state.product.loading}
+            isLoading={!hasFetched.current || state.product.loading}
             product={state.product.value}
           />
         }

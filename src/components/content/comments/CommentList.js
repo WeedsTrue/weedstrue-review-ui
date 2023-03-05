@@ -1,8 +1,7 @@
 import React from 'react';
-import { Card, Group, Stack, Text } from '@mantine/core';
+import { Card, Stack, Text } from '@mantine/core';
 import PropTypes from 'prop-types';
 import CommentListItem from './CommentListItem';
-import CreateComment from './CreateComment';
 
 const CommentList = ({ userPost, comments, isLoading }) => {
   const commentsSorted = comments.sort(
@@ -13,14 +12,6 @@ const CommentList = ({ userPost, comments, isLoading }) => {
 
   return (
     <Stack sx={{ flex: 1, gap: 15 }}>
-      <Group
-        sx={{
-          gap: 5,
-          flex: 1
-        }}
-      >
-        <CreateComment fkUserPost={userPost.pkUserPost} />
-      </Group>
       {isLoading ? (
         <>
           <CommentListItem />

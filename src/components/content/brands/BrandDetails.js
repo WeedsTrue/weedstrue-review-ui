@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Group, Rating, Stack, Title } from '@mantine/core';
+import { Card, Group, Rating, Skeleton, Stack, Title } from '@mantine/core';
 import PropTypes from 'prop-types';
 import BrandSidebarInfo from './BrandSidebarInfo';
 import PostList from '../posts/PostList';
@@ -22,17 +22,39 @@ const BrandDetails = ({ brand, isLoading }) => {
           padding: 10
         }}
       >
-        <Stack style={{ flex: 1, maxWidth: 900 }}>
+        <Stack style={{ flex: 1, maxWidth: 768 }}>
           <PostList userPosts={brand.userPosts} />
         </Stack>
 
-        <Stack style={{ flex: 1, maxWidth: 300 }}>
+        <Stack style={{ flex: 1, maxWidth: 332 }}>
           <BrandSidebarInfo brand={brand} />
         </Stack>
       </Group>
     </Stack>
   ) : (
-    <></>
+    <Stack sx={{ gap: 20 }}>
+      <Card>
+        <Stack sx={{ flex: 1, padding: 20, alignItems: 'center', gap: 10 }}>
+          <Skeleton height={45} width="25%" />
+          <Skeleton height={20} width={100} />
+        </Stack>
+      </Card>
+      <Group
+        sx={{
+          gap: 20,
+          placeItems: 'start',
+          justifyContent: 'center'
+        }}
+      >
+        <Stack style={{ flex: 1, maxWidth: 768 }}>
+          <PostList isLoading />
+        </Stack>
+
+        <Stack style={{ flex: 1, maxWidth: 332 }}>
+          <BrandSidebarInfo />
+        </Stack>
+      </Group>
+    </Stack>
   );
 };
 

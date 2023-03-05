@@ -480,11 +480,99 @@ const deleteComment =
     }
   };
 
+const createUserPostReaction =
+  dispatch =>
+  async ({ fkUserPost, isPositive }, onSuccessCallback, onErrorCallback) => {
+    try {
+      await weedstrueAPI.post(`/api/userPosts/${fkUserPost}/reaction`, null, {
+        params: {
+          isPositive
+        }
+      });
+      if (onSuccessCallback) {
+        onSuccessCallback();
+      }
+    } catch (e) {
+      const message = getErrorMessage(e);
+      if (onErrorCallback) {
+        onErrorCallback(message);
+      }
+    }
+  };
+
+const createCommentReaction =
+  dispatch =>
+  async ({ fkComment, isPositive }, onSuccessCallback, onErrorCallback) => {
+    try {
+      await weedstrueAPI.post(
+        `/api/userPosts/comments/${fkComment}/reaction`,
+        null,
+        {
+          params: {
+            isPositive
+          }
+        }
+      );
+      if (onSuccessCallback) {
+        onSuccessCallback();
+      }
+    } catch (e) {
+      const message = getErrorMessage(e);
+      if (onErrorCallback) {
+        onErrorCallback(message);
+      }
+    }
+  };
+
+const createProductReaction =
+  dispatch =>
+  async ({ fkProduct, isPositive }, onSuccessCallback, onErrorCallback) => {
+    try {
+      await weedstrueAPI.post(`/api/products/${fkProduct}/reaction`, null, {
+        params: {
+          isPositive
+        }
+      });
+      if (onSuccessCallback) {
+        onSuccessCallback();
+      }
+    } catch (e) {
+      const message = getErrorMessage(e);
+      if (onErrorCallback) {
+        onErrorCallback(message);
+      }
+    }
+  };
+
+const createBrandReaction =
+  dispatch =>
+  async ({ fkBrand, isPositive }, onSuccessCallback, onErrorCallback) => {
+    try {
+      await weedstrueAPI.post(`/api/brands/${fkBrand}/reaction`, null, {
+        params: {
+          isPositive
+        }
+      });
+      if (onSuccessCallback) {
+        onSuccessCallback();
+      }
+    } catch (e) {
+      const message = getErrorMessage(e);
+      if (onErrorCallback) {
+        onErrorCallback(message);
+      }
+    }
+  };
+
 export const { Provider, Context } = createProvider(
   reducer,
   {
+    createBrandReaction,
     createComment,
+    createCommentReaction,
+    createProductReaction,
     createUserPost,
+    createUserPostReaction,
     deleteComment,
     deleteUserPost,
     fetchBrand,
