@@ -295,18 +295,20 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
                     required
                     value={formState.content}
                   />
-                  {formState.fkUserPostType === USER_POST_TYPE.REVIEW.value && (
-                    <CreatePostReviewAdditions
-                      onPostReviewStateChange={newReviewState =>
-                        setFormState({
-                          ...formState,
-                          reviewState: newReviewState,
-                          hasUnsavedChanges: true
-                        })
-                      }
-                      postReviewState={formState.reviewState}
-                    />
-                  )}
+                  {postType === 'product' &&
+                    formState.fkUserPostType ===
+                      USER_POST_TYPE.REVIEW.value && (
+                      <CreatePostReviewAdditions
+                        onPostReviewStateChange={newReviewState =>
+                          setFormState({
+                            ...formState,
+                            reviewState: newReviewState,
+                            hasUnsavedChanges: true
+                          })
+                        }
+                        postReviewState={formState.reviewState}
+                      />
+                    )}
                 </Stack>
 
                 <Divider />
