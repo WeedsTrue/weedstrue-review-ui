@@ -30,15 +30,15 @@ const PostList = ({ userPosts, isLoading }) => {
           <TextInput
             onClick={() => navigate('submit')}
             placeholder="Create Post"
+            style={{
+              flex: 1
+            }}
             styles={{
               input: {
                 '&:hover': {
                   borderColor: 'dodgerblue'
                 }
               }
-            }}
-            sx={{
-              flex: 1
             }}
           />
           <ActionIcon component={Link} size={36} to="submit">

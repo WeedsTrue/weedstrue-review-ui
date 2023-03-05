@@ -75,6 +75,7 @@ const CommentListItem = ({ comment, replyComments }) => {
             <CreateComment
               fkCommentParent={comment.pkComment}
               fkUserPost={comment.fkUserPost}
+              onCancel={() => setShowReplyBox(false)}
               onSuccess={() => setShowReplyBox(false)}
             />
           </Stack>
