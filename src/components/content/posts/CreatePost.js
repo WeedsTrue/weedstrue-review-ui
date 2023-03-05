@@ -362,7 +362,7 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
               </FormSection>
             </Card>
           </Stack>
-          <Stack sx={{ flex: 1 }}>
+          <Stack style={{ flex: 1, maxWidth: 332 }}>
             {postType === 'brand' ? (
               <BrandSidebarInfo brand={postItem} />
             ) : (

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
 import { Navigate, Route, Routes, useParams } from 'react-router-dom';
 import BrandDetails from './BrandDetails';
 import { triggerNotification } from '../../../helpers/notificationHelper';
@@ -7,12 +7,14 @@ import CreatePost from '../posts/CreatePost';
 import PostDetails from '../posts/PostDetails';
 
 const BrandView = () => {
+  const hasFetched = useRef(false);
   const { uuid } = useParams();
   const { state, fetchBrand } = useContext(ReviewsContext);
 
   useEffect(() => {
     if (uuid) {
       fetchBrand(uuid, () => {}, triggerNotification);
+      hasFetched.current = true;
     }
   }, [uuid]);
 
@@ -31,7 +33,7 @@ const BrandView = () => {
       <Route
         element={
           <PostDetails
-            isLoading={state.brand.loading}
+            isLoading={!hasFetched.current || state.brand.loading}
             postItem={state.brand.value}
           />
         }
@@ -41,7 +43,7 @@ const BrandView = () => {
         element={
           <BrandDetails
             brand={state.brand.value}
-            isLoading={state.brand.loading}
+            isLoading={!hasFetched.current || state.brand.loading}
           />
         }
         path="/"

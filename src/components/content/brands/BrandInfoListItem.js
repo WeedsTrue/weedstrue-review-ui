@@ -7,55 +7,27 @@ import {
   Skeleton,
   Stack,
   Text,
-  Title,
-  UnstyledButton
+  Title
 } from '@mantine/core';
 import PropTypes from 'prop-types';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Leaf } from 'tabler-icons-react';
 import { Context as ReviewsContext } from '../../../providers/ReviewsProvider';
 
-const ProductListItem = ({ product }) => {
-  const { createProductReaction } = useContext(ReviewsContext);
+const BrandInfoListItem = ({ brand }) => {
+  const { createBrandReaction } = useContext(ReviewsContext);
   const [reactionState, setReactionState] = useState(0);
 
-  const navigate = useNavigate();
-  return product ? (
+  return brand ? (
     <Card
       component={Link}
       shadow="xl"
       sx={{ height: 350, display: 'flex' }}
-      to={`/products/${product.uuid}`}
+      to={`/brands/${brand.uuid}`}
     >
-      <Stack
-        sx={{
-          flex: 1,
-          padding: 10,
-          alignItems: 'center',
-          gap: 10
-        }}
-      >
-        <UnstyledButton
-          onClick={e => {
-            e.preventDefault();
-            e.stopPropagation();
-            navigate(`/brands/${product.brand.uuid}`);
-          }}
-        >
-          <Text
-            sx={{
-              fontSize: 14,
-              lineHeight: '14px',
-              color: 'dodgerblue',
-              '&:hover': { fontWeight: 500 }
-            }}
-          >
-            {product.brand.name}
-          </Text>
-        </UnstyledButton>
-
+      <Stack sx={{ flex: 1, padding: 10, alignItems: 'center', gap: 10 }}>
         <Title order={4} sx={{ textAlign: 'center' }}>
-          {product.name}
+          {brand.name}
         </Title>
         <Rating readOnly value={Math.floor(Math.random() * 5) + 1}></Rating>
         <Stack sx={{ flex: 1 }}></Stack>
@@ -66,9 +38,9 @@ const ProductListItem = ({ product }) => {
               onClick={e => {
                 e.preventDefault();
                 setReactionState(1);
-                createProductReaction(
+                createBrandReaction(
                   {
-                    fkProduct: product.pkProduct,
+                    fkBrand: brand.pkBrand,
                     isPositive: true
                   },
                   () => {},
@@ -83,8 +55,8 @@ const ProductListItem = ({ product }) => {
               <Leaf />
             </ActionIcon>
             <Text size={14} weight={500}>
-              {product.positiveReactionCount -
-                product.negativeReactionCount +
+              {brand.positiveReactionCount -
+                brand.negativeReactionCount +
                 reactionState}
             </Text>
             <ActionIcon
@@ -92,9 +64,9 @@ const ProductListItem = ({ product }) => {
               onClick={e => {
                 e.preventDefault();
                 setReactionState(-1);
-                createProductReaction(
+                createBrandReaction(
                   {
-                    fkProduct: product.pkProduct,
+                    fkBrand: brand.pkBrand,
                     isPositive: false
                   },
                   () => {},
@@ -120,9 +92,8 @@ const ProductListItem = ({ product }) => {
       </Stack>
     </Card>
   ) : (
-    <Card shadow="xl" sx={{ height: 350, display: 'flex' }}>
+    <Card shadow="xl" sx={{ height: 350 }}>
       <Stack sx={{ flex: 1, padding: 10, alignItems: 'center', gap: 15 }}>
-        <Skeleton height={14} width={100} />
         <Skeleton height={18} width={200} />
         <Skeleton height={18} width={100} />
       </Stack>
@@ -130,8 +101,8 @@ const ProductListItem = ({ product }) => {
   );
 };
 
-ProductListItem.propTypes = {
-  product: PropTypes.object
+BrandInfoListItem.propTypes = {
+  brand: PropTypes.object
 };
 
-export default ProductListItem;
+export default BrandInfoListItem;
