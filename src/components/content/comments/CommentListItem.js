@@ -21,7 +21,7 @@ const CommentListItem = ({ comment, replyComments }) => {
       <Group sx={{ gap: 3, placeItems: 'center' }}>
         <Avatar size={45} />
         <Text sx={{ fontSize: 14 }} weight={500}>
-          Gmoney
+          {comment.user.username}
         </Text>
         <Point size={5} />
         <Text color="grey" sx={{ fontSize: 12 }}>

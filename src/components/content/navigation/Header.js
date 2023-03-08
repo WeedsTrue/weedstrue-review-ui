@@ -15,7 +15,7 @@ import { Context as AuthContext } from '../../../providers/AuthProvider';
 
 const Header = () => {
   const navigate = useNavigate();
-  const { state, logout } = useContext(AuthContext);
+  const { state, logout, toggleAuthModal } = useContext(AuthContext);
   const { pathname } = useLocation();
 
   return (
@@ -92,10 +92,7 @@ const Header = () => {
                 >
                   <Group sx={{ gap: 10 }}>
                     <Avatar color="blue" radius={100} size={29} src={null}>
-                      <Text>
-                        {state.userData?.firstName[0].toUpperCase()}
-                        {state.userData?.lastName[0].toUpperCase()}
-                      </Text>
+                      <Text>{state.userData.username[0].toUpperCase()}</Text>
                     </Avatar>
                     <Text>My Account</Text>
                   </Group>
@@ -121,11 +118,11 @@ const Header = () => {
             </Menu>
           ) : (
             <Button
-              component="a"
-              href="/login"
+              onClick={() => toggleAuthModal(true)}
+              radius="xl"
               sx={mq({ width: ['unset', 'unset', 125] })}
             >
-              Sign In
+              Log In
             </Button>
           )}
         </Group>

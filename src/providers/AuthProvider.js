@@ -1,12 +1,12 @@
+import { Auth } from '@aws-amplify/auth';
 import createProvider from './createProvider';
-import { getAuthToken } from '../api/auth';
 import weedstrueAPI from '../api/weedstrueAPI';
 
 const initialState = {
-  email: '',
-  password: '',
+  username: '',
+  showAuthModal: false,
   isAuthenticated: false,
-  isGuest: false,
+  isAdmin: false,
   tokenAttempted: false,
   userData: null,
   userGroups: [],
@@ -27,6 +27,7 @@ const reducer = (state, action) => {
       return {
         ...state,
         loading: false,
+        error: null,
         ...action.payload
       };
     case 'ERROR':
@@ -51,36 +52,20 @@ const getErrorMessage = error => {
 const tokenLogin = dispatch => async () => {
   try {
     dispatch({ type: 'FETCHING', payload: { tokenAttempted: true } });
+    await Auth.currentAuthenticatedUser();
+    const response = await weedstrueAPI.post('/api/auth/login', null);
 
-    const token = await getAuthToken();
-    if (token) {
-      const response = await weedstrueAPI.post('/api/account/refresh-token', {
-        token: token.refreshToken
-      });
-      window.localStorage.setItem(
-        'session',
-        JSON.stringify(response.data.token)
-      );
-
-      dispatch({
-        type: 'SUCCESS',
-        payload: {
-          userData: response.data.user,
-          userGroups: response.data.groups,
-          isAuthenticated: true,
-          tokenAttempted: true
-        }
-      });
-    } else {
-      dispatch({
-        type: 'SUCCESS',
-        payload: {}
-      });
-    }
+    dispatch({
+      type: 'SUCCESS',
+      payload: {
+        isAdmin: response.data.isAdmin,
+        userData: response.data.user,
+        userGroups: [],
+        isAuthenticated: true,
+        tokenAttempted: true
+      }
+    });
   } catch (e) {
-    if (e.response?.status === 401) {
-      window.localStorage.removeItem('session');
-    }
     dispatch({
       type: 'ERROR',
       payload: null
@@ -90,158 +75,220 @@ const tokenLogin = dispatch => async () => {
 
 const login =
   dispatch =>
-  async ({ email, password }, onSuccessCallback, onErrorCallback) => {
+  async ({ username, password }, onSuccessCallback, onErrorCallback) => {
     try {
-      dispatch({ type: 'SUCCESS', payload: { email, password } });
-      const response = await weedstrueAPI.post('/api/account/authorize', {
-        email,
-        password
-      });
-      window.localStorage.setItem(
-        'session',
-        JSON.stringify(response.data.token)
-      );
-
       dispatch({
         type: 'SUCCESS',
         payload: {
-          userData: response.data.user,
-          userGroups: response.data.groups,
-          isAuthenticated: true
+          username
         }
       });
-
+      await Auth.signIn(username.trim(), password.trim());
+      const response = await weedstrueAPI.post('/api/auth/login', null);
+      dispatch({
+        type: 'SUCCESS',
+        payload: {
+          isAdmin: response.data.isAdmin,
+          userData: response.data.user,
+          userGroups: [],
+          isAuthenticated: true,
+          tokenAttempted: true
+        }
+      });
       if (onSuccessCallback) {
         onSuccessCallback();
       }
-    } catch (e) {
-      const error =
-        e.response.status === 401
-          ? 'Invalid Login'
-          : 'Oops something went wrong.';
-      dispatch({ type: 'ERROR', payload: error });
-
-      if (onErrorCallback) {
-        onErrorCallback(e);
+    } catch (error) {
+      let errorMessage = '';
+      switch (error.message) {
+        case 'Incorrect username or password.':
+          errorMessage = 'Incorrect username or password.';
+          break;
+        case 'User is not confirmed.':
+          errorMessage = 'User is not confirmed.';
+          break;
+        default:
+          errorMessage = 'Oops something went wrong';
+          break;
       }
+      if (onErrorCallback) {
+        onErrorCallback(errorMessage);
+      }
+      dispatch({ type: 'ERROR', payload: error });
     }
   };
 
-const register =
+const signUp =
   dispatch =>
-  async (
-    { firstName, lastName, email, password, confirmPassword },
-    onSuccessCallback,
-    onErrorCallback
-  ) => {
+  async ({ username, email, password }, onSuccessCallback, onErrorCallback) => {
     try {
-      await weedstrueAPI.post('/api/account/register', {
-        firstName,
-        lastName,
-        email,
-        password,
-        confirmPassword
+      dispatch({
+        type: 'SUCCESS',
+        payload: {
+          username
+        }
       });
-
-      dispatch({ type: 'SUCCESS', payload: { email, password } });
-
+      await Auth.signUp({
+        username,
+        password,
+        preferred_username: username,
+        attributes: {
+          email
+        },
+        autoSignIn: {
+          enabled: true
+        }
+      });
       if (onSuccessCallback) {
         onSuccessCallback();
       }
-    } catch (e) {
-      const error = getErrorMessage(e);
-      dispatch({ type: 'ERROR', payload: error });
-
-      if (onErrorCallback) {
-        onErrorCallback(e);
+    } catch (error) {
+      let errorMessage = '';
+      switch (error.message) {
+        case 'User already exists':
+          errorMessage = 'That username is already taken';
+          break;
+        case 'Password did not conform with policy: Password not long enough':
+          errorMessage = 'Password not long enough';
+          break;
+        default:
+          errorMessage = 'Oops something went wrong';
+          break;
       }
+      if (onErrorCallback) {
+        onErrorCallback(errorMessage);
+      }
+      dispatch({ type: 'ERROR', payload: error });
     }
   };
 
 const sendPasswordReset =
   dispatch =>
-  async ({ email }, onSuccessCallback, onErrorCallback) => {
+  async ({ username }, onSuccessCallback, onErrorCallback) => {
+    dispatch({
+      type: 'SUCCESS',
+      payload: {
+        username
+      }
+    });
     try {
-      await weedstrueAPI.post('/api/account/reset-password', {
-        email
-      });
-
-      dispatch({ type: 'SUCCESS', payload: { email } });
-
+      await Auth.forgotPassword(username);
       if (onSuccessCallback) {
         onSuccessCallback();
       }
-    } catch (e) {
-      dispatch({ type: 'ERROR', payload: 'Oops something went wrong.' });
-
-      if (onErrorCallback) {
-        onErrorCallback(e);
+    } catch (error) {
+      let errorMessage = '';
+      switch (error.message) {
+        default:
+          errorMessage = 'Oops something went wrong';
+          break;
       }
+      if (onErrorCallback) {
+        onErrorCallback(errorMessage);
+      }
+      dispatch({ type: 'ERROR', payload: error });
     }
   };
 
 const resetPassword =
   dispatch =>
   async (
-    { email, newPassword, confirmPassword, code },
+    { username, code, newPassword },
     onSuccessCallback,
     onErrorCallback
   ) => {
     try {
-      await weedstrueAPI.post('/api/account/reset-password/confirm', {
-        email,
-        newPassword,
-        confirmPassword,
-        code
-      });
-
-      dispatch({
-        type: 'SUCCESS',
-        payload: { email, password: newPassword }
-      });
-
+      await Auth.forgotPasswordSubmit(username, code, newPassword);
       if (onSuccessCallback) {
         onSuccessCallback();
       }
-    } catch (e) {
-      const error = getErrorMessage(e);
-      dispatch({ type: 'ERROR', payload: error });
-
-      if (onErrorCallback) {
-        onErrorCallback(e);
+    } catch (error) {
+      let errorMessage = '';
+      switch (error.message) {
+        case 'Invalid code provided, please request a code again.':
+          errorMessage = 'Invalid code.';
+          break;
+        default:
+          errorMessage = 'Oops something went wrong';
+          break;
       }
+      if (onErrorCallback) {
+        onErrorCallback(errorMessage);
+      }
+      dispatch({ type: 'ERROR', payload: error });
     }
   };
 
-const changePassword =
+const sendConfirmationCode =
   dispatch =>
-  async (
-    { currentPassword, newPassword, confirmNewPassword },
-    onSuccessCallback,
-    onErrorCallback
-  ) => {
+  async ({ username }, onSuccessCallback, onErrorCallback) => {
+    dispatch({
+      type: 'SUCCESS',
+      payload: {
+        username
+      }
+    });
     try {
-      await weedstrueAPI.post('/api/account/change-password', {
-        currentPassword,
-        newPassword,
-        confirmNewPassword
-      });
-
+      await Auth.resendSignUp(username);
       if (onSuccessCallback) {
         onSuccessCallback();
       }
-    } catch (e) {
-      if (onErrorCallback) {
-        onErrorCallback(
-          e.response?.data?.message ?? 'Oops something went wrong.'
-        );
+    } catch (error) {
+      let errorMessage = '';
+      switch (error.message) {
+        default:
+          errorMessage = 'Oops something went wrong';
+          break;
       }
+      if (onErrorCallback) {
+        onErrorCallback(errorMessage);
+      }
+      dispatch({ type: 'ERROR', payload: error });
+    }
+  };
+
+const confirmAccount =
+  dispatch =>
+  async ({ username, code }, onSuccessCallback, onErrorCallback) => {
+    try {
+      await Auth.confirmSignUp(username, code);
+      if (onSuccessCallback) {
+        onSuccessCallback();
+      }
+    } catch (error) {
+      let errorMessage = '';
+      switch (error.message) {
+        default:
+          errorMessage = 'Oops something went wrong';
+          break;
+      }
+      if (onErrorCallback) {
+        onErrorCallback(errorMessage);
+      }
+      dispatch({ type: 'ERROR', payload: error });
     }
   };
 
 const logout = dispatch => async () => {
-  window.localStorage.removeItem('session');
-  dispatch({ type: 'RESET' });
+  try {
+    await Auth.signOut();
+    dispatch({ type: 'RESET' });
+  } catch (error) {
+    dispatch({ type: 'ERROR', payload: error });
+  }
+};
+
+const toggleAuthModal = dispatch => async isOpen => {
+  try {
+    dispatch({
+      type: 'SUCCESS',
+      payload: {
+        showAuthModal: isOpen
+      }
+    });
+  } catch (error) {
+    dispatch({ type: 'ERROR', payload: error });
+  }
 };
 
 const clearError = dispatch => async () => {
@@ -250,16 +297,19 @@ const clearError = dispatch => async () => {
     payload: null
   });
 };
+
 export const { Provider, Context } = createProvider(
   reducer,
   {
-    changePassword,
     clearError,
+    confirmAccount,
     login,
     logout,
-    register,
+    signUp,
     resetPassword,
+    sendConfirmationCode,
     sendPasswordReset,
+    toggleAuthModal,
     tokenLogin
   },
   initialState

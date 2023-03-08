@@ -1,5 +1,5 @@
+import { Auth } from '@aws-amplify/auth';
 import axios from 'axios';
-import { getAuthToken, refreshAuthToken } from './auth';
 import { PRODUCTION } from '../config/constants';
 
 const weedstrueAPI = axios.create({
@@ -8,35 +8,21 @@ const weedstrueAPI = axios.create({
 
 weedstrueAPI.interceptors.request.use(
   async config => {
-    const token = await getAuthToken();
-    if (token) {
-      config.headers = {
-        Authorization: `Bearer ${token.accessToken}`
-      };
-    }
+    try {
+      const token = (await Auth.currentSession()).getIdToken().getJwtToken();
+      if (token) {
+        config.headers = {
+          Authorization: `Bearer ${token}`
+        };
+        config.withCredentials = true;
+      }
+    } catch {}
     return config;
   },
   error => {
-    Promise.reject(error);
-  }
-);
+    console.log(error);
 
-weedstrueAPI.interceptors.response.use(
-  response => {
-    return response;
-  },
-  async function (error) {
-    const originalRequest = error.config;
-    if (error.response.status === 401 && !originalRequest.__isRetryRequest) {
-      originalRequest.__isRetryRequest = true;
-      await refreshAuthToken();
-      const token = await getAuthToken();
-      if (token) {
-        axios.defaults.headers.common.Authorization = `Bearer ${token.accessToken}`;
-        return weedstrueAPI(originalRequest);
-      }
-    }
-    return Promise.reject(error);
+    Promise.reject(error);
   }
 );
 

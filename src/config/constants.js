@@ -1,4 +1,18 @@
+import Auth from '@aws-amplify/auth';
+
 const PRODUCTION = false;
+
+const AWS_COGNITO_SETTINGS = {
+  Auth: {
+    identityPoolId: 'us-east-1:074c2f3e-8539-49e4-9c3b-fec7d63d7bc4',
+    region: 'us-east-1',
+    userPoolId: 'us-east-1_7qZzoWH6v',
+    userPoolWebClientId: '3sjhbgb9k4m0b54j3k7vqivq9j',
+    mandatorySignIn: true
+  }
+};
+
+Auth.configure(AWS_COGNITO_SETTINGS);
 
 const PRODUCT_TYPE = {
   DRY_FLOWER: {
@@ -66,6 +80,7 @@ const LINK_SOURCE_TYPE = {
 
 export {
   PRODUCTION,
+  AWS_COGNITO_SETTINGS,
   PRODUCT_TYPE,
   USER_POST_TYPE,
   USER_POST_ATTRIBUTE_TYPE,
