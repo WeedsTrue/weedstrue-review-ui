@@ -44,45 +44,45 @@ const USER_POST_TYPE = {
   }
 };
 
-const USER_POST_ATTRIBUTE_TYPE = [
+const PRODUCT_ATTRIBUTE_TYPE = [
   {
     value: 1,
     inputValue: 'thc',
     label: 'THC %',
-    type: 'product-review'
+    userPostType: 'product-review'
   },
   {
     value: 2,
     inputValue: 'cbd',
     label: 'CBD %',
-    type: 'product-review'
+    userPostType: 'product-review'
   },
   {
     value: 3,
-    inputValue: 'terps',
+    inputValue: 'TERPENES',
     label: 'TERPS %',
-    type: 'product-review'
+    userPostType: 'product-review'
   },
   {
     value: 4,
     inputValue: 'packagedDate',
     label: 'Packaged Date',
-    type: 'product-review'
+    userPostType: 'product-review'
   }
 ];
 
-const LINK_SOURCE_TYPE = {
-  OCS: {
+const LINK_SOURCE_TYPE = [
+  {
     value: 1,
     label: 'OCS'
   }
-};
+];
 
 export {
   PRODUCTION,
   AWS_COGNITO_SETTINGS,
   PRODUCT_TYPE,
   USER_POST_TYPE,
-  USER_POST_ATTRIBUTE_TYPE,
+  PRODUCT_ATTRIBUTE_TYPE,
   LINK_SOURCE_TYPE
 };

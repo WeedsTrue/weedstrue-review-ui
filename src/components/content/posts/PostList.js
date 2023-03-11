@@ -11,6 +11,7 @@ import {
 import PropTypes from 'prop-types';
 import { Link, useNavigate } from 'react-router-dom';
 import { Photo, Link as LinkIcon } from 'tabler-icons-react';
+import PostListFilter from './PostListFilter';
 import PostListItem from './PostListItem';
 
 const PostList = ({ userPosts, isLoading }) => {
@@ -49,6 +50,7 @@ const PostList = ({ userPosts, isLoading }) => {
           </ActionIcon>
         </Group>
       </Card>
+      <PostListFilter />
       {isLoading ? (
         <>
           <PostListItem />

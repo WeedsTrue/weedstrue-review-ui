@@ -16,7 +16,7 @@ import { useNavigate } from 'react-router-dom';
 import CreatePostReviewAdditions from './CreatePostReviewAdditions';
 import DraftSelectModal from './DraftSelectModal';
 import {
-  USER_POST_ATTRIBUTE_TYPE,
+  PRODUCT_ATTRIBUTE_TYPE,
   USER_POST_TYPE
 } from '../../../config/constants';
 import { USER_POST_EFFECT_TYPE } from '../../../config/effectConstants';
@@ -154,11 +154,11 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
         : [],
       attributes: isReview
         ? Object.entries(finalFormState.reviewState.attributes).map(e => {
-            const fkUserPostAttributeType = USER_POST_ATTRIBUTE_TYPE.find(
+            const fkProductAttributeType = PRODUCT_ATTRIBUTE_TYPE.find(
               t => t.inputValue === e[0]
             )?.value;
             return {
-              fkUserPostAttributeType,
+              fkProductAttributeType,
               Value: e[1]?.toString()
             };
           })
@@ -413,8 +413,8 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
               fkUserPostType: userPost.fkUserPostType,
               reviewState: {
                 attributes: userPost.attributes.reduce((a, v) => {
-                  const attribute = USER_POST_ATTRIBUTE_TYPE.find(
-                    t => t.value === v.fkUserPostAttributeType
+                  const attribute = PRODUCT_ATTRIBUTE_TYPE.find(
+                    t => t.value === v.fkProductAttributeType
                   );
                   return {
                     ...a,
