@@ -1,0 +1,80 @@
+import React, { useContext, useState } from 'react';
+import { Alert, Button, Stack, Text, TextInput, Title } from '@mantine/core';
+import PropTypes from 'prop-types';
+import { AlertCircle } from 'tabler-icons-react';
+import { Context as AuthContext } from '../../../providers/AuthProvider';
+import FormSection from '../../common/FormSection';
+
+const ConfirmAccountResend = ({ onModalViewChange }) => {
+  const { state, sendConfirmationCode } = useContext(AuthContext);
+  const [formState, setFormState] = useState({
+    username: state.username,
+    isLoading: false,
+    error: ''
+  });
+  return (
+    <Stack sx={{ gap: 20 }}>
+      <Stack sx={{ gap: 5 }}>
+        <Title order={3}>Resend Confirmation Code</Title>
+      </Stack>
+      <FormSection
+        hideButtons
+        onSubmit={() => {
+          setFormState({ ...formState, isLoading: true, error: '' });
+          sendConfirmationCode(
+            formState,
+            () => onModalViewChange('confirm-code'),
+            message =>
+              setFormState({ ...formState, isLoading: false, error: message })
+          );
+        }}
+        sx={{ gap: 10 }}
+      >
+        <TextInput
+          disabled={formState.isLoading}
+          onChange={e =>
+            setFormState({
+              ...formState,
+              username: e.currentTarget.value,
+              error: ''
+            })
+          }
+          placeholder="Username"
+          required
+          value={formState.username}
+        />
+        <Button loading={formState.isLoading} type="submit">
+          Continue
+        </Button>
+
+        <Text size={13} sx={{ marginTop: 10 }}>
+          Already have a code?{' '}
+          <Text
+            color="dodgerblue"
+            component="a"
+            onClick={() => onModalViewChange('confirm-code')}
+            sx={{ cursor: 'pointer' }}
+          >
+            Confirm Account
+          </Text>
+        </Text>
+        {formState.error && (
+          <Alert
+            color="red"
+            icon={<AlertCircle />}
+            sx={{ marginTop: 10 }}
+            variant={'outline'}
+          >
+            <Text weight={500}>{formState.error}</Text>
+          </Alert>
+        )}
+      </FormSection>
+    </Stack>
+  );
+};
+
+ConfirmAccountResend.propTypes = {
+  onModalViewChange: PropTypes.func
+};
+
+export default ConfirmAccountResend;

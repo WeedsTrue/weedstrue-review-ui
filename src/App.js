@@ -7,7 +7,7 @@ import {
   Route,
   Routes
 } from 'react-router-dom';
-import Footer from './components/content/navigation/Footer';
+import AuthModal from './components/content/auth/AuthModal';
 import Header from './components/content/navigation/Header';
 import GlobalStyles from './config/GlobalStyles';
 import { theme } from './config/theme';
@@ -55,7 +55,6 @@ const App = () => {
             <Route element={<BrandsView />} path="/brands/*" />
             <Route element={<ProductsView />} path="/products/*" />
             <Route element={<PostsView />} path="/" />
-            {state.isAuthenticated ? <></> : <></>}
             <Route element={<Navigate replace to="/" />} path="*" />
           </Routes>
         ) : (
@@ -64,6 +63,7 @@ const App = () => {
           </Stack>
         )}
       </Box>
+      <AuthModal isOpen={state.showAuthModal} />
     </AppShell>
   );
 };
