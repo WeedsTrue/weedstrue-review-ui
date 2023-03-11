@@ -144,17 +144,26 @@ const signUp =
       }
     } catch (error) {
       let errorMessage = '';
-      switch (error.message) {
-        case 'User already exists':
-          errorMessage = 'That username is already taken';
-          break;
-        case 'Password did not conform with policy: Password not long enough':
-          errorMessage = 'Password not long enough';
-          break;
-        default:
-          errorMessage = 'Oops something went wrong';
-          break;
+      if (
+        error.message.startsWith(
+          "1 validation error detected: Value at 'username' failed to satisfy constraint:"
+        )
+      ) {
+        errorMessage = 'Invalid username';
+      } else {
+        switch (error.message) {
+          case 'User already exists':
+            errorMessage = 'That username is already taken';
+            break;
+          case 'Password did not conform with policy: Password not long enough':
+            errorMessage = 'Password not long enough';
+            break;
+          default:
+            errorMessage = 'Oops something went wrong';
+            break;
+        }
       }
+
       if (onErrorCallback) {
         onErrorCallback(errorMessage);
       }

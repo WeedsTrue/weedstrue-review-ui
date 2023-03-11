@@ -51,7 +51,7 @@ const CreatePostReviewAdditions = ({
             </Group>
           </Accordion.Control>
           <Accordion.Panel>
-            <Stack sx={{ gap: 0 }}>
+            <Stack sx={{ gap: 10 }}>
               <Group sx={{ flex: 1 }}>
                 <NumericFormat
                   allowNegative={false}
