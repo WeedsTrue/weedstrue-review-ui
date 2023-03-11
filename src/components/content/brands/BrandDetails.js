@@ -1,10 +1,27 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, Group, Rating, Skeleton, Stack, Title } from '@mantine/core';
 import PropTypes from 'prop-types';
 import BrandSidebarInfo from './BrandSidebarInfo';
 import PostList from '../posts/PostList';
 
 const BrandDetails = ({ brand, isLoading }) => {
+  const [filterState, setFilterState] = useState({
+    sortAction: 'trending',
+    sortBy: 'trending',
+    fkUserPostType: null,
+    totalCount: 0,
+    isLoading: false
+  });
+
+  const onFilterChange = (name, value) => {
+    const newState = {
+      ...filterState,
+      [name]: value,
+      isLoading: true
+    };
+    setFilterState(newState);
+  };
+
   return !isLoading && brand ? (
     <Stack sx={{ gap: 10, flex: 1 }}>
       <Card>
@@ -23,7 +40,11 @@ const BrandDetails = ({ brand, isLoading }) => {
         }}
       >
         <Stack style={{ flex: 1, maxWidth: 768 }}>
-          <PostList userPosts={brand.userPosts} />
+          <PostList
+            filterState={filterState}
+            onFilterChange={onFilterChange}
+            userPosts={brand.userPosts}
+          />
         </Stack>
 
         <Stack style={{ flex: 1, maxWidth: 332 }}>

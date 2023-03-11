@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Button, Card, Group, Select } from '@mantine/core';
+import PropTypes from 'prop-types';
 import { ChartArrowsVertical, Flame, Star, Sun } from 'tabler-icons-react';
 
 const FILTER_BUTTONS = [
@@ -52,32 +53,19 @@ const POST_TYPES = [
   }
 ];
 
-const PostListFilter = () => {
-  const [formState, setFormState] = useState({
-    sortAction: 'trending',
-    sortBy: 'trending',
-    fkUserPostType: null
-  });
-
+const PostListFilter = ({ onFilterChange, filterState }) => {
   return (
     <Card sx={{ overflow: 'visible' }}>
       <Group sx={{ justifyContent: 'space-between' }}>
         <Group sx={{ gap: 10 }}>
           {FILTER_BUTTONS.map(b => {
-            const isSelected = formState.sortBy === b.value;
+            const isSelected = filterState?.sortBy === b.value;
             return (
               <Button
                 color={isSelected ? 'blue' : 'gray'}
                 key={b.value}
                 leftIcon={b.icon}
-                onClick={() =>
-                  setFormState({
-                    ...formState,
-
-                    sortAction: b.action,
-                    sortBy: b.value
-                  })
-                }
+                onClick={() => onFilterChange('sortBy', b.value)}
                 radius="xl"
                 styles={{ leftIcon: { marginRight: 10 } }}
                 variant={isSelected ? 'light' : 'subtle'}
@@ -90,20 +78,18 @@ const PostListFilter = () => {
         <Select
           clearable
           data={POST_TYPES}
-          onChange={value =>
-            setFormState({
-              ...formState,
-              fkUserPostType: value
-            })
-          }
+          onChange={value => onFilterChange('fkUserPostType', value)}
           placeholder="Filter by post..."
-          value={formState.fkUserPostType}
+          value={filterState?.fkUserPostType}
         />
       </Group>
     </Card>
   );
 };
 
-PostListFilter.postFilter = {};
+PostListFilter.propTypes = {
+  filterState: PropTypes.object,
+  onFilterChange: PropTypes.func
+};
 
 export default PostListFilter;

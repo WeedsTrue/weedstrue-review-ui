@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Button, Card, Group, Select } from '@mantine/core';
+import PropTypes from 'prop-types';
 import { ChartArrowsVertical, Flame, Star, Sun } from 'tabler-icons-react';
+import { PRODUCT_TYPES } from '../../../config/constants';
 
 const FILTER_BUTTONS = [
   {
@@ -29,55 +31,19 @@ const FILTER_BUTTONS = [
   }
 ];
 
-const POST_TYPES = [
-  {
-    value: 1,
-    label: 'Flower'
-  },
-  {
-    value: 2,
-    label: 'Vapes'
-  },
-  {
-    value: 3,
-    label: 'Extracts'
-  },
-  {
-    value: 4,
-    label: 'Concentrates'
-  },
-  {
-    value: 5,
-    label: 'Edibles'
-  }
-];
-
-const ProductListFilter = () => {
-  const [formState, setFormState] = useState({
-    sortAction: 'trending',
-    sortBy: 'trending',
-    fkUserPostType: null
-  });
-
+const ProductListFilter = ({ onFilterChange, filterState }) => {
   return (
     <Card sx={{ overflow: 'visible' }}>
       <Group sx={{ justifyContent: 'space-between' }}>
         <Group sx={{ gap: 10 }}>
           {FILTER_BUTTONS.map(b => {
-            const isSelected = formState.sortBy === b.value;
+            const isSelected = filterState.sortBy === b.value;
             return (
               <Button
                 color={isSelected ? 'blue' : 'gray'}
                 key={b.value}
                 leftIcon={b.icon}
-                onClick={() =>
-                  setFormState({
-                    ...formState,
-
-                    sortAction: b.action,
-                    sortBy: b.value
-                  })
-                }
+                onClick={() => onFilterChange('sortBy', b.value)}
                 radius="xl"
                 styles={{ leftIcon: { marginRight: 10 } }}
                 variant={isSelected ? 'light' : 'subtle'}
@@ -89,21 +55,19 @@ const ProductListFilter = () => {
         </Group>
         <Select
           clearable
-          data={POST_TYPES}
-          onChange={value =>
-            setFormState({
-              ...formState,
-              fkUserPostType: value
-            })
-          }
+          data={PRODUCT_TYPES.sort((a, b) => a.label.localeCompare(b.label))}
+          onChange={value => onFilterChange('fkProductType', value)}
           placeholder="Filter by type..."
-          value={formState.fkUserPostType}
+          value={filterState?.fkProductType}
         />
       </Group>
     </Card>
   );
 };
 
-ProductListFilter.postFilter = {};
+ProductListFilter.propTypes = {
+  filterState: PropTypes.object,
+  onFilterChange: PropTypes.func
+};
 
 export default ProductListFilter;

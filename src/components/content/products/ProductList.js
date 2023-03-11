@@ -4,14 +4,17 @@ import PropTypes from 'prop-types';
 import ProductListFilter from './ProductListFilter';
 import ProductListItem from './ProductListItem';
 
-const ProductList = ({ products, isLoading }) => {
+const ProductList = ({ products, isLoading, onFilterChange, filterState }) => {
   return (
     <Stack sx={{ gap: 10 }}>
       <Card sx={{ textAlign: 'center' }}>
         <Title sx={{ margin: 'auto' }}>Products</Title>
       </Card>
 
-      <ProductListFilter />
+      <ProductListFilter
+        filterState={filterState}
+        onFilterChange={onFilterChange}
+      />
       <Stack sx={{ gap: 20 }}>
         {isLoading ? (
           <Grid gutter="xl" sx={{}}>
@@ -57,8 +60,10 @@ const ProductList = ({ products, isLoading }) => {
 };
 
 ProductList.propTypes = {
+  filterState: PropTypes.object,
   isLoading: PropTypes.bool,
-  products: PropTypes.array
+  products: PropTypes.array,
+  onFilterChange: PropTypes.func
 };
 
 export default ProductList;
