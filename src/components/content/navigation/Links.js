@@ -1,5 +1,5 @@
 import React from 'react';
-import { Archive } from 'tabler-icons-react';
+import { Archive, Building, Notes } from 'tabler-icons-react';
 
 const links = {
   public: [
@@ -7,14 +7,14 @@ const links = {
       label: 'Community',
       to: '/',
       isGuestView: true,
-      icon: <Archive size={20} />,
+      icon: <Notes size={20} />,
       isSelected: pathname => pathname === '/'
     },
     {
       label: 'Brands',
       to: '/brands',
       isGuestView: true,
-      icon: <Archive size={20} />,
+      icon: <Building size={20} />,
       isSelected: pathname => pathname.startsWith('/brands')
     },
     {

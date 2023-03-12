@@ -1,6 +1,5 @@
 import createProvider from './createProvider';
 import weedstrueAPI from '../api/weedstrueAPI';
-import { USER_POST_EFFECT_TYPE } from '../config/effectConstants';
 
 const initialState = {
   brands: { value: [], loading: false, error: null },
@@ -8,6 +7,7 @@ const initialState = {
   comments: { value: [], loading: false, error: null },
   userPosts: { value: [], loading: false, error: null },
   userPost: { value: null, loading: false, error: null },
+  userProfile: { value: null, loading: false, error: null },
   products: { value: [], loading: false, error: null },
   product: { value: null, loading: false, error: null }
 };
@@ -144,6 +144,12 @@ const fetchBrand = dispatch => async uuid => {
       stateName: 'brand',
       payload: { value: response.data }
     });
+
+    dispatch({
+      type: 'SUCCESS',
+      stateName: 'userPosts',
+      payload: { value: response.data.userPosts.data }
+    });
   } catch (e) {
     dispatch({
       type: 'ERROR',
@@ -192,6 +198,12 @@ const fetchProduct = dispatch => async uuid => {
       stateName: 'product',
       payload: { value: response.data }
     });
+
+    dispatch({
+      type: 'SUCCESS',
+      stateName: 'userPosts',
+      payload: { value: response.data.userPosts.data }
+    });
   } catch (e) {
     dispatch({
       type: 'ERROR',
@@ -204,7 +216,15 @@ const fetchProduct = dispatch => async uuid => {
 const fetchUserPosts =
   dispatch =>
   async (
-    { fkUserPostType, sortBy, orderBy, lastUserPost },
+    {
+      fkUserPostType,
+      sortBy,
+      orderBy,
+      lastUserPost,
+      fkBrand,
+      fkProduct,
+      fkUser
+    },
     onSuccessCallback,
     onErrorCallback
   ) => {
@@ -214,7 +234,15 @@ const fetchUserPosts =
         stateName: 'userPosts'
       });
       const response = await weedstrueAPI.get('/api/userPosts', {
-        params: { fkUserPostType, sortBy, orderBy, lastUserPost }
+        params: {
+          fkUserPostType,
+          sortBy,
+          orderBy,
+          lastUserPost,
+          fkBrand,
+          fkProduct,
+          fkUser
+        }
       });
       if (lastUserPost) {
         dispatch({
@@ -592,6 +620,34 @@ const createBrandReaction =
     }
   };
 
+const fetchUserProfile = dispatch => async username => {
+  try {
+    dispatch({
+      type: 'FETCHING',
+      stateName: 'userProfile'
+    });
+    const response = await weedstrueAPI.get(`/api/users/${username}`);
+
+    dispatch({
+      type: 'SUCCESS',
+      stateName: 'userProfile',
+      payload: { value: response.data }
+    });
+
+    dispatch({
+      type: 'SUCCESS',
+      stateName: 'userPosts',
+      payload: { value: response.data.userPosts.data }
+    });
+  } catch (e) {
+    dispatch({
+      type: 'ERROR',
+      stateName: 'userProfile',
+      payload: 'Oops something went wrong.'
+    });
+  }
+};
+
 export const { Provider, Context } = createProvider(
   reducer,
   {
@@ -610,6 +666,7 @@ export const { Provider, Context } = createProvider(
     fetchUserDrafts,
     fetchUserPosts,
     fetchUserPost,
+    fetchUserProfile,
     updateUserPost
   },
   initialState

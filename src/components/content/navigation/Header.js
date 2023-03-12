@@ -8,7 +8,7 @@ import {
   Button
 } from '@mantine/core';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { ChevronDown, Leaf, Logout } from 'tabler-icons-react';
+import { ChevronDown, Leaf, Logout, User } from 'tabler-icons-react';
 import { links } from './links';
 import { mq } from '../../../config/theme';
 import { Context as AuthContext } from '../../../providers/AuthProvider';
@@ -100,6 +100,13 @@ const Header = () => {
               </Menu.Target>
 
               <Menu.Dropdown>
+                <Menu.Item
+                  icon={<User />}
+                  onClick={() => navigate(`profile/${state.userData.username}`)}
+                >
+                  My Profile
+                </Menu.Item>
+                <Menu.Divider />
                 {links.public.map(link => (
                   <Menu.Item
                     icon={link.icon}
@@ -119,8 +126,8 @@ const Header = () => {
           ) : (
             <Button
               onClick={() => toggleAuthModal(true)}
-              radius="xl"
               sx={mq({ width: ['unset', 'unset', 125] })}
+              variant="filled"
             >
               Log In
             </Button>

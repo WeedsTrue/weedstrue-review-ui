@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
   ActionIcon,
   Avatar,
@@ -14,43 +14,95 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Photo, Link as LinkIcon } from 'tabler-icons-react';
 import PostListFilter from './PostListFilter';
 import PostListItem from './PostListItem';
+import { Context as ReviewsContext } from '../../../providers/ReviewsProvider';
 
-const PostList = ({ userPosts, isLoading, onFilterChange, filterState }) => {
+const PostList = ({
+  isLoading,
+  fkUser,
+  fkBrand,
+  fkProduct,
+  hidePostSubmit,
+  searchOnRender
+}) => {
   const navigate = useNavigate();
+  const { state, fetchUserPosts } = useContext(ReviewsContext);
+  const [filterState, setFilterState] = useState({
+    sortAction: 'trending',
+    sortBy: 'trending',
+    fkUserPostType: null,
+    lastUserPost: null,
+    totalCount: 0,
+    isLoading: false
+  });
+
+  useEffect(() => {
+    if (searchOnRender) {
+      setFilterState({
+        ...filterState,
+        isLoading: true
+      });
+      fetchUserPosts(filterState, totalCount =>
+        setFilterState({
+          ...filterState,
+          totalCount,
+          isLoading: false
+        })
+      );
+    }
+  }, [searchOnRender]);
+
+  const onFilterChange = (name, value) => {
+    const newState = {
+      ...filterState,
+      [name]: value,
+      isLoading: true
+    };
+    setFilterState(newState);
+    fetchUserPosts({ ...newState, fkUser, fkBrand, fkProduct }, totalCount =>
+      setFilterState({
+        ...newState,
+        totalCount
+      })
+    );
+  };
+
   return (
     <Stack sx={{ flex: 1, gap: 15 }}>
-      <Card>
-        <Group
-          sx={{
-            gap: 5
-          }}
-        >
-          <Avatar
-            size={36}
-            styles={{ placeholderIcon: { height: '100%', width: '100%' } }}
-          />
-          <TextInput
-            onClick={() => navigate('submit')}
-            placeholder="Create Post"
-            style={{
-              flex: 1
+      {!hidePostSubmit && (
+        <Card>
+          <Group
+            sx={{
+              gap: 5
             }}
-            styles={{
-              input: {
-                '&:hover': {
-                  borderColor: 'dodgerblue'
+          >
+            <Avatar
+              size={36}
+              styles={{ placeholderIcon: { height: '100%', width: '100%' } }}
+            />
+            <TextInput
+              onClick={() => navigate('submit')}
+              placeholder="Create Post"
+              style={{
+                flex: 1
+              }}
+              styles={{
+                input: {
+                  '&:hover': {
+                    borderColor: 'dodgerblue'
+                  }
                 }
-              }
-            }}
-          />
-          <ActionIcon component={Link} size={36} to="submit">
-            <Photo />
-          </ActionIcon>
-          <ActionIcon component={Link} size={36} to="submit">
-            <LinkIcon />
-          </ActionIcon>
-        </Group>
-      </Card>
+              }}
+            />
+            <ActionIcon component={Link} size={36} to="submit">
+              <Photo />
+            </ActionIcon>
+            <ActionIcon component={Link} size={36} to="submit">
+              <LinkIcon />
+            </ActionIcon>
+          </Group>
+        </Card>
+      )}
+
       <PostListFilter
         filterState={filterState}
         isLoading={isLoading}
@@ -63,7 +115,7 @@ const PostList = ({ userPosts, isLoading, onFilterChange, filterState }) => {
           <PostListItem />
           <PostListItem />
         </>
-      ) : userPosts.length === 0 ? (
+      ) : state.userPosts.value.length === 0 ? (
         <Card>
           <Stack sx={{ padding: 60 }}>
             <Text sx={{ margin: 'auto' }} weight={500}>
@@ -72,15 +124,17 @@ const PostList = ({ userPosts, isLoading, onFilterChange, filterState }) => {
           </Stack>
         </Card>
       ) : (
-        userPosts.map(p => <PostListItem key={p.pkUserPost} userPost={p} />)
+        state.userPosts.value.map(p => (
+          <PostListItem key={p.pkUserPost} userPost={p} />
+        ))
       )}
-      {!isLoading && filterState.totalCount > userPosts.length && (
+      {!isLoading && filterState.totalCount > state.userPosts.value.length && (
         <Button
           color="dark"
           onClick={() =>
             onFilterChange(
               'lastUserPost',
-              userPosts[userPosts.length - 1].pkUserPost
+              state.userPosts.value[state.userPosts.value.length - 1].pkUserPost
             )
           }
           sx={{ margin: 'auto', marginTop: 10 }}
@@ -94,10 +148,12 @@ const PostList = ({ userPosts, isLoading, onFilterChange, filterState }) => {
 };
 
 PostList.propTypes = {
-  filterState: PropTypes.object,
+  fkBrand: PropTypes.number,
+  fkProduct: PropTypes.number,
+  fkUser: PropTypes.number,
+  hidePostSubmit: PropTypes.bool,
   isLoading: PropTypes.bool,
-  userPosts: PropTypes.array,
-  onFilterChange: PropTypes.func
+  searchOnRender: PropTypes.bool
 };
 
 export default PostList;

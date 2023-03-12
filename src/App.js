@@ -19,6 +19,7 @@ import { Provider as ReviewsProvider } from './providers/ReviewsProvider';
 import BrandsView from './views/BrandsView';
 import PostsView from './views/PostsView';
 import ProductsView from './views/ProductsView';
+import ProfileView from './views/ProfileView';
 
 const App = () => {
   const hasAttemptedToken = useRef(false);
@@ -54,6 +55,7 @@ const App = () => {
           <Routes>
             <Route element={<BrandsView />} path="/brands/*" />
             <Route element={<ProductsView />} path="/products/*" />
+            <Route element={<ProfileView />} path="/profile/*" />
             <Route element={<PostsView />} path="/" />
             <Route element={<Navigate replace to="/" />} path="*" />
           </Routes>

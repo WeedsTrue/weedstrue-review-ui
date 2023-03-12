@@ -1,38 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Card, Group, Rating, Skeleton, Stack, Title } from '@mantine/core';
 import PropTypes from 'prop-types';
 import ProductSidebarInfo from './ProductSidebarInfo';
-import { userPostSort } from '../../../helpers/sortHelper';
 import PostList from '../posts/PostList';
 
 const ProductDetails = ({ product, isLoading }) => {
-  const [filterState, setFilterState] = useState({
-    sortAction: 'trending',
-    sortBy: 'trending',
-    fkUserPostType: null,
-    lastUserPost: null,
-    totalCount: 0,
-    isLoading: false
-  });
-
-  const filteredPosts = product
-    ? product.userPosts.filter(
-        p =>
-          !filterState.fkUserPostType ||
-          filterState.fkUserPostType === p.fkUserPostType
-      )
-    : // .sort((a, b) => userPostSort(a, b, filterState.sortBy))
-      [];
-
-  const onFilterChange = (name, value) => {
-    const newState = {
-      ...filterState,
-      [name]: value,
-      isLoading: true
-    };
-    setFilterState(newState);
-  };
-
   return !isLoading && product ? (
     <Stack sx={{ gap: 20 }}>
       <Card>
@@ -49,11 +21,7 @@ const ProductDetails = ({ product, isLoading }) => {
         }}
       >
         <Stack style={{ flex: 1, maxWidth: 768 }}>
-          <PostList
-            filterState={filterState}
-            onFilterChange={onFilterChange}
-            userPosts={filteredPosts}
-          />
+          <PostList fkProduct={product.pkProduct} />
         </Stack>
 
         <Stack style={{ flex: 1, maxWidth: 332 }}>
