@@ -18,7 +18,7 @@ const ProductList = ({ isLoading, searchOnRender }) => {
 
   useEffect(() => {
     if (searchOnRender) {
-      fetchProducts();
+      fetchProducts({});
     }
   }, [searchOnRender]);
 
