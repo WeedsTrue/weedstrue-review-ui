@@ -414,7 +414,7 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
               draft: userPost.draft,
               fkUserPostType: userPost.fkUserPostType,
               reviewState: {
-                rating: userPost.postItemUserRating,
+                rating: userPost.userRating,
                 attributes: userPost.attributes.reduce((a, v) => {
                   const attribute = PRODUCT_ATTRIBUTE_TYPE.find(
                     t => t.value === v.fkProductAttributeType

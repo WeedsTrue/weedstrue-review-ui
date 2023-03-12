@@ -104,8 +104,8 @@ const PostListItem = ({ userPost }) => {
               {userPost.title}
             </Title>
             {userPost.fkUserPostType === USER_POST_TYPE.REVIEW.value &&
-              userPost.postItemUserRating && (
-                <Rating readOnly value={userPost.postItemUserRating} />
+              userPost.userRating && (
+                <Rating readOnly value={userPost.userRating} />
               )}
             <Text
               sx={{
