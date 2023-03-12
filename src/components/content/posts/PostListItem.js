@@ -13,6 +13,7 @@ import {
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { Dots, Leaf, Message, Share } from 'tabler-icons-react';
+import { USER_POST_TYPE } from '../../../config/constants';
 import { Context as ReviewsContext } from '../../../providers/ReviewsProvider';
 
 const PostListItem = ({ userPost }) => {
@@ -102,7 +103,10 @@ const PostListItem = ({ userPost }) => {
             >
               {userPost.title}
             </Title>
-            <Rating readOnly value={4} />
+            {userPost.fkUserPostType === USER_POST_TYPE.REVIEW.value &&
+              userPost.postItemUserRating && (
+                <Rating readOnly value={userPost.postItemUserRating} />
+              )}
             <Text
               sx={{
                 fontSize: 14,

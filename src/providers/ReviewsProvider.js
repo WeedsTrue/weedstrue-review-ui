@@ -302,7 +302,8 @@ const createUserPost =
       fkPostItem,
       postItemType,
       effectTypes,
-      attributes
+      attributes,
+      rating
     },
     onSuccessCallback,
     onErrorCallback
@@ -320,7 +321,8 @@ const createUserPost =
         fkPostItem,
         postItemType,
         effectTypes,
-        attributes
+        attributes,
+        rating
       });
 
       dispatch({
@@ -356,7 +358,8 @@ const updateUserPost =
       fkPostItem,
       postItemType,
       effectTypes,
-      attributes
+      attributes,
+      rating
     },
     onSuccessCallback,
     onErrorCallback
@@ -374,7 +377,8 @@ const updateUserPost =
         fkPostItem,
         postItemType,
         effectTypes,
-        attributes
+        attributes,
+        rating
       });
 
       dispatch({
