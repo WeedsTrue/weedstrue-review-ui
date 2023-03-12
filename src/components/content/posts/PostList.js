@@ -2,6 +2,7 @@ import React from 'react';
 import {
   ActionIcon,
   Avatar,
+  Button,
   Card,
   Group,
   Stack,
@@ -11,9 +12,10 @@ import {
 import PropTypes from 'prop-types';
 import { Link, useNavigate } from 'react-router-dom';
 import { Photo, Link as LinkIcon } from 'tabler-icons-react';
+import PostListFilter from './PostListFilter';
 import PostListItem from './PostListItem';
 
-const PostList = ({ userPosts, isLoading }) => {
+const PostList = ({ userPosts, isLoading, onFilterChange, filterState }) => {
   const navigate = useNavigate();
   return (
     <Stack sx={{ flex: 1, gap: 15 }}>
@@ -49,6 +51,11 @@ const PostList = ({ userPosts, isLoading }) => {
           </ActionIcon>
         </Group>
       </Card>
+      <PostListFilter
+        filterState={filterState}
+        isLoading={isLoading}
+        onFilterChange={onFilterChange}
+      />
       {isLoading ? (
         <>
           <PostListItem />
@@ -65,17 +72,32 @@ const PostList = ({ userPosts, isLoading }) => {
           </Stack>
         </Card>
       ) : (
-        userPosts
-          .sort((a, b) => new Date(b.created) - new Date(a.created))
-          .map(p => <PostListItem key={p.pkUserPost} userPost={p} />)
+        userPosts.map(p => <PostListItem key={p.pkUserPost} userPost={p} />)
+      )}
+      {!isLoading && filterState.totalCount > userPosts.length && (
+        <Button
+          color="dark"
+          onClick={() =>
+            onFilterChange(
+              'lastUserPost',
+              userPosts[userPosts.length - 1].pkUserPost
+            )
+          }
+          sx={{ margin: 'auto', marginTop: 10 }}
+          variant="outline"
+        >
+          Show More
+        </Button>
       )}
     </Stack>
   );
 };
 
 PostList.propTypes = {
+  filterState: PropTypes.object,
   isLoading: PropTypes.bool,
-  userPosts: PropTypes.array
+  userPosts: PropTypes.array,
+  onFilterChange: PropTypes.func
 };
 
 export default PostList;

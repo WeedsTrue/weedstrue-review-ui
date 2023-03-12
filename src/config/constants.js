@@ -14,13 +14,6 @@ const AWS_COGNITO_SETTINGS = {
 
 Auth.configure(AWS_COGNITO_SETTINGS);
 
-const PRODUCT_TYPE = {
-  DRY_FLOWER: {
-    value: 1,
-    label: 'Dry Flower'
-  }
-};
-
 const USER_POST_TYPE = {
   REVIEW: {
     value: 1,
@@ -44,45 +37,88 @@ const USER_POST_TYPE = {
   }
 };
 
-const USER_POST_ATTRIBUTE_TYPE = [
+const PRODUCT_ATTRIBUTE_TYPE = [
   {
     value: 1,
     inputValue: 'thc',
     label: 'THC %',
-    type: 'product-review'
+    userPostType: 'product-review'
   },
   {
     value: 2,
     inputValue: 'cbd',
     label: 'CBD %',
-    type: 'product-review'
+    userPostType: 'product-review'
   },
   {
     value: 3,
     inputValue: 'terps',
     label: 'TERPS %',
-    type: 'product-review'
+    userPostType: 'product-review'
   },
   {
     value: 4,
     inputValue: 'packagedDate',
     label: 'Packaged Date',
-    type: 'product-review'
+    userPostType: 'product-review'
   }
 ];
 
-const LINK_SOURCE_TYPE = {
-  OCS: {
+const LINK_SOURCE_TYPE = [
+  {
     value: 1,
     label: 'OCS'
   }
-};
+];
+
+const PRODUCT_TYPES = [
+  {
+    value: 2,
+    label: 'Rosin'
+  },
+  {
+    value: 3,
+    label: 'Seeds'
+  },
+  {
+    value: 4,
+    label: 'Pre-rolls'
+  },
+  {
+    value: 5,
+    label: 'Accessories'
+  },
+  {
+    value: 6,
+    label: 'Dried Flower'
+  },
+  {
+    value: 7,
+    label: '510 Thread Cartridges'
+  },
+  {
+    value: 8,
+    label: 'Pax Pods'
+  },
+  {
+    value: 9,
+    label: 'Soft Chews'
+  },
+  {
+    value: 10,
+    label: 'Chocolates'
+  },
+  {
+    value: 11,
+    label: 'Baked Goods'
+  }
+];
 
 export {
   PRODUCTION,
   AWS_COGNITO_SETTINGS,
-  PRODUCT_TYPE,
+  PRODUCT_TYPES,
   USER_POST_TYPE,
-  USER_POST_ATTRIBUTE_TYPE,
+  PRODUCT_ATTRIBUTE_TYPE,
   LINK_SOURCE_TYPE
 };

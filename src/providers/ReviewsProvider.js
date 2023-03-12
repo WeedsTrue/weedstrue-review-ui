@@ -77,7 +77,9 @@ const reducer = (state, action) => {
         ...state,
         [action.stateName]: {
           ...state[action.stateName],
-          value: [...state[action.stateName].value, action.payload],
+          value: Array.isArray(action.payload)
+            ? [...state[action.stateName].value, ...action.payload]
+            : [...state[action.stateName].value, action.payload],
           loading: false
         }
       };
@@ -151,27 +153,31 @@ const fetchBrand = dispatch => async uuid => {
   }
 };
 
-const fetchProducts = dispatch => async () => {
-  try {
-    dispatch({
-      type: 'FETCHING',
-      stateName: 'products'
-    });
-    const response = await weedstrueAPI.get('/api/products');
+const fetchProducts =
+  dispatch =>
+  async ({ fkProductType, sortBy, orderBy }) => {
+    try {
+      dispatch({
+        type: 'FETCHING',
+        stateName: 'products'
+      });
+      const response = await weedstrueAPI.get('/api/products', {
+        params: { fkProductType, sortBy, orderBy }
+      });
 
-    dispatch({
-      type: 'SUCCESS',
-      stateName: 'products',
-      payload: { value: response.data }
-    });
-  } catch (e) {
-    dispatch({
-      type: 'ERROR',
-      stateName: 'products',
-      payload: 'Oops something went wrong.'
-    });
-  }
-};
+      dispatch({
+        type: 'SUCCESS',
+        stateName: 'products',
+        payload: { value: response.data }
+      });
+    } catch (e) {
+      dispatch({
+        type: 'ERROR',
+        stateName: 'products',
+        payload: 'Oops something went wrong.'
+      });
+    }
+  };
 
 const fetchProduct = dispatch => async uuid => {
   try {
@@ -195,27 +201,45 @@ const fetchProduct = dispatch => async uuid => {
   }
 };
 
-const fetchUserPosts = dispatch => async () => {
-  try {
-    dispatch({
-      type: 'FETCHING',
-      stateName: 'userPosts'
-    });
-    const response = await weedstrueAPI.get('/api/userPosts');
-
-    dispatch({
-      type: 'SUCCESS',
-      stateName: 'userPosts',
-      payload: { value: response.data }
-    });
-  } catch (e) {
-    dispatch({
-      type: 'ERROR',
-      stateName: 'userPosts',
-      payload: 'Oops something went wrong.'
-    });
-  }
-};
+const fetchUserPosts =
+  dispatch =>
+  async (
+    { fkUserPostType, sortBy, orderBy, lastUserPost },
+    onSuccessCallback,
+    onErrorCallback
+  ) => {
+    try {
+      dispatch({
+        type: 'FETCHING',
+        stateName: 'userPosts'
+      });
+      const response = await weedstrueAPI.get('/api/userPosts', {
+        params: { fkUserPostType, sortBy, orderBy, lastUserPost }
+      });
+      if (lastUserPost) {
+        dispatch({
+          type: 'APPEND',
+          stateName: 'userPosts',
+          payload: response.data.data
+        });
+      } else {
+        dispatch({
+          type: 'SUCCESS',
+          stateName: 'userPosts',
+          payload: { value: response.data.data }
+        });
+      }
+      if (onSuccessCallback) {
+        onSuccessCallback(response.data.totalCount);
+      }
+    } catch (e) {
+      dispatch({
+        type: 'ERROR',
+        stateName: 'userPosts',
+        payload: 'Oops something went wrong.'
+      });
+    }
+  };
 
 const fetchUserDrafts = dispatch => async () => {
   try {
