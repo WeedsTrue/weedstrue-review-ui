@@ -10,6 +10,7 @@ const initialState = {
   tokenAttempted: false,
   userData: null,
   userGroups: [],
+  userKarma: 0,
   error: null,
   loading: false
 };
@@ -91,6 +92,7 @@ const login =
           isAdmin: response.data.isAdmin,
           userData: response.data.user,
           userGroups: [],
+          userKarma: response.data.karmaPoints,
           isAuthenticated: true,
           tokenAttempted: true
         }
