@@ -44,6 +44,7 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
     fkPostItem: null,
     postItemType: postType,
     reviewState: {
+      rating: null,
       attributes: {
         thc: '',
         cbd: '',
@@ -90,6 +91,7 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
         fkPostItem: postItemInfo.pkPostItem,
         postItemType: postType,
         reviewState: {
+          rating: null,
           attributes: {
             thc: '',
             cbd: '',
@@ -152,6 +154,7 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
             description: e.description
           }))
         : [],
+      rating: isReview ? finalFormState.reviewState.rating : null,
       attributes: isReview
         ? Object.entries(finalFormState.reviewState.attributes).map(e => {
             const fkProductAttributeType = PRODUCT_ATTRIBUTE_TYPE.find(
@@ -287,7 +290,7 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
                     onChange={e =>
                       setFormState({
                         ...formState,
-                        content: e.currentTarget.value.substring(0, 2000),
+                        content: e.currentTarget.value.substring(0, 4000),
                         hasUnsavedChanges: true
                       })
                     }
@@ -295,20 +298,19 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
                     required
                     value={formState.content}
                   />
-                  {postType === 'product' &&
-                    formState.fkUserPostType ===
-                      USER_POST_TYPE.REVIEW.value && (
-                      <CreatePostReviewAdditions
-                        onPostReviewStateChange={newReviewState =>
-                          setFormState({
-                            ...formState,
-                            reviewState: newReviewState,
-                            hasUnsavedChanges: true
-                          })
-                        }
-                        postReviewState={formState.reviewState}
-                      />
-                    )}
+                  {formState.fkUserPostType === USER_POST_TYPE.REVIEW.value && (
+                    <CreatePostReviewAdditions
+                      onPostReviewStateChange={newReviewState =>
+                        setFormState({
+                          ...formState,
+                          reviewState: newReviewState,
+                          hasUnsavedChanges: true
+                        })
+                      }
+                      postReviewState={formState.reviewState}
+                      postType={postType}
+                    />
+                  )}
                 </Stack>
 
                 <Divider />
@@ -412,6 +414,7 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
               draft: userPost.draft,
               fkUserPostType: userPost.fkUserPostType,
               reviewState: {
+                rating: userPost.userRating,
                 attributes: userPost.attributes.reduce((a, v) => {
                   const attribute = PRODUCT_ATTRIBUTE_TYPE.find(
                     t => t.value === v.fkProductAttributeType

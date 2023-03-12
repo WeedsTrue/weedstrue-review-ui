@@ -12,6 +12,7 @@ import {
 import PropTypes from 'prop-types';
 import { useParams } from 'react-router-dom';
 import { Dots, Leaf, Message, Share } from 'tabler-icons-react';
+import { USER_POST_TYPE } from '../../../config/constants';
 import { Context as ReviewsContext } from '../../../providers/ReviewsProvider';
 import BrandSidebarInfo from '../brands/BrandSidebarInfo';
 import CommentList from '../comments/CommentList';
@@ -110,7 +111,11 @@ const PostDetails = ({ postItem, isLoading }) => {
                       >
                         {userPost.title}
                       </Title>
-                      <Rating readOnly value={4} />
+                      {userPost.fkUserPostType ===
+                        USER_POST_TYPE.REVIEW.value &&
+                        userPost.userRating && (
+                          <Rating readOnly value={userPost.userRating} />
+                        )}
                       <Text
                         sx={{
                           fontSize: 16,

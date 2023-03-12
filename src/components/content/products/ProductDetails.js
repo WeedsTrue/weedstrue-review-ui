@@ -38,7 +38,7 @@ const ProductDetails = ({ product, isLoading }) => {
       <Card>
         <Stack sx={{ flex: 1, padding: 20, alignItems: 'center', gap: 10 }}>
           <Title sx={{ textAlign: 'center' }}>{product.name}</Title>
-          <Rating readOnly value={4}></Rating>
+          <Rating fractions={2} readOnly value={product.rating}></Rating>
         </Stack>
       </Card>
       <Group

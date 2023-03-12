@@ -57,7 +57,7 @@ const ProductListItem = ({ product }) => {
         <Title order={4} sx={{ textAlign: 'center' }}>
           {product.name}
         </Title>
-        <Rating readOnly value={Math.floor(Math.random() * 5) + 1}></Rating>
+        <Rating fractions={2} readOnly value={product.rating}></Rating>
         <Stack sx={{ flex: 1 }}></Stack>
         <Group>
           <Group sx={{ gap: 5, marginRight: 5 }}>
