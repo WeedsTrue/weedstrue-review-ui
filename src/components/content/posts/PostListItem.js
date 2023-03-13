@@ -1,6 +1,7 @@
 import React, { useContext, useState } from 'react';
 import {
   ActionIcon,
+  Badge,
   Button,
   Card,
   Group,
@@ -12,21 +13,36 @@ import {
 } from '@mantine/core';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
-import { Dots, Leaf, Message, Share } from 'tabler-icons-react';
-import { USER_POST_TYPE } from '../../../config/constants';
+import { Dots, Leaf, Message, Point, Share } from 'tabler-icons-react';
+import { USER_POST_TYPE, USER_POST_TYPE_LIST } from '../../../config/constants';
 import { Context as ReviewsContext } from '../../../providers/ReviewsProvider';
 
 const PostListItem = ({ userPost }) => {
   const { createUserPostReaction } = useContext(ReviewsContext);
   const [reactionState, setReactionState] = useState(0);
 
+  const postType =
+    userPost &&
+    USER_POST_TYPE_LIST.find(t => t.value === userPost.fkUserPostType);
+
   return userPost ? (
-    <Card>
+    <Card
+      component={Link}
+      to={`/${userPost.postItemType}s/${userPost.postItemUuid}/posts/${
+        userPost.uuid
+      }/${userPost.title
+        .replace(/[^a-zA-Z' ']/g, '')
+        .split(' ')
+        .slice(0, 6)
+        .join('_')
+        .toLowerCase()}`}
+    >
       <Group sx={{ alignItems: 'start' }}>
         <Stack sx={{ gap: 0, placeItems: 'center', marginLeft: 5 }}>
           <ActionIcon
             color={reactionState === 1 ? 'blue' : 'dark'}
-            onClick={() => {
+            onClick={e => {
+              e.preventDefault();
               setReactionState(1);
               createUserPostReaction(
                 {
@@ -50,7 +66,8 @@ const PostListItem = ({ userPost }) => {
           </Text>
           <ActionIcon
             color={reactionState === -1 ? 'blue' : 'dark'}
-            onClick={() => {
+            onClick={e => {
+              e.preventDefault();
               setReactionState(-1);
               createUserPostReaction(
                 {
@@ -75,34 +92,67 @@ const PostListItem = ({ userPost }) => {
             />
           </ActionIcon>
         </Stack>
-        <Stack
-          component={Link}
-          sx={{ gap: 10, textDecoration: 'none', color: '#000', flex: 1 }}
-          to={`/${userPost.postItemType}s/${userPost.postItemUuid}/posts/${
-            userPost.uuid
-          }/${userPost.title
-            .replace(/[^a-zA-Z' ']/g, '')
-            .split(' ')
-            .slice(0, 6)
-            .join('_')
-            .toLowerCase()}`}
-        >
+        <Stack sx={{ gap: 10, textDecoration: 'none', color: '#000', flex: 1 }}>
           <Stack
             sx={{
-              gap: 10,
+              gap: 5,
               overflow: 'hidden',
               marginLeft: 5
             }}
           >
-            <Title
-              order={4}
-              sx={{
-                overflow: 'hidden',
-                textOverflow: 'ellipsis'
-              }}
-            >
-              {userPost.title}
-            </Title>
+            <Stack sx={{ gap: 0 }}>
+              <Text color="grey" size={13}>
+                Posted by{' '}
+                <Text
+                  component={Link}
+                  sx={{ '&:hover': { textDecoration: 'underline' } }}
+                  to={`/profile/${userPost.user.username}`}
+                >
+                  {userPost.user.username}
+                </Text>
+              </Text>
+              <Group
+                sx={{
+                  gap: 5,
+                  flexWrap: 'nowrap',
+                  overflow: 'hidden',
+                  justifyContent: 'space-between',
+                  alignItems: 'start'
+                }}
+              >
+                <Title
+                  order={4}
+                  sx={{
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis'
+                  }}
+                >
+                  {userPost.title}
+                </Title>
+                <Badge
+                  color={postType.color}
+                  size="lg"
+                  sx={{ minWidth: 100 }}
+                  variant="filled"
+                >
+                  {postType.label}
+                </Badge>
+              </Group>
+            </Stack>
+
+            <Group sx={{ gap: 5 }}>
+              <Text color="dodgerblue" size={14}>
+                {userPost.postItemName}
+              </Text>
+              {userPost.postItemSecondaryName && (
+                <>
+                  <Point size={5} />
+                  <Text color="dodgerblue" size={14}>
+                    {userPost.postItemUuid}
+                  </Text>
+                </>
+              )}
+            </Group>
             {userPost.fkUserPostType === USER_POST_TYPE.REVIEW.value &&
               userPost.userRating && (
                 <Rating readOnly value={userPost.userRating} />

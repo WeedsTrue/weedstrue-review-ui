@@ -18,19 +18,21 @@ const CommentListItem = ({ comment, replyComments }) => {
   );
   return (
     <Stack sx={{ gap: 0 }}>
-      <Group sx={{ gap: 3, placeItems: 'center' }}>
-        <Avatar size={45} />
-        <Text sx={{ fontSize: 14 }} weight={500}>
-          {comment.user.username}
-        </Text>
-        <Point size={5} />
-        <Text color="grey" sx={{ fontSize: 12 }}>
-          {dayjs(comment.created).fromNow()}
-        </Text>
+      <Group sx={{ gap: 5, placeItems: 'center' }}>
+        <Avatar radius="xl" size={45} />
+        <Group sx={{ gap: 3 }}>
+          <Text sx={{ fontSize: 14 }} weight={500}>
+            {comment.user.username}
+          </Text>
+          <Point size={5} />
+          <Text color="grey" sx={{ fontSize: 12 }}>
+            {dayjs(comment.created).fromNow()}
+          </Text>
+        </Group>
       </Group>
       <Stack
         sx={{
-          marginLeft: 22,
+          marginLeft: 25,
           gap: 10,
           overflow: 'hidden',
           borderLeft: 'solid 2px lightgrey',
