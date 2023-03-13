@@ -55,6 +55,7 @@ const tokenLogin = dispatch => async () => {
     dispatch({ type: 'FETCHING', payload: { tokenAttempted: true } });
     await Auth.currentAuthenticatedUser();
     const response = await weedstrueAPI.post('/api/auth/login', null);
+    window.localStorage.setItem('ageVerifiedAt', new Date().toISOString());
 
     dispatch({
       type: 'SUCCESS',
@@ -62,6 +63,7 @@ const tokenLogin = dispatch => async () => {
         isAdmin: response.data.isAdmin,
         userData: response.data.user,
         userGroups: [],
+        userKarma: response.data.karmaPoints,
         isAuthenticated: true,
         tokenAttempted: true
       }
@@ -309,11 +311,21 @@ const clearError = dispatch => async () => {
   });
 };
 
+const confirmAgeRequirements = dispatch => async () => {
+  window.localStorage.setItem('ageVerifiedAt', new Date().toISOString());
+
+  dispatch({
+    type: 'SUCCESS',
+    payload: {}
+  });
+};
+
 export const { Provider, Context } = createProvider(
   reducer,
   {
     clearError,
     confirmAccount,
+    confirmAgeRequirements,
     login,
     logout,
     signUp,

@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useRef } from 'react';
 import { AppShell, Box, Loader, MantineProvider, Stack } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
+import dayjs from 'dayjs';
 import {
   BrowserRouter as Router,
   Navigate,
@@ -16,6 +17,7 @@ import {
   Context as AuthContext
 } from './providers/AuthProvider';
 import { Provider as ReviewsProvider } from './providers/ReviewsProvider';
+import AgeVerificationView from './views/AgeVerificationView';
 import BrandsView from './views/BrandsView';
 import PostsView from './views/PostsView';
 import ProductsView from './views/ProductsView';
@@ -24,6 +26,10 @@ import ProfileView from './views/ProfileView';
 const App = () => {
   const hasAttemptedToken = useRef(false);
   const { state, tokenLogin } = useContext(AuthContext);
+  const ageVerifiedAt = localStorage.getItem('ageVerifiedAt');
+  const isAgeVerified = ageVerifiedAt
+    ? dayjs().diff(new Date(ageVerifiedAt), 'd') < 30
+    : false;
 
   useEffect(() => {
     if (!state.tokenAttempted) {
@@ -35,7 +41,7 @@ const App = () => {
   return (
     <AppShell
       // footer={<Footer />}
-      header={<Header />}
+      header={isAgeVerified && <Header />}
       padding={0}
       style={{
         display: 'flex',
@@ -51,7 +57,9 @@ const App = () => {
           display: 'flex'
         }}
       >
-        {hasAttemptedToken.current && !state.loading ? (
+        {!isAgeVerified ? (
+          <AgeVerificationView />
+        ) : hasAttemptedToken.current && !state.loading ? (
           <Routes>
             <Route element={<BrandsView />} path="/brands/*" />
             <Route element={<ProductsView />} path="/products/*" />
