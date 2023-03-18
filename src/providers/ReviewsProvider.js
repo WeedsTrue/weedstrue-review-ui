@@ -213,6 +213,27 @@ const fetchProduct = dispatch => async uuid => {
   }
 };
 
+const fetchUserPostProductOptions =
+  dispatch => async (searchTerm, onSuccessCallback, onErrorCallback) => {
+    try {
+      const response = await weedstrueAPI.get(
+        '/api/userPosts/products/search',
+        {
+          params: {
+            searchTerm
+          }
+        }
+      );
+      if (onSuccessCallback) {
+        onSuccessCallback(response.data);
+      }
+    } catch (e) {
+      if (onErrorCallback) {
+        onErrorCallback(e);
+      }
+    }
+  };
+
 const fetchUserPosts =
   dispatch =>
   async (
@@ -688,6 +709,7 @@ export const { Provider, Context } = createProvider(
     fetchProduct,
     fetchProducts,
     fetchUserDrafts,
+    fetchUserPostProductOptions,
     fetchUserPosts,
     fetchUserPost,
     fetchUserProfile,

@@ -10,6 +10,7 @@ import {
 } from 'react-router-dom';
 import AuthModal from './components/content/auth/AuthModal';
 import Header from './components/content/navigation/Header';
+import CreatePost from './components/content/posts/CreatePost';
 import GlobalStyles from './config/GlobalStyles';
 import { theme } from './config/theme';
 import {
@@ -62,6 +63,7 @@ const App = () => {
         ) : hasAttemptedToken.current && !state.loading ? (
           <Routes>
             <Route element={<BrandsView />} path="/brands/*" />
+            <Route element={<CreatePost />} path="/submit" />
             <Route element={<ProductsView />} path="/products/*" />
             <Route element={<ProfileView />} path="/profile/*" />
             <Route element={<PostsView />} path="/" />
