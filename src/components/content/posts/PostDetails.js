@@ -14,6 +14,7 @@ import PropTypes from 'prop-types';
 import { Link, useParams } from 'react-router-dom';
 import { Dots, Leaf, Message, Point, Share } from 'tabler-icons-react';
 import { USER_POST_TYPE, USER_POST_TYPE_LIST } from '../../../config/constants';
+import { reactToItem } from '../../../helpers/reactionHelper';
 import { Context as ReviewsContext } from '../../../providers/ReviewsProvider';
 import BrandSidebarInfo from '../brands/BrandSidebarInfo';
 import CommentList from '../comments/CommentList';
@@ -26,17 +27,44 @@ const PostDetails = ({ postItem }) => {
   const hasFetched = useRef(false);
   const { state, fetchUserPost, createUserPostReaction } =
     useContext(ReviewsContext);
-  const [reactionState, setReactionState] = useState(0);
+  const [reactionState, setReactionState] = useState({
+    value: 0,
+    deleted: false
+  });
   const { uuid } = useParams();
   const { value: userPost } = state.userPost;
   const postType =
     userPost &&
     USER_POST_TYPE_LIST.find(t => t.value === userPost.fkUserPostType);
 
+  const isUpvoted =
+    (userPost?.userReaction?.isPositive && reactionState.value === 0) ||
+    (reactionState.value > 0 && !reactionState.deleted);
+  const isDownVoted =
+    (userPost?.userReaction &&
+      !userPost.userReaction.isPositive &&
+      reactionState.value === 0) ||
+    (reactionState.value < 0 && !reactionState.deleted);
+
   useEffect(() => {
     fetchUserPost(uuid);
     hasFetched.current = true;
   }, []);
+
+  const createReaction = isPositive => {
+    reactToItem(
+      {
+        isUpvoted,
+        isDownVoted,
+        fkUserPost: userPost.pkUserPost,
+        isPositive,
+        deleted: reactionState.deleted
+      },
+      userPost?.userReaction,
+      createUserPostReaction,
+      setReactionState
+    );
+  };
 
   return (
     <Group
@@ -55,44 +83,22 @@ const PostDetails = ({ postItem }) => {
                 <Group sx={{ placeItems: 'start', flex: 1 }}>
                   <Stack sx={{ gap: 0, placeItems: 'center', marginLeft: 5 }}>
                     <ActionIcon
-                      color={reactionState === 1 ? 'blue' : 'dark'}
-                      onClick={() => {
-                        setReactionState(1);
-                        createUserPostReaction(
-                          {
-                            fkUserPost: userPost.pkUserPost,
-                            isPositive: true
-                          },
-                          () => {},
-                          () => {
-                            setReactionState(0);
-                          }
-                        );
-                      }}
+                      color={isUpvoted ? 'blue' : 'dark'}
+                      onClick={() => createReaction(true)}
                       variant="transparent"
                     >
                       <Leaf />
                     </ActionIcon>
                     <Text weight={500}>
-                      {userPost.positiveReactionCount -
-                        userPost.negativeReactionCount +
-                        reactionState}
+                      {userPost?.positiveReactionCount -
+                        userPost?.negativeReactionCount +
+                        (!userPost?.userReaction && reactionState.deleted
+                          ? 0
+                          : reactionState.value)}
                     </Text>
                     <ActionIcon
-                      color={reactionState === -1 ? 'blue' : 'dark'}
-                      onClick={() => {
-                        setReactionState(-1);
-                        createUserPostReaction(
-                          {
-                            fkUserPost: userPost.pkUserPost,
-                            isPositive: false
-                          },
-                          () => {},
-                          () => {
-                            setReactionState(0);
-                          }
-                        );
-                      }}
+                      color={isDownVoted ? 'blue' : 'dark'}
+                      onClick={() => createReaction(false)}
                       variant="transparent"
                     >
                       <Leaf

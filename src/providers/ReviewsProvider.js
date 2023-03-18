@@ -538,11 +538,17 @@ const deleteComment =
 
 const createUserPostReaction =
   dispatch =>
-  async ({ fkUserPost, isPositive }, onSuccessCallback, onErrorCallback) => {
+  async (
+    { fkUserPost, pkUserPostReaction, isPositive, removeReaction },
+    onSuccessCallback,
+    onErrorCallback
+  ) => {
     try {
       await weedstrueAPI.post(`/api/userPosts/${fkUserPost}/reaction`, null, {
         params: {
-          isPositive
+          pkUserPostReaction,
+          isPositive,
+          removeReaction
         }
       });
       if (onSuccessCallback) {
@@ -558,14 +564,20 @@ const createUserPostReaction =
 
 const createCommentReaction =
   dispatch =>
-  async ({ fkComment, isPositive }, onSuccessCallback, onErrorCallback) => {
+  async (
+    { fkComment, pkCommentReaction, isPositive, removeReaction },
+    onSuccessCallback,
+    onErrorCallback
+  ) => {
     try {
       await weedstrueAPI.post(
         `/api/userPosts/comments/${fkComment}/reaction`,
         null,
         {
           params: {
-            isPositive
+            pkCommentReaction,
+            isPositive,
+            removeReaction
           }
         }
       );
@@ -582,11 +594,17 @@ const createCommentReaction =
 
 const createProductReaction =
   dispatch =>
-  async ({ fkProduct, isPositive }, onSuccessCallback, onErrorCallback) => {
+  async (
+    { fkProduct, pkProductReaction, isPositive, removeReaction },
+    onSuccessCallback,
+    onErrorCallback
+  ) => {
     try {
       await weedstrueAPI.post(`/api/products/${fkProduct}/reaction`, null, {
         params: {
-          isPositive
+          pkProductReaction,
+          isPositive,
+          removeReaction
         }
       });
       if (onSuccessCallback) {
@@ -602,11 +620,17 @@ const createProductReaction =
 
 const createBrandReaction =
   dispatch =>
-  async ({ fkBrand, isPositive }, onSuccessCallback, onErrorCallback) => {
+  async (
+    { fkBrand, pkBrandReaction, isPositive, removeReaction },
+    onSuccessCallback,
+    onErrorCallback
+  ) => {
     try {
       await weedstrueAPI.post(`/api/brands/${fkBrand}/reaction`, null, {
         params: {
-          isPositive
+          pkBrandReaction,
+          isPositive,
+          removeReaction
         }
       });
       if (onSuccessCallback) {

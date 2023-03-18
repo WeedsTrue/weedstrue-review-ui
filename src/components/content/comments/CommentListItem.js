@@ -4,18 +4,47 @@ import dayjs from 'dayjs';
 import PropTypes from 'prop-types';
 import { Leaf, Message, Point, Share } from 'tabler-icons-react';
 import CreateComment from './CreateComment';
+import { reactToItem } from '../../../helpers/reactionHelper';
 import { Context as ReviewsContext } from '../../../providers/ReviewsProvider';
 const relativeTime = require('dayjs/plugin/relativeTime');
 
 const CommentListItem = ({ comment, replyComments }) => {
   dayjs.extend(relativeTime);
   const { createCommentReaction } = useContext(ReviewsContext);
-  const [reactionState, setReactionState] = useState(0);
-
   const [showReplyBox, setShowReplyBox] = useState(false);
   const replies = replyComments.filter(
     c => c.fkCommentParent === comment.pkComment
   );
+  const [reactionState, setReactionState] = useState({
+    value: 0,
+    deleted: false
+  });
+
+  const isUpvoted =
+    (comment?.userReaction?.isPositive && reactionState.value === 0) ||
+    (reactionState.value > 0 && !reactionState.deleted);
+  const isDownVoted =
+    (comment?.userReaction &&
+      !comment.userReaction.isPositive &&
+      reactionState.value === 0) ||
+    (reactionState.value < 0 && !reactionState.deleted);
+
+  const createReaction = isPositive => {
+    reactToItem(
+      {
+        isUpvoted,
+        isDownVoted,
+        fkComment: comment.pkComment,
+        fkUserPostReaction: comment.userReaction?.pkUserReaction,
+        isPositive,
+        deleted: reactionState.deleted
+      },
+      comment?.userReaction,
+      createCommentReaction,
+      setReactionState
+    );
+  };
+
   return (
     <Stack sx={{ gap: 0 }}>
       <Group sx={{ gap: 5, placeItems: 'center' }}>
@@ -50,20 +79,8 @@ const CommentListItem = ({ comment, replyComments }) => {
         <Group sx={{ gap: 5 }}>
           <Group sx={{ gap: 5, marginRight: 5 }}>
             <ActionIcon
-              color={reactionState === 1 ? 'blue' : 'dark'}
-              onClick={() => {
-                setReactionState(1);
-                createCommentReaction(
-                  {
-                    fkComment: comment.pkComment,
-                    isPositive: true
-                  },
-                  () => {},
-                  () => {
-                    setReactionState(0);
-                  }
-                );
-              }}
+              color={isUpvoted ? 'blue' : 'dark'}
+              onClick={() => createReaction(true)}
               size={24}
               variant="transparent"
             >
@@ -72,23 +89,13 @@ const CommentListItem = ({ comment, replyComments }) => {
             <Text size={14} weight={500}>
               {comment.positiveReactionCount -
                 comment.negativeReactionCount +
-                reactionState}
+                (!comment?.userReaction && reactionState.deleted
+                  ? 0
+                  : reactionState.value)}
             </Text>
             <ActionIcon
-              color={reactionState === -1 ? 'blue' : 'dark'}
-              onClick={() => {
-                setReactionState(-1);
-                createCommentReaction(
-                  {
-                    fkComment: comment.pkComment,
-                    isPositive: false
-                  },
-                  () => {},
-                  () => {
-                    setReactionState(0);
-                  }
-                );
-              }}
+              color={isDownVoted ? 'blue' : 'dark'}
+              onClick={() => createReaction(false)}
               size={24}
               variant="transparent"
             >

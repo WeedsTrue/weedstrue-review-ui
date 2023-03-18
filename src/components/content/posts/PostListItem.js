@@ -12,18 +12,47 @@ import {
   Title
 } from '@mantine/core';
 import PropTypes from 'prop-types';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Dots, Leaf, Message, Point, Share } from 'tabler-icons-react';
 import { USER_POST_TYPE, USER_POST_TYPE_LIST } from '../../../config/constants';
+import { reactToItem } from '../../../helpers/reactionHelper';
 import { Context as ReviewsContext } from '../../../providers/ReviewsProvider';
 
 const PostListItem = ({ userPost }) => {
+  const navigate = useNavigate();
   const { createUserPostReaction } = useContext(ReviewsContext);
-  const [reactionState, setReactionState] = useState(0);
+  const [reactionState, setReactionState] = useState({
+    value: 0,
+    deleted: false
+  });
 
   const postType =
     userPost &&
     USER_POST_TYPE_LIST.find(t => t.value === userPost.fkUserPostType);
+
+  const isUpvoted =
+    (userPost?.userReaction?.isPositive && reactionState.value === 0) ||
+    (reactionState.value > 0 && !reactionState.deleted);
+  const isDownVoted =
+    (userPost?.userReaction &&
+      !userPost.userReaction.isPositive &&
+      reactionState.value === 0) ||
+    (reactionState.value < 0 && !reactionState.deleted);
+
+  const createReaction = isPositive => {
+    reactToItem(
+      {
+        isUpvoted,
+        isDownVoted,
+        fkUserPost: userPost.pkUserPost,
+        isPositive,
+        deleted: reactionState.deleted
+      },
+      userPost?.userReaction,
+      createUserPostReaction,
+      setReactionState
+    );
+  };
 
   return userPost ? (
     <Card
@@ -40,20 +69,10 @@ const PostListItem = ({ userPost }) => {
       <Group sx={{ alignItems: 'start' }}>
         <Stack sx={{ gap: 0, placeItems: 'center', marginLeft: 5 }}>
           <ActionIcon
-            color={reactionState === 1 ? 'blue' : 'dark'}
+            color={isUpvoted ? 'blue' : 'dark'}
             onClick={e => {
               e.preventDefault();
-              setReactionState(1);
-              createUserPostReaction(
-                {
-                  fkUserPost: userPost.pkUserPost,
-                  isPositive: true
-                },
-                () => {},
-                () => {
-                  setReactionState(0);
-                }
-              );
+              createReaction(true);
             }}
             variant="transparent"
           >
@@ -62,23 +81,15 @@ const PostListItem = ({ userPost }) => {
           <Text weight={500}>
             {userPost.positiveReactionCount -
               userPost.negativeReactionCount +
-              reactionState}
+              (!userPost?.userReaction && reactionState.deleted
+                ? 0
+                : reactionState.value)}
           </Text>
           <ActionIcon
-            color={reactionState === -1 ? 'blue' : 'dark'}
+            color={isDownVoted ? 'blue' : 'dark'}
             onClick={e => {
               e.preventDefault();
-              setReactionState(-1);
-              createUserPostReaction(
-                {
-                  fkUserPost: userPost.pkUserPost,
-                  isPositive: false
-                },
-                () => {},
-                () => {
-                  setReactionState(0);
-                }
-              );
+              createReaction(false);
             }}
             variant="transparent"
           >
@@ -101,12 +112,17 @@ const PostListItem = ({ userPost }) => {
             }}
           >
             <Stack sx={{ gap: 0 }}>
-              <Text color="grey" size={13}>
+              <Text color="grey" size={13} sx={{ flexWrap: 'nowrap' }}>
                 Posted by{' '}
                 <Text
-                  component={Link}
-                  sx={{ '&:hover': { textDecoration: 'underline' } }}
-                  to={`/profile/${userPost.user.username}`}
+                  onClick={e => {
+                    e.preventDefault();
+                    navigate(`/profile/${userPost.user.username}`);
+                  }}
+                  sx={{
+                    display: 'inline',
+                    '&:hover': { textDecoration: 'underline' }
+                  }}
                 >
                   {userPost.user.username}
                 </Text>
