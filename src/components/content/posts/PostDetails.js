@@ -16,6 +16,7 @@ import { Dots, Leaf, Message, Point, Share } from 'tabler-icons-react';
 import { USER_POST_TYPE, USER_POST_TYPE_LIST } from '../../../config/constants';
 import { reactToItem } from '../../../helpers/reactionHelper';
 import { Context as ReviewsContext } from '../../../providers/ReviewsProvider';
+import ShareLinkModal from '../../common/ShareLinkModal';
 import BrandSidebarInfo from '../brands/BrandSidebarInfo';
 import CommentList from '../comments/CommentList';
 import CreateComment from '../comments/CreateComment';
@@ -27,6 +28,7 @@ const PostDetails = ({ postItem }) => {
   const hasFetched = useRef(false);
   const { state, fetchUserPost, createUserPostReaction } =
     useContext(ReviewsContext);
+  const [showSharePostModal, setShowSharePostModal] = useState(false);
   const [reactionState, setReactionState] = useState({
     value: 0,
     deleted: false
@@ -215,6 +217,7 @@ const PostDetails = ({ postItem }) => {
                         <Button
                           color="dark"
                           leftIcon={<Share size={20} />}
+                          onClick={() => setShowSharePostModal(true)}
                           size="xs"
                           sx={{ fontSize: 14 }}
                           variant="subtle"
@@ -256,6 +259,12 @@ const PostDetails = ({ postItem }) => {
           </Stack>
         </>
       )}
+      <ShareLinkModal
+        onClose={() => setShowSharePostModal(false)}
+        opened={showSharePostModal}
+        pathname={window.location.pathname}
+        title={<Title order={3}>Share Post</Title>}
+      />
     </Group>
   );
 };

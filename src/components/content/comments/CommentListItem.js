@@ -1,16 +1,26 @@
 import React, { useContext, useState } from 'react';
-import { ActionIcon, Avatar, Button, Group, Stack, Text } from '@mantine/core';
+import {
+  ActionIcon,
+  Avatar,
+  Button,
+  Group,
+  Stack,
+  Text,
+  Title
+} from '@mantine/core';
 import dayjs from 'dayjs';
 import PropTypes from 'prop-types';
 import { Leaf, Message, Point, Share } from 'tabler-icons-react';
 import CreateComment from './CreateComment';
 import { reactToItem } from '../../../helpers/reactionHelper';
 import { Context as ReviewsContext } from '../../../providers/ReviewsProvider';
+import ShareLinkModal from '../../common/ShareLinkModal';
 const relativeTime = require('dayjs/plugin/relativeTime');
 
 const CommentListItem = ({ comment, replyComments }) => {
   dayjs.extend(relativeTime);
   const { createCommentReaction } = useContext(ReviewsContext);
+  const [showSharePostModal, setShowSharePostModal] = useState(false);
   const [showReplyBox, setShowReplyBox] = useState(false);
   const replies = replyComments.filter(
     c => c.fkCommentParent === comment.pkComment
@@ -123,6 +133,7 @@ const CommentListItem = ({ comment, replyComments }) => {
           <Button
             color="dark"
             leftIcon={<Share size={22} />}
+            onClick={() => setShowSharePostModal(true)}
             size="xs"
             sx={{ padding: 5 }}
             variant="subtle"
@@ -156,6 +167,12 @@ const CommentListItem = ({ comment, replyComments }) => {
           />
         ))}
       </Stack>
+      <ShareLinkModal
+        onClose={() => setShowSharePostModal(false)}
+        opened={showSharePostModal}
+        pathname={window.location.pathname}
+        title={<Title order={3}>Share Post</Title>}
+      />
     </Stack>
   );
 };
