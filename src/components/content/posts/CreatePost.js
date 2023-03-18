@@ -288,12 +288,14 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
                         (postItem && !hasSearched.current) ||
                         (searchData.brands.length === 0 &&
                           searchData.products.length === 0)
-                          ? [
-                              {
-                                label: postItemInfo.name,
-                                value: postItemInfo.link
-                              }
-                            ]
+                          ? postItem
+                            ? [
+                                {
+                                  label: postItemInfo.name,
+                                  value: postItemInfo.link
+                                }
+                              ]
+                            : []
                           : [
                               ...searchData.brands.map(b => ({
                                 label: b.name,
@@ -304,7 +306,7 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
                                 description: p.brand.name,
                                 value: `/products/${p.uuid}`
                               }))
-                            ]
+                            ].sort((a, b) => a.label.localeCompare(b.label))
                       }
                       itemComponent={CustomSearchItem}
                       onChange={value => {
