@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import {
   Button,
   Card,
@@ -29,6 +29,7 @@ import BrandSidebarInfo from '../brands/BrandSidebarInfo';
 import ProductSidebarInfo from '../products/ProductSidebarInfo';
 
 const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
+  const hasSearched = useRef(false);
   const navigate = useNavigate();
   const {
     state,
@@ -38,7 +39,7 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
     deleteUserPost,
     fetchUserPostProductOptions
   } = useContext(ReviewsContext);
-  const [searchData, setSearchData] = useState(null);
+  const [searchData, setSearchData] = useState({ brands: [], products: [] });
   const [formState, setFormState] = useState({
     userPost: null,
     title: '',
@@ -178,6 +179,30 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
     };
   };
 
+  console.log(
+    postItem,
+    hasSearched,
+    postItem && !hasSearched.current,
+    postItem && !hasSearched.current
+      ? [
+          {
+            label: postItemInfo.name,
+            value: postItemInfo.name
+          }
+        ]
+      : [
+          ...searchData.brands.map(b => ({
+            label: b.name,
+            value: `/brands/${b.uuid}/submit`
+          })),
+          ...searchData.products.map(p => ({
+            label: p.name,
+            description: p.brand.name,
+            value: `/products/${p.uuid}/submit`
+          }))
+        ]
+  );
+
   return (
     !isPostItemLoading && (
       <Stack
@@ -260,40 +285,44 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
                   <Group sx={{ justifyContent: 'space-between' }}>
                     <SearchInput
                       data={
-                        postItem && !searchData
+                        (postItem && !hasSearched.current) ||
+                        (searchData.brands.length === 0 &&
+                          searchData.products.length === 0)
                           ? [
                               {
                                 label: postItemInfo.name,
-                                value: postItemInfo.name
+                                value: postItemInfo.link
                               }
                             ]
-                          : !searchData
-                          ? []
                           : [
                               ...searchData.brands.map(b => ({
                                 label: b.name,
-                                value: `/brands/${b.uuid}/submit`
+                                value: `/brands/${b.uuid}`
                               })),
                               ...searchData.products.map(p => ({
                                 label: p.name,
                                 description: p.brand.name,
-                                value: `/products/${p.uuid}/submit`
+                                value: `/products/${p.uuid}`
                               }))
                             ]
                       }
                       itemComponent={CustomSearchItem}
-                      onChange={navigate}
+                      onChange={value => {
+                        navigate(`${value}/submit`);
+                        hasSearched.current = false;
+                      }}
                       onSearch={searchTerm => {
                         if (searchTerm) {
                           fetchUserPostProductOptions(
                             searchTerm,
                             setSearchData
                           );
+                          hasSearched.current = true;
                         }
                       }}
                       placeholder="Choose a product..."
                       sx={{ maxWidth: 300 }}
-                      value={postItemInfo.name}
+                      value={postItemInfo.link}
                     />
                     <Select
                       data={Object.entries(USER_POST_TYPE)
