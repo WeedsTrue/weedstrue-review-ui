@@ -179,30 +179,6 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
     };
   };
 
-  console.log(
-    postItem,
-    hasSearched,
-    postItem && !hasSearched.current,
-    postItem && !hasSearched.current
-      ? [
-          {
-            label: postItemInfo.name,
-            value: postItemInfo.name
-          }
-        ]
-      : [
-          ...searchData.brands.map(b => ({
-            label: b.name,
-            value: `/brands/${b.uuid}/submit`
-          })),
-          ...searchData.products.map(p => ({
-            label: p.name,
-            description: p.brand.name,
-            value: `/products/${p.uuid}/submit`
-          }))
-        ]
-  );
-
   return (
     !isPostItemLoading && (
       <Stack
