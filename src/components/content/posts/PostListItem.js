@@ -11,6 +11,7 @@ import {
   Text,
   Title
 } from '@mantine/core';
+import dayjs from 'dayjs';
 import PropTypes from 'prop-types';
 import { Link, useNavigate } from 'react-router-dom';
 import { Dots, Leaf, Message, Point, Share } from 'tabler-icons-react';
@@ -18,8 +19,10 @@ import { USER_POST_TYPE, USER_POST_TYPE_LIST } from '../../../config/constants';
 import { reactToItem } from '../../../helpers/reactionHelper';
 import { Context as ReviewsContext } from '../../../providers/ReviewsProvider';
 import ShareLinkModal from '../../common/ShareLinkModal';
+const relativeTime = require('dayjs/plugin/relativeTime');
 
 const PostListItem = ({ userPost }) => {
+  dayjs.extend(relativeTime);
   const navigate = useNavigate();
   const { createUserPostReaction } = useContext(ReviewsContext);
   const [showSharePostModal, setShowSharePostModal] = useState(false);
@@ -118,20 +121,29 @@ const PostListItem = ({ userPost }) => {
               }}
             >
               <Stack sx={{ gap: 0 }}>
-                <Text color="grey" size={13} sx={{ flexWrap: 'nowrap' }}>
+                <Text
+                  color="grey"
+                  size={13}
+                  sx={{ flexWrap: 'nowrap', display: 'inline' }}
+                >
                   Posted by{' '}
-                  <Text
-                    onClick={e => {
-                      e.preventDefault();
-                      navigate(`/profile/${userPost.user.username}`);
-                    }}
-                    sx={{
-                      display: 'inline',
-                      '&:hover': { textDecoration: 'underline' }
-                    }}
-                  >
-                    {userPost.user.username}
-                  </Text>
+                  <Group sx={{ gap: 3, display: 'inline-flex' }}>
+                    <Text
+                      onClick={e => {
+                        e.preventDefault();
+                        navigate(`/profile/${userPost?.user.username}`);
+                      }}
+                      sx={{
+                        '&:hover': { textDecoration: 'underline' }
+                      }}
+                    >
+                      {userPost.user.username}
+                    </Text>
+                    <Point size={10} />
+                    <Text color="grey" sx={{ fontSize: 12 }}>
+                      {dayjs(userPost.created).fromNow()}
+                    </Text>
+                  </Group>
                 </Text>
                 <Group
                   sx={{

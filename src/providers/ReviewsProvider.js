@@ -7,6 +7,7 @@ const initialState = {
   comments: { value: [], loading: false, error: null },
   userPosts: { value: [], loading: false, error: null },
   userPost: { value: null, loading: false, error: null },
+  userPostDrafts: { value: [], loading: false, error: null },
   userProfile: { value: null, loading: false, error: null },
   products: { value: [], loading: false, error: null },
   product: { value: null, loading: false, error: null }
@@ -294,19 +295,19 @@ const fetchUserDrafts = dispatch => async () => {
   try {
     dispatch({
       type: 'FETCHING',
-      stateName: 'userPosts'
+      stateName: 'userPostDrafts'
     });
     const response = await weedstrueAPI.get('/api/userPosts/drafts');
 
     dispatch({
       type: 'SUCCESS',
-      stateName: 'userPosts',
+      stateName: 'userPostDrafts',
       payload: { value: response.data }
     });
   } catch (e) {
     dispatch({
       type: 'ERROR',
-      stateName: 'userPosts',
+      stateName: 'userPostDrafts',
       payload: 'Oops something went wrong.'
     });
   }
@@ -360,7 +361,7 @@ const createUserPost =
     try {
       dispatch({
         type: 'FETCHING',
-        stateName: 'userPosts'
+        stateName: 'userPostDrafts'
       });
       const response = await weedstrueAPI.post('/api/userPosts', {
         title,
@@ -376,7 +377,7 @@ const createUserPost =
 
       dispatch({
         type: 'APPEND',
-        stateName: 'userPosts',
+        stateName: 'userPostDrafts',
         payload: response.data
       });
       if (onSuccessCallback) {
@@ -386,7 +387,7 @@ const createUserPost =
       const message = getErrorMessage(e);
       dispatch({
         type: 'ERROR',
-        stateName: 'userPosts',
+        stateName: 'userPostDrafts',
         payload: message
       });
       if (onErrorCallback) {
@@ -416,7 +417,7 @@ const updateUserPost =
     try {
       dispatch({
         type: 'FETCHING',
-        stateName: 'userPosts'
+        stateName: 'userPostDrafts'
       });
       const response = await weedstrueAPI.put(`/api/userPosts/${pkUserPost}`, {
         title,
@@ -432,7 +433,7 @@ const updateUserPost =
 
       dispatch({
         type: 'REPLACE',
-        stateName: 'userPosts',
+        stateName: 'userPostDrafts',
         payload: {
           filter: p => p.pkUserPost !== pkUserPost,
           value: response.data
@@ -445,7 +446,7 @@ const updateUserPost =
       const message = getErrorMessage(e);
       dispatch({
         type: 'ERROR',
-        stateName: 'userPosts',
+        stateName: 'userPostDrafts',
         payload: message
       });
       if (onErrorCallback) {

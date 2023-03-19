@@ -10,6 +10,7 @@ import {
   Text,
   Title
 } from '@mantine/core';
+import dayjs from 'dayjs';
 import PropTypes from 'prop-types';
 import { Link, useParams } from 'react-router-dom';
 import { Dots, Leaf, Message, Point, Share } from 'tabler-icons-react';
@@ -23,8 +24,10 @@ import CreateComment from '../comments/CreateComment';
 import ProductAttribute from '../products/ProductAttribute';
 import ProductEffect from '../products/ProductEffect';
 import ProductSidebarInfo from '../products/ProductSidebarInfo';
+const relativeTime = require('dayjs/plugin/relativeTime');
 
 const PostDetails = ({ postItem }) => {
+  dayjs.extend(relativeTime);
   const hasFetched = useRef(false);
   const { state, fetchUserPost, createUserPostReaction } =
     useContext(ReviewsContext);
@@ -123,15 +126,27 @@ const PostDetails = ({ postItem }) => {
                       }}
                     >
                       <Stack sx={{ gap: 0 }}>
-                        <Text color="grey" size={13}>
+                        <Text
+                          color="grey"
+                          size={13}
+                          sx={{ flexWrap: 'nowrap', display: 'inline' }}
+                        >
                           Posted by{' '}
-                          <Text
-                            component={Link}
-                            sx={{ '&:hover': { textDecoration: 'underline' } }}
-                            to={`/profile/${userPost.user.username}`}
-                          >
-                            {userPost.user.username}
-                          </Text>
+                          <Group sx={{ gap: 3, display: 'inline-flex' }}>
+                            <Text
+                              component={Link}
+                              sx={{
+                                '&:hover': { textDecoration: 'underline' }
+                              }}
+                              to={`/profile/${userPost.user.username}`}
+                            >
+                              {userPost.user.username}
+                            </Text>
+                            <Point size={10} />
+                            <Text color="grey" sx={{ fontSize: 12 }}>
+                              {dayjs(userPost.created).fromNow()}
+                            </Text>
+                          </Group>
                         </Text>
                         <Group
                           sx={{

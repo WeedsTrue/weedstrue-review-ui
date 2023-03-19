@@ -57,7 +57,7 @@ const CommentListItem = ({ comment, replyComments }) => {
 
   return (
     <Stack sx={{ gap: 0 }}>
-      <Group sx={{ gap: 5, placeItems: 'center' }}>
+      <Group sx={{ gap: 10, placeItems: 'center' }}>
         <Avatar radius="xl" size={45} />
         <Group sx={{ gap: 3 }}>
           <Text sx={{ fontSize: 14 }} weight={500}>
@@ -71,11 +71,11 @@ const CommentListItem = ({ comment, replyComments }) => {
       </Group>
       <Stack
         sx={{
-          marginLeft: 25,
+          marginLeft: 22,
           gap: 10,
           overflow: 'hidden',
           borderLeft: 'solid 2px lightgrey',
-          paddingLeft: 25
+          paddingLeft: 30
         }}
       >
         <Text

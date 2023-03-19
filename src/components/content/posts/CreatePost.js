@@ -12,7 +12,7 @@ import {
   Title
 } from '@mantine/core';
 import PropTypes from 'prop-types';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import CreatePostReviewAdditions from './CreatePostReviewAdditions';
 import DraftSelectModal from './DraftSelectModal';
 import {
@@ -21,6 +21,7 @@ import {
 } from '../../../config/constants';
 import { USER_POST_EFFECT_TYPE } from '../../../config/effectConstants';
 import { triggerNotification } from '../../../helpers/notificationHelper';
+import { usePrompt } from '../../../helpers/usePrompt';
 import { Context as ReviewsContext } from '../../../providers/ReviewsProvider';
 import CustomSearchItem from '../../common/CustomSearchItem';
 import FormSection from '../../common/FormSection';
@@ -29,6 +30,8 @@ import BrandSidebarInfo from '../brands/BrandSidebarInfo';
 import ProductSidebarInfo from '../products/ProductSidebarInfo';
 
 const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [forceSaveDraft, setForceSaveDraft] = useState(false);
   const hasSearched = useRef(false);
   const navigate = useNavigate();
   const {
@@ -64,7 +67,8 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
     isLoading: false,
     isDraftSelectOpen: false
   });
-  const userDrafts = state.userPosts.value.filter(p => p.draft);
+  const userDrafts = state.userPostDrafts.value.filter(p => p.draft);
+  const draftId = searchParams.get('draft');
 
   let postItemInfo = {};
   switch (postType) {
@@ -85,6 +89,25 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
     default:
       break;
   }
+
+  usePrompt(() => {
+    setForceSaveDraft(true);
+  }, formState.hasUnsavedChanges && !formState.isLoading);
+
+  useEffect(() => {
+    if (
+      draftId &&
+      !state.userPostDrafts.loading &&
+      formState.userPost?.pkUserPost.toString() !== draftId
+    ) {
+      const userPost = userDrafts.find(
+        d => d.pkUserPost.toString() === draftId
+      );
+      if (userPost) {
+        selectDraft(userPost);
+      }
+    }
+  }, [draftId, state.userPostDrafts.value]);
 
   useEffect(() => {
     if (!isPostItemLoading) {
@@ -115,6 +138,13 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
       });
     }
   }, [isPostItemLoading]);
+
+  useEffect(() => {
+    if (forceSaveDraft) {
+      saveDraft();
+      setForceSaveDraft(false);
+    }
+  }, [forceSaveDraft]);
 
   const onSuccess = userPost => {
     if (userPost.draft) {
@@ -177,6 +207,57 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
         : [],
       draft: isDraft
     };
+  };
+
+  const saveDraft = () => {
+    setFormState({
+      ...formState,
+      draft: true,
+      isLoading: true
+    });
+    if (formState.userPost) {
+      updateUserPost(
+        formState.userPost.pkUserPost,
+        getFormStateRequestData(formState, true),
+        onSuccess,
+        onError
+      );
+    } else {
+      createUserPost(
+        getFormStateRequestData(formState, true),
+        onSuccess,
+        onError
+      );
+    }
+  };
+
+  const selectDraft = userPost => {
+    setFormState({
+      ...formState,
+      userPost,
+      title: userPost.title,
+      content: userPost.content,
+      draft: userPost.draft,
+      fkUserPostType: userPost.fkUserPostType,
+      reviewState: {
+        rating: userPost.userRating,
+        attributes: userPost.attributes.reduce((a, v) => {
+          const attribute = PRODUCT_ATTRIBUTE_TYPE.find(
+            t => t.value === v.fkProductAttributeType
+          );
+          return {
+            ...a,
+            [attribute.inputValue]: v.value
+          };
+        }, {}),
+        effects: USER_POST_EFFECT_TYPE.filter(e =>
+          userPost.effectTypes.includes(e.value)
+        )
+      },
+      hasUnsavedChanges: false,
+      isLoading: false,
+      isDraftSelectOpen: false
+    });
   };
 
   return (
@@ -298,13 +379,14 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
                           hasSearched.current = true;
                         }
                       }}
-                      placeholder="Choose a product..."
+                      placeholder="Search a product..."
                       sx={{ maxWidth: 300 }}
                       value={postItemInfo.link}
                     />
                     <Select
                       data={Object.entries(USER_POST_TYPE)
                         .map(a => a[1])
+                        .filter(t => postItem || t.value !== 1)
                         .sort((a, b) => a.label.localeCompare(b.label))}
                       onChange={value =>
                         setFormState({
@@ -366,27 +448,7 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
                       (!formState.draft && formState.isLoading)
                     }
                     loading={formState.draft && formState.isLoading}
-                    onClick={() => {
-                      setFormState({
-                        ...formState,
-                        draft: true,
-                        isLoading: true
-                      });
-                      if (formState.userPost) {
-                        updateUserPost(
-                          formState.userPost.pkUserPost,
-                          getFormStateRequestData(formState, true),
-                          onSuccess,
-                          onError
-                        );
-                      } else {
-                        createUserPost(
-                          getFormStateRequestData(formState, true),
-                          onSuccess,
-                          onError
-                        );
-                      }
-                    }}
+                    onClick={saveDraft}
                     radius="xl"
                     type="button"
                     value="draft"
@@ -453,32 +515,27 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
             );
           }}
           onSelect={userPost => {
-            setFormState({
-              ...formState,
-              userPost,
-              title: userPost.title,
-              content: userPost.content,
-              draft: userPost.draft,
-              fkUserPostType: userPost.fkUserPostType,
-              reviewState: {
-                rating: userPost.userRating,
-                attributes: userPost.attributes.reduce((a, v) => {
-                  const attribute = PRODUCT_ATTRIBUTE_TYPE.find(
-                    t => t.value === v.fkProductAttributeType
+            if (
+              userPost.pkPostItem &&
+              postItemInfo.pkPostItem !== userPost.pkPostItem
+            ) {
+              switch (userPost.postItemType) {
+                case 'brand':
+                  navigate(
+                    `/brands/${userPost.postItemUuid}/submit?draft=${userPost.pkUserPost}`
                   );
-                  return {
-                    ...a,
-                    [attribute.inputValue]: v.value
-                  };
-                }, {}),
-                effects: USER_POST_EFFECT_TYPE.filter(e =>
-                  userPost.effectTypes.includes(e.value)
-                )
-              },
-              hasUnsavedChanges: false,
-              isLoading: false,
-              isDraftSelectOpen: false
-            });
+                  break;
+                case 'product':
+                  navigate(
+                    `/products/${userPost.postItemUuid}/submit?draft=${userPost.pkUserPost}`
+                  );
+                  break;
+                default:
+                  break;
+              }
+            }
+
+            selectDraft(userPost);
           }}
           selectUserPost={formState.userPost}
           userPosts={userDrafts}

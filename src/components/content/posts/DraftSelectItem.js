@@ -2,12 +2,11 @@ import React, { useState } from 'react';
 import { ActionIcon, Group, Stack, Text } from '@mantine/core';
 import dayjs from 'dayjs';
 import PropTypes from 'prop-types';
-import { Notes, Trash } from 'tabler-icons-react';
+import { Notes, Point, Trash } from 'tabler-icons-react';
 const relativeTime = require('dayjs/plugin/relativeTime');
 
 const DraftSelectItem = ({ userPost, isBeingEdited, onDelete, onSelect }) => {
   dayjs.extend(relativeTime);
-
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   return (
@@ -35,11 +34,25 @@ const DraftSelectItem = ({ userPost, isBeingEdited, onDelete, onSelect }) => {
           }}
           weight={isBeingEdited ? 700 : 'normal'}
         >
-          {isBeingEdited ? `EDITING: ${userPost.title}` : userPost.title}
+          {isBeingEdited
+            ? `EDITING: ${userPost.title ? userPost.title : 'Untitled'}`
+            : userPost.title
+            ? userPost.title
+            : 'Untitled'}
         </Text>
-        <Text sx={{ fontSize: 14, lineHeight: '16px' }}>
-          Draft Saved {dayjs(userPost.created).fromNow()}
-        </Text>
+        <Group sx={{ gap: 5 }}>
+          {userPost.postItemName && (
+            <>
+              <Text sx={{ fontSize: 14, lineHeight: '16px' }}>
+                {userPost.postItemName}
+              </Text>
+              <Point size={5} />
+            </>
+          )}
+          <Text sx={{ fontSize: 14, lineHeight: '16px' }}>
+            Draft Saved {dayjs(userPost.created).fromNow()}
+          </Text>
+        </Group>
       </Stack>
       <Stack>
         {confirmDelete ? (
