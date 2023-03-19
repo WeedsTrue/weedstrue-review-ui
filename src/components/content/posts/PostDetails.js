@@ -12,8 +12,10 @@ import {
 } from '@mantine/core';
 import dayjs from 'dayjs';
 import PropTypes from 'prop-types';
-import { Link, useParams } from 'react-router-dom';
-import { Dots, Leaf, Message, Point, Share } from 'tabler-icons-react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Leaf, Message, Point, Share } from 'tabler-icons-react';
+import DeletePostModal from './DeletePostModal';
+import PostMenu from './PostMenu';
 import { USER_POST_TYPE, USER_POST_TYPE_LIST } from '../../../config/constants';
 import { reactToItem } from '../../../helpers/reactionHelper';
 import { Context as ReviewsContext } from '../../../providers/ReviewsProvider';
@@ -27,11 +29,13 @@ import ProductSidebarInfo from '../products/ProductSidebarInfo';
 const relativeTime = require('dayjs/plugin/relativeTime');
 
 const PostDetails = ({ postItem }) => {
+  const navigate = useNavigate();
   dayjs.extend(relativeTime);
   const hasFetched = useRef(false);
   const { state, fetchUserPost, createUserPostReaction } =
     useContext(ReviewsContext);
   const [showSharePostModal, setShowSharePostModal] = useState(false);
+  const [showDeletePostModal, setShowDeletePostModal] = useState(false);
   const [reactionState, setReactionState] = useState({
     value: 0,
     deleted: false
@@ -146,6 +150,14 @@ const PostDetails = ({ postItem }) => {
                             <Text color="grey" sx={{ fontSize: 12 }}>
                               {dayjs(userPost.created).fromNow()}
                             </Text>
+                            {userPost.updated && (
+                              <>
+                                <Point size={10} />
+                                <Text color="grey" sx={{ fontSize: 12 }}>
+                                  Updated {dayjs(userPost.updated).fromNow()}
+                                </Text>
+                              </>
+                            )}
                           </Group>
                         </Text>
                         <Group
@@ -241,9 +253,14 @@ const PostDetails = ({ postItem }) => {
                         </Button>
                       </Group>
                       <Group>
-                        <Button color="dark" size="xs" variant="subtle">
-                          <Dots />
-                        </Button>
+                        <PostMenu
+                          onAction={action => {
+                            if (action === 'DELETE') {
+                              setShowDeletePostModal(true);
+                            }
+                          }}
+                          userPost={userPost}
+                        />
                       </Group>
                     </Group>
                     <Group
@@ -279,6 +296,12 @@ const PostDetails = ({ postItem }) => {
         opened={showSharePostModal}
         pathname={window.location.pathname}
         title={<Title order={3}>Share Post</Title>}
+      />
+      <DeletePostModal
+        onClose={() => setShowDeletePostModal(false)}
+        onDelete={() => navigate('/')}
+        opened={showDeletePostModal}
+        userPost={userPost}
       />
     </Group>
   );

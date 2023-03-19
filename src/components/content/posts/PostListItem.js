@@ -14,7 +14,9 @@ import {
 import dayjs from 'dayjs';
 import PropTypes from 'prop-types';
 import { Link, useNavigate } from 'react-router-dom';
-import { Dots, Leaf, Message, Point, Share } from 'tabler-icons-react';
+import { Leaf, Message, Point, Share } from 'tabler-icons-react';
+import DeletePostModal from './DeletePostModal';
+import PostMenu from './PostMenu';
 import { USER_POST_TYPE, USER_POST_TYPE_LIST } from '../../../config/constants';
 import { reactToItem } from '../../../helpers/reactionHelper';
 import { Context as ReviewsContext } from '../../../providers/ReviewsProvider';
@@ -26,6 +28,7 @@ const PostListItem = ({ userPost }) => {
   const navigate = useNavigate();
   const { createUserPostReaction } = useContext(ReviewsContext);
   const [showSharePostModal, setShowSharePostModal] = useState(false);
+  const [showDeletePostModal, setShowDeletePostModal] = useState(false);
   const [reactionState, setReactionState] = useState({
     value: 0,
     deleted: false
@@ -72,7 +75,7 @@ const PostListItem = ({ userPost }) => {
 
   return userPost ? (
     <>
-      <Card component={Link} to={postLink}>
+      <Card component={Link} sx={{ overflow: 'visible' }} to={postLink}>
         <Group sx={{ alignItems: 'start' }}>
           <Stack sx={{ gap: 0, placeItems: 'center', marginLeft: 5 }}>
             <ActionIcon
@@ -234,14 +237,14 @@ const PostListItem = ({ userPost }) => {
                 </Button>
               </Group>
               <Group>
-                <Button
-                  color="dark"
-                  size="xs"
-                  sx={{ padding: 3 }}
-                  variant="subtle"
-                >
-                  <Dots />
-                </Button>
+                <PostMenu
+                  onAction={action => {
+                    if (action === 'DELETE') {
+                      setShowDeletePostModal(true);
+                    }
+                  }}
+                  userPost={userPost}
+                />
               </Group>
             </Group>
           </Stack>
@@ -252,6 +255,11 @@ const PostListItem = ({ userPost }) => {
         opened={showSharePostModal}
         pathname={postLink}
         title={<Title order={3}>Share Post</Title>}
+      />
+      <DeletePostModal
+        onClose={() => setShowDeletePostModal(false)}
+        opened={showDeletePostModal}
+        userPost={userPost}
       />
     </>
   ) : (

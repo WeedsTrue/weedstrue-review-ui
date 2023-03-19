@@ -12,7 +12,7 @@ import {
   Title
 } from '@mantine/core';
 import PropTypes from 'prop-types';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import CreatePostReviewAdditions from './CreatePostReviewAdditions';
 import DraftSelectModal from './DraftSelectModal';
 import {
@@ -30,6 +30,7 @@ import BrandSidebarInfo from '../brands/BrandSidebarInfo';
 import ProductSidebarInfo from '../products/ProductSidebarInfo';
 
 const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
+  const { postUuid } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
   const [forceSaveDraft, setForceSaveDraft] = useState(false);
   const hasSearched = useRef(false);
@@ -40,7 +41,8 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
     createUserPost,
     updateUserPost,
     deleteUserPost,
-    fetchUserPostProductOptions
+    fetchUserPostProductOptions,
+    fetchUserPostSummary
   } = useContext(ReviewsContext);
   const [searchData, setSearchData] = useState({ brands: [], products: [] });
   const [formState, setFormState] = useState({
@@ -111,31 +113,35 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
 
   useEffect(() => {
     if (!isPostItemLoading) {
-      fetchUserDrafts();
-      setFormState({
-        userPost: null,
-        title: '',
-        content: '',
-        draft: false,
-        fkUserPostType: postItem
-          ? USER_POST_TYPE.REVIEW.value
-          : USER_POST_TYPE.DISCUSSION.value,
-        fkPostItem: postItemInfo.pkPostItem,
-        postItemType: postType,
-        reviewState: {
-          rating: null,
-          attributes: {
-            thc: '',
-            cbd: '',
-            terps: '',
-            packagedDate: ''
+      if (postUuid) {
+        fetchUserPostSummary(postUuid, selectDraft, triggerNotification);
+      } else {
+        fetchUserDrafts();
+        setFormState({
+          userPost: null,
+          title: '',
+          content: '',
+          draft: false,
+          fkUserPostType: postItem
+            ? USER_POST_TYPE.REVIEW.value
+            : USER_POST_TYPE.DISCUSSION.value,
+          fkPostItem: postItemInfo.pkPostItem,
+          postItemType: postType,
+          reviewState: {
+            rating: null,
+            attributes: {
+              thc: '',
+              cbd: '',
+              terps: '',
+              packagedDate: ''
+            },
+            effects: []
           },
-          effects: []
-        },
-        hasUnsavedChanges: false,
-        isLoading: false,
-        isDraftSelectOpen: false
-      });
+          hasUnsavedChanges: false,
+          isLoading: false,
+          isDraftSelectOpen: false
+        });
+      }
     }
   }, [isPostItemLoading]);
 
@@ -303,39 +309,45 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
               >
                 <Group sx={{ justifyContent: 'space-between' }}>
                   <Title order={4}>
-                    {formState.userPost ? 'Edit draft' : 'Create a post'}
+                    {postUuid
+                      ? 'Edit post'
+                      : formState.userPost
+                      ? 'Edit draft'
+                      : 'Create a post'}
                   </Title>
-                  <Button
-                    color="dark"
-                    onClick={() => {
-                      setFormState({
-                        ...formState,
-                        isDraftSelectOpen: true
-                      });
-                    }}
-                    radius="xl"
-                    size="xs"
-                    type="button"
-                    uppercase
-                    variant="subtle"
-                  >
-                    <Group>
-                      <Title order={6} sx={{ color: 'dodgerblue' }}>
-                        Drafts
-                      </Title>
-                      <Indicator
-                        color="gray"
-                        label={userDrafts.length.toString()}
-                        radius="xs"
-                        styles={{
-                          common: {
-                            height: 20
-                          }
-                        }}
-                        sx={{ marginRight: 10 }}
-                      />
-                    </Group>
-                  </Button>
+                  {!postUuid && (
+                    <Button
+                      color="dark"
+                      onClick={() => {
+                        setFormState({
+                          ...formState,
+                          isDraftSelectOpen: true
+                        });
+                      }}
+                      radius="xl"
+                      size="xs"
+                      type="button"
+                      uppercase
+                      variant="subtle"
+                    >
+                      <Group>
+                        <Title order={6} sx={{ color: 'dodgerblue' }}>
+                          Drafts
+                        </Title>
+                        <Indicator
+                          color="gray"
+                          label={userDrafts.length.toString()}
+                          radius="xs"
+                          styles={{
+                            common: {
+                              height: 20
+                            }
+                          }}
+                          sx={{ marginRight: 10 }}
+                        />
+                      </Group>
+                    </Button>
+                  )}
                 </Group>
                 <Divider />
                 <Stack sx={{ gap: 10 }}>
@@ -442,20 +454,35 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
 
                 <Divider />
                 <Group sx={{ justifyContent: 'end' }}>
-                  <Button
-                    disabled={
-                      !formState.hasUnsavedChanges ||
-                      (!formState.draft && formState.isLoading)
-                    }
-                    loading={formState.draft && formState.isLoading}
-                    onClick={saveDraft}
-                    radius="xl"
-                    type="button"
-                    value="draft"
-                    variant="outline"
-                  >
-                    {formState.userPost ? 'Update Draft' : 'Save Draft'}
-                  </Button>
+                  {postUuid ? (
+                    <Button
+                      color="red"
+                      disabled={!formState.delete && formState.isLoading}
+                      loading={formState.delete && formState.isLoading}
+                      onClick={() => {}}
+                      radius="xl"
+                      type="button"
+                      value="draft"
+                      variant="outline"
+                    >
+                      Delete Post
+                    </Button>
+                  ) : (
+                    <Button
+                      disabled={
+                        !formState.hasUnsavedChanges ||
+                        (!formState.draft && formState.isLoading)
+                      }
+                      loading={formState.draft && formState.isLoading}
+                      onClick={saveDraft}
+                      radius="xl"
+                      type="button"
+                      value="draft"
+                      variant="outline"
+                    >
+                      {formState.userPost ? 'Update Draft' : 'Save Draft'}
+                    </Button>
+                  )}
                   <Button
                     disabled={
                       !formState.title ||
@@ -465,7 +492,7 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
                     radius="xl"
                     type="submit"
                   >
-                    Post
+                    {postUuid ? 'Update' : 'Post'}
                   </Button>
                 </Group>
               </FormSection>

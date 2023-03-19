@@ -7,6 +7,7 @@ const initialState = {
   comments: { value: [], loading: false, error: null },
   userPosts: { value: [], loading: false, error: null },
   userPost: { value: null, loading: false, error: null },
+  userPostSummary: { value: null, loading: false, error: null },
   userPostDrafts: { value: [], loading: false, error: null },
   userProfile: { value: null, loading: false, error: null },
   products: { value: [], loading: false, error: null },
@@ -341,6 +342,35 @@ const fetchUserPost = dispatch => async uuid => {
   }
 };
 
+const fetchUserPostSummary =
+  dispatch => async (uuid, onSuccessCallback, onErrorCallback) => {
+    try {
+      dispatch({
+        type: 'FETCHING',
+        stateName: 'userPostSummary'
+      });
+      const response = await weedstrueAPI.get(`/api/userPosts/${uuid}/summary`);
+
+      dispatch({
+        type: 'SUCCESS',
+        stateName: 'userPostSummary',
+        payload: { value: response.data }
+      });
+      if (onSuccessCallback) {
+        onSuccessCallback(response.data);
+      }
+    } catch (e) {
+      if (onErrorCallback) {
+        onErrorCallback();
+      }
+      dispatch({
+        type: 'ERROR',
+        stateName: 'userPostSummary',
+        payload: 'Oops something went wrong.'
+      });
+    }
+  };
+
 const createUserPost =
   dispatch =>
   async (
@@ -471,6 +501,14 @@ const deleteUserPost =
           filter: p => p.pkUserPost !== pkUserPost
         }
       });
+      dispatch({
+        type: 'REMOVE',
+        stateName: 'userPostDrafts',
+        payload: {
+          filter: p => p.pkUserPost !== pkUserPost
+        }
+      });
+
       if (onSuccessCallback) {
         onSuccessCallback();
       }
@@ -713,6 +751,7 @@ export const { Provider, Context } = createProvider(
     fetchUserPostProductOptions,
     fetchUserPosts,
     fetchUserPost,
+    fetchUserPostSummary,
     fetchUserProfile,
     updateUserPost
   },

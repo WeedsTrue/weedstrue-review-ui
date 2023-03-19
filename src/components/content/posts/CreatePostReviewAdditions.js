@@ -74,15 +74,17 @@ const CreatePostReviewAdditions = ({
                     customInput={TextInput}
                     decimalScale={2}
                     label="THC %"
-                    onValueChange={e =>
-                      onPostReviewStateChange({
-                        ...postReviewState,
-                        attributes: {
-                          ...postReviewState.attributes,
-                          thc: e.floatValue
-                        }
-                      })
-                    }
+                    onValueChange={e => {
+                      if (e.value !== postReviewState.attributes.thc) {
+                        onPostReviewStateChange({
+                          ...postReviewState,
+                          attributes: {
+                            ...postReviewState.attributes,
+                            thc: e.floatValue
+                          }
+                        });
+                      }
+                    }}
                     placeholder="18%"
                     suffix="%"
                     sx={{ flex: 1 }}
@@ -93,15 +95,17 @@ const CreatePostReviewAdditions = ({
                     customInput={TextInput}
                     decimalScale={2}
                     label="CBD %"
-                    onValueChange={e =>
-                      onPostReviewStateChange({
-                        ...postReviewState,
-                        attributes: {
-                          ...postReviewState.attributes,
-                          cbd: e.floatValue
-                        }
-                      })
-                    }
+                    onValueChange={e => {
+                      if (e.value !== postReviewState.attributes.cbd) {
+                        onPostReviewStateChange({
+                          ...postReviewState,
+                          attributes: {
+                            ...postReviewState.attributes,
+                            cbd: e.floatValue
+                          }
+                        });
+                      }
+                    }}
                     placeholder="0.1%"
                     suffix="%"
                     sx={{ flex: 1 }}
@@ -115,15 +119,17 @@ const CreatePostReviewAdditions = ({
                     customInput={TextInput}
                     decimalScale={2}
                     label="TERP %"
-                    onValueChange={e =>
-                      onPostReviewStateChange({
-                        ...postReviewState,
-                        attributes: {
-                          ...postReviewState.attributes,
-                          terps: e.floatValue
-                        }
-                      })
-                    }
+                    onValueChange={e => {
+                      if (e.value !== postReviewState.attributes.terps) {
+                        onPostReviewStateChange({
+                          ...postReviewState,
+                          attributes: {
+                            ...postReviewState.attributes,
+                            terps: e.floatValue
+                          }
+                        });
+                      }
+                    }}
                     placeholder="3.11%"
                     suffix="%"
                     sx={{ flex: 1 }}
