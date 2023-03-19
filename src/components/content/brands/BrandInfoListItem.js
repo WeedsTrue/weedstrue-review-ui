@@ -12,11 +12,40 @@ import {
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { Leaf } from 'tabler-icons-react';
+import { reactToItem } from '../../../helpers/reactionHelper';
 import { Context as ReviewsContext } from '../../../providers/ReviewsProvider';
 
 const BrandInfoListItem = ({ brand }) => {
   const { createBrandReaction } = useContext(ReviewsContext);
-  const [reactionState, setReactionState] = useState(0);
+  const [reactionState, setReactionState] = useState({
+    value: 0,
+    deleted: false
+  });
+
+  const isUpvoted =
+    (brand?.userReaction?.isPositive && reactionState.value === 0) ||
+    (reactionState.value > 0 && !reactionState.deleted);
+  const isDownVoted =
+    (brand?.userReaction &&
+      !brand.userReaction.isPositive &&
+      reactionState.value === 0) ||
+    (reactionState.value < 0 && !reactionState.deleted);
+
+  const createReaction = isPositive => {
+    reactToItem(
+      {
+        isUpvoted,
+        isDownVoted,
+        fkBrand: brand.pkBrand,
+        fkUserPostReaction: brand.userReaction?.pkUserReaction,
+        isPositive,
+        deleted: reactionState.deleted
+      },
+      brand?.userReaction,
+      createBrandReaction,
+      setReactionState
+    );
+  };
 
   return brand ? (
     <Card
@@ -34,20 +63,10 @@ const BrandInfoListItem = ({ brand }) => {
         <Group>
           <Group sx={{ gap: 5, marginRight: 5 }}>
             <ActionIcon
-              color={reactionState === 1 ? 'blue' : 'dark'}
+              color={isUpvoted ? 'blue' : 'dark'}
               onClick={e => {
                 e.preventDefault();
-                setReactionState(1);
-                createBrandReaction(
-                  {
-                    fkBrand: brand.pkBrand,
-                    isPositive: true
-                  },
-                  () => {},
-                  () => {
-                    setReactionState(0);
-                  }
-                );
+                createReaction(true);
               }}
               size={24}
               variant="transparent"
@@ -57,23 +76,15 @@ const BrandInfoListItem = ({ brand }) => {
             <Text size={14} weight={500}>
               {brand.positiveReactionCount -
                 brand.negativeReactionCount +
-                reactionState}
+                (!brand?.userReaction && reactionState.deleted
+                  ? 0
+                  : reactionState.value)}
             </Text>
             <ActionIcon
-              color={reactionState === -1 ? 'blue' : 'dark'}
+              color={isDownVoted ? 'blue' : 'dark'}
               onClick={e => {
                 e.preventDefault();
-                setReactionState(-1);
-                createBrandReaction(
-                  {
-                    fkBrand: brand.pkBrand,
-                    isPositive: false
-                  },
-                  () => {},
-                  () => {
-                    setReactionState(0);
-                  }
-                );
+                createReaction(false);
               }}
               size={24}
               variant="transparent"

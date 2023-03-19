@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import {
   Button,
   Card,
@@ -12,7 +12,7 @@ import {
   Title
 } from '@mantine/core';
 import PropTypes from 'prop-types';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import CreatePostReviewAdditions from './CreatePostReviewAdditions';
 import DraftSelectModal from './DraftSelectModal';
 import {
@@ -21,26 +21,36 @@ import {
 } from '../../../config/constants';
 import { USER_POST_EFFECT_TYPE } from '../../../config/effectConstants';
 import { triggerNotification } from '../../../helpers/notificationHelper';
+import { usePrompt } from '../../../helpers/usePrompt';
 import { Context as ReviewsContext } from '../../../providers/ReviewsProvider';
+import CustomSearchItem from '../../common/CustomSearchItem';
 import FormSection from '../../common/FormSection';
+import SearchInput from '../../common/SearchInput';
 import BrandSidebarInfo from '../brands/BrandSidebarInfo';
 import ProductSidebarInfo from '../products/ProductSidebarInfo';
 
 const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [forceSaveDraft, setForceSaveDraft] = useState(false);
+  const hasSearched = useRef(false);
   const navigate = useNavigate();
   const {
     state,
     fetchUserDrafts,
     createUserPost,
     updateUserPost,
-    deleteUserPost
+    deleteUserPost,
+    fetchUserPostProductOptions
   } = useContext(ReviewsContext);
+  const [searchData, setSearchData] = useState({ brands: [], products: [] });
   const [formState, setFormState] = useState({
     userPost: null,
     title: '',
     content: '',
     draft: false,
-    fkUserPostType: USER_POST_TYPE.REVIEW.value,
+    fkUserPostType: postItem
+      ? USER_POST_TYPE.REVIEW.value
+      : USER_POST_TYPE.DISCUSSION.value,
     fkPostItem: null,
     postItemType: postType,
     reviewState: {
@@ -57,7 +67,8 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
     isLoading: false,
     isDraftSelectOpen: false
   });
-  const userDrafts = state.userPosts.value.filter(p => p.draft);
+  const userDrafts = state.userPostDrafts.value.filter(p => p.draft);
+  const draftId = searchParams.get('draft');
 
   let postItemInfo = {};
   switch (postType) {
@@ -79,6 +90,25 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
       break;
   }
 
+  usePrompt(() => {
+    setForceSaveDraft(true);
+  }, formState.hasUnsavedChanges && !formState.isLoading);
+
+  useEffect(() => {
+    if (
+      draftId &&
+      !state.userPostDrafts.loading &&
+      formState.userPost?.pkUserPost.toString() !== draftId
+    ) {
+      const userPost = userDrafts.find(
+        d => d.pkUserPost.toString() === draftId
+      );
+      if (userPost) {
+        selectDraft(userPost);
+      }
+    }
+  }, [draftId, state.userPostDrafts.value]);
+
   useEffect(() => {
     if (!isPostItemLoading) {
       fetchUserDrafts();
@@ -87,7 +117,9 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
         title: '',
         content: '',
         draft: false,
-        fkUserPostType: USER_POST_TYPE.REVIEW.value,
+        fkUserPostType: postItem
+          ? USER_POST_TYPE.REVIEW.value
+          : USER_POST_TYPE.DISCUSSION.value,
         fkPostItem: postItemInfo.pkPostItem,
         postItemType: postType,
         reviewState: {
@@ -106,6 +138,13 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
       });
     }
   }, [isPostItemLoading]);
+
+  useEffect(() => {
+    if (forceSaveDraft) {
+      saveDraft();
+      setForceSaveDraft(false);
+    }
+  }, [forceSaveDraft]);
 
   const onSuccess = userPost => {
     if (userPost.draft) {
@@ -170,6 +209,57 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
     };
   };
 
+  const saveDraft = () => {
+    setFormState({
+      ...formState,
+      draft: true,
+      isLoading: true
+    });
+    if (formState.userPost) {
+      updateUserPost(
+        formState.userPost.pkUserPost,
+        getFormStateRequestData(formState, true),
+        onSuccess,
+        onError
+      );
+    } else {
+      createUserPost(
+        getFormStateRequestData(formState, true),
+        onSuccess,
+        onError
+      );
+    }
+  };
+
+  const selectDraft = userPost => {
+    setFormState({
+      ...formState,
+      userPost,
+      title: userPost.title,
+      content: userPost.content,
+      draft: userPost.draft,
+      fkUserPostType: userPost.fkUserPostType,
+      reviewState: {
+        rating: userPost.userRating,
+        attributes: userPost.attributes.reduce((a, v) => {
+          const attribute = PRODUCT_ATTRIBUTE_TYPE.find(
+            t => t.value === v.fkProductAttributeType
+          );
+          return {
+            ...a,
+            [attribute.inputValue]: v.value
+          };
+        }, {}),
+        effects: USER_POST_EFFECT_TYPE.filter(e =>
+          userPost.effectTypes.includes(e.value)
+        )
+      },
+      hasUnsavedChanges: false,
+      isLoading: false,
+      isDraftSelectOpen: false
+    });
+  };
+
   return (
     !isPostItemLoading && (
       <Stack
@@ -179,10 +269,11 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
           sx={{
             gap: 20,
             alignItems: 'start',
+            justifyContent: 'center',
             flex: 1
           }}
         >
-          <Stack sx={{ gap: 40, flex: 2 }}>
+          <Stack sx={{ gap: 40, flex: 2, maxWidth: 725 }}>
             <Card shadow="xl" sx={{}}>
               <FormSection
                 hideButtons
@@ -249,17 +340,53 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
                 <Divider />
                 <Stack sx={{ gap: 10 }}>
                   <Group sx={{ justifyContent: 'space-between' }}>
-                    <Select
-                      data={[
-                        { label: postItemInfo.name, value: postItemInfo.name }
-                      ]}
-                      disabled
+                    <SearchInput
+                      data={
+                        (postItem && !hasSearched.current) ||
+                        (searchData.brands.length === 0 &&
+                          searchData.products.length === 0)
+                          ? postItem
+                            ? [
+                                {
+                                  label: postItemInfo.name,
+                                  value: postItemInfo.link
+                                }
+                              ]
+                            : []
+                          : [
+                              ...searchData.brands.map(b => ({
+                                label: b.name,
+                                value: `/brands/${b.uuid}`
+                              })),
+                              ...searchData.products.map(p => ({
+                                label: p.name,
+                                description: p.brand.name,
+                                value: `/products/${p.uuid}`
+                              }))
+                            ].sort((a, b) => a.label.localeCompare(b.label))
+                      }
+                      itemComponent={CustomSearchItem}
+                      onChange={value => {
+                        navigate(`${value}/submit`);
+                        hasSearched.current = false;
+                      }}
+                      onSearch={searchTerm => {
+                        if (searchTerm) {
+                          fetchUserPostProductOptions(
+                            searchTerm,
+                            setSearchData
+                          );
+                          hasSearched.current = true;
+                        }
+                      }}
+                      placeholder="Search a product..."
                       sx={{ maxWidth: 300 }}
-                      value={postItemInfo.name}
+                      value={postItemInfo.link}
                     />
                     <Select
                       data={Object.entries(USER_POST_TYPE)
                         .map(a => a[1])
+                        .filter(t => postItem || t.value !== 1)
                         .sort((a, b) => a.label.localeCompare(b.label))}
                       onChange={value =>
                         setFormState({
@@ -321,27 +448,7 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
                       (!formState.draft && formState.isLoading)
                     }
                     loading={formState.draft && formState.isLoading}
-                    onClick={() => {
-                      setFormState({
-                        ...formState,
-                        draft: true,
-                        isLoading: true
-                      });
-                      if (formState.userPost) {
-                        updateUserPost(
-                          formState.userPost.pkUserPost,
-                          getFormStateRequestData(formState, true),
-                          onSuccess,
-                          onError
-                        );
-                      } else {
-                        createUserPost(
-                          getFormStateRequestData(formState, true),
-                          onSuccess,
-                          onError
-                        );
-                      }
-                    }}
+                    onClick={saveDraft}
                     radius="xl"
                     type="button"
                     value="draft"
@@ -364,15 +471,17 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
               </FormSection>
             </Card>
           </Stack>
-          <Stack style={{ flex: 1, maxWidth: 332 }}>
-            {postType === 'brand' ? (
-              <BrandSidebarInfo brand={postItem} />
-            ) : (
-              postType === 'product' && (
-                <ProductSidebarInfo product={postItem} />
-              )
-            )}
-          </Stack>
+          {postItem && (
+            <Stack style={{ flex: 1, maxWidth: 332 }}>
+              {postType === 'brand' ? (
+                <BrandSidebarInfo brand={postItem} />
+              ) : (
+                postType === 'product' && (
+                  <ProductSidebarInfo product={postItem} />
+                )
+              )}
+            </Stack>
+          )}
         </Group>
         <DraftSelectModal
           isOpen={formState.isDraftSelectOpen}
@@ -406,32 +515,27 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
             );
           }}
           onSelect={userPost => {
-            setFormState({
-              ...formState,
-              userPost,
-              title: userPost.title,
-              content: userPost.content,
-              draft: userPost.draft,
-              fkUserPostType: userPost.fkUserPostType,
-              reviewState: {
-                rating: userPost.userRating,
-                attributes: userPost.attributes.reduce((a, v) => {
-                  const attribute = PRODUCT_ATTRIBUTE_TYPE.find(
-                    t => t.value === v.fkProductAttributeType
+            if (
+              userPost.pkPostItem &&
+              postItemInfo.pkPostItem !== userPost.pkPostItem
+            ) {
+              switch (userPost.postItemType) {
+                case 'brand':
+                  navigate(
+                    `/brands/${userPost.postItemUuid}/submit?draft=${userPost.pkUserPost}`
                   );
-                  return {
-                    ...a,
-                    [attribute.inputValue]: v.value
-                  };
-                }, {}),
-                effects: USER_POST_EFFECT_TYPE.filter(e =>
-                  userPost.effectTypes.includes(e.value)
-                )
-              },
-              hasUnsavedChanges: false,
-              isLoading: false,
-              isDraftSelectOpen: false
-            });
+                  break;
+                case 'product':
+                  navigate(
+                    `/products/${userPost.postItemUuid}/submit?draft=${userPost.pkUserPost}`
+                  );
+                  break;
+                default:
+                  break;
+              }
+            }
+
+            selectDraft(userPost);
           }}
           selectUserPost={formState.userPost}
           userPosts={userDrafts}

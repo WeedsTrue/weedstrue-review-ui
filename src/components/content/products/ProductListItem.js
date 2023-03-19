@@ -13,11 +13,39 @@ import {
 import PropTypes from 'prop-types';
 import { Link, useNavigate } from 'react-router-dom';
 import { Leaf } from 'tabler-icons-react';
+import { reactToItem } from '../../../helpers/reactionHelper';
 import { Context as ReviewsContext } from '../../../providers/ReviewsProvider';
 
 const ProductListItem = ({ product }) => {
   const { createProductReaction } = useContext(ReviewsContext);
-  const [reactionState, setReactionState] = useState(0);
+  const [reactionState, setReactionState] = useState({
+    value: 0,
+    deleted: false
+  });
+
+  const isUpvoted =
+    (product?.userReaction?.isPositive && reactionState.value === 0) ||
+    (reactionState.value > 0 && !reactionState.deleted);
+  const isDownVoted =
+    (product?.userReaction &&
+      !product.userReaction.isPositive &&
+      reactionState.value === 0) ||
+    (reactionState.value < 0 && !reactionState.deleted);
+
+  const createReaction = isPositive => {
+    reactToItem(
+      {
+        isUpvoted,
+        isDownVoted,
+        fkProduct: product.pkProduct,
+        isPositive,
+        deleted: reactionState.deleted
+      },
+      product?.userReaction,
+      createProductReaction,
+      setReactionState
+    );
+  };
 
   const navigate = useNavigate();
   return product ? (
@@ -62,20 +90,10 @@ const ProductListItem = ({ product }) => {
         <Group>
           <Group sx={{ gap: 5, marginRight: 5 }}>
             <ActionIcon
-              color={reactionState === 1 ? 'blue' : 'dark'}
+              color={isUpvoted ? 'blue' : 'dark'}
               onClick={e => {
                 e.preventDefault();
-                setReactionState(1);
-                createProductReaction(
-                  {
-                    fkProduct: product.pkProduct,
-                    isPositive: true
-                  },
-                  () => {},
-                  () => {
-                    setReactionState(0);
-                  }
-                );
+                createReaction(true);
               }}
               size={24}
               variant="transparent"
@@ -85,23 +103,15 @@ const ProductListItem = ({ product }) => {
             <Text size={14} weight={500}>
               {product.positiveReactionCount -
                 product.negativeReactionCount +
-                reactionState}
+                (!product?.userReaction && reactionState.deleted
+                  ? 0
+                  : reactionState.value)}
             </Text>
             <ActionIcon
-              color={reactionState === -1 ? 'blue' : 'dark'}
+              color={isDownVoted ? 'blue' : 'dark'}
               onClick={e => {
                 e.preventDefault();
-                setReactionState(-1);
-                createProductReaction(
-                  {
-                    fkProduct: product.pkProduct,
-                    isPositive: false
-                  },
-                  () => {},
-                  () => {
-                    setReactionState(0);
-                  }
-                );
+                createReaction(false);
               }}
               size={24}
               variant="transparent"

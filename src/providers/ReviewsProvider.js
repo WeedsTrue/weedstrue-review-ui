@@ -7,6 +7,7 @@ const initialState = {
   comments: { value: [], loading: false, error: null },
   userPosts: { value: [], loading: false, error: null },
   userPost: { value: null, loading: false, error: null },
+  userPostDrafts: { value: [], loading: false, error: null },
   userProfile: { value: null, loading: false, error: null },
   products: { value: [], loading: false, error: null },
   product: { value: null, loading: false, error: null }
@@ -213,6 +214,27 @@ const fetchProduct = dispatch => async uuid => {
   }
 };
 
+const fetchUserPostProductOptions =
+  dispatch => async (searchTerm, onSuccessCallback, onErrorCallback) => {
+    try {
+      const response = await weedstrueAPI.get(
+        '/api/userPosts/products/search',
+        {
+          params: {
+            searchTerm
+          }
+        }
+      );
+      if (onSuccessCallback) {
+        onSuccessCallback(response.data);
+      }
+    } catch (e) {
+      if (onErrorCallback) {
+        onErrorCallback(e);
+      }
+    }
+  };
+
 const fetchUserPosts =
   dispatch =>
   async (
@@ -273,19 +295,19 @@ const fetchUserDrafts = dispatch => async () => {
   try {
     dispatch({
       type: 'FETCHING',
-      stateName: 'userPosts'
+      stateName: 'userPostDrafts'
     });
     const response = await weedstrueAPI.get('/api/userPosts/drafts');
 
     dispatch({
       type: 'SUCCESS',
-      stateName: 'userPosts',
+      stateName: 'userPostDrafts',
       payload: { value: response.data }
     });
   } catch (e) {
     dispatch({
       type: 'ERROR',
-      stateName: 'userPosts',
+      stateName: 'userPostDrafts',
       payload: 'Oops something went wrong.'
     });
   }
@@ -339,7 +361,7 @@ const createUserPost =
     try {
       dispatch({
         type: 'FETCHING',
-        stateName: 'userPosts'
+        stateName: 'userPostDrafts'
       });
       const response = await weedstrueAPI.post('/api/userPosts', {
         title,
@@ -355,7 +377,7 @@ const createUserPost =
 
       dispatch({
         type: 'APPEND',
-        stateName: 'userPosts',
+        stateName: 'userPostDrafts',
         payload: response.data
       });
       if (onSuccessCallback) {
@@ -365,7 +387,7 @@ const createUserPost =
       const message = getErrorMessage(e);
       dispatch({
         type: 'ERROR',
-        stateName: 'userPosts',
+        stateName: 'userPostDrafts',
         payload: message
       });
       if (onErrorCallback) {
@@ -395,7 +417,7 @@ const updateUserPost =
     try {
       dispatch({
         type: 'FETCHING',
-        stateName: 'userPosts'
+        stateName: 'userPostDrafts'
       });
       const response = await weedstrueAPI.put(`/api/userPosts/${pkUserPost}`, {
         title,
@@ -411,7 +433,7 @@ const updateUserPost =
 
       dispatch({
         type: 'REPLACE',
-        stateName: 'userPosts',
+        stateName: 'userPostDrafts',
         payload: {
           filter: p => p.pkUserPost !== pkUserPost,
           value: response.data
@@ -424,7 +446,7 @@ const updateUserPost =
       const message = getErrorMessage(e);
       dispatch({
         type: 'ERROR',
-        stateName: 'userPosts',
+        stateName: 'userPostDrafts',
         payload: message
       });
       if (onErrorCallback) {
@@ -538,11 +560,17 @@ const deleteComment =
 
 const createUserPostReaction =
   dispatch =>
-  async ({ fkUserPost, isPositive }, onSuccessCallback, onErrorCallback) => {
+  async (
+    { fkUserPost, pkUserPostReaction, isPositive, removeReaction },
+    onSuccessCallback,
+    onErrorCallback
+  ) => {
     try {
       await weedstrueAPI.post(`/api/userPosts/${fkUserPost}/reaction`, null, {
         params: {
-          isPositive
+          pkUserPostReaction,
+          isPositive,
+          removeReaction
         }
       });
       if (onSuccessCallback) {
@@ -558,14 +586,20 @@ const createUserPostReaction =
 
 const createCommentReaction =
   dispatch =>
-  async ({ fkComment, isPositive }, onSuccessCallback, onErrorCallback) => {
+  async (
+    { fkComment, pkCommentReaction, isPositive, removeReaction },
+    onSuccessCallback,
+    onErrorCallback
+  ) => {
     try {
       await weedstrueAPI.post(
         `/api/userPosts/comments/${fkComment}/reaction`,
         null,
         {
           params: {
-            isPositive
+            pkCommentReaction,
+            isPositive,
+            removeReaction
           }
         }
       );
@@ -582,11 +616,17 @@ const createCommentReaction =
 
 const createProductReaction =
   dispatch =>
-  async ({ fkProduct, isPositive }, onSuccessCallback, onErrorCallback) => {
+  async (
+    { fkProduct, pkProductReaction, isPositive, removeReaction },
+    onSuccessCallback,
+    onErrorCallback
+  ) => {
     try {
       await weedstrueAPI.post(`/api/products/${fkProduct}/reaction`, null, {
         params: {
-          isPositive
+          pkProductReaction,
+          isPositive,
+          removeReaction
         }
       });
       if (onSuccessCallback) {
@@ -602,11 +642,17 @@ const createProductReaction =
 
 const createBrandReaction =
   dispatch =>
-  async ({ fkBrand, isPositive }, onSuccessCallback, onErrorCallback) => {
+  async (
+    { fkBrand, pkBrandReaction, isPositive, removeReaction },
+    onSuccessCallback,
+    onErrorCallback
+  ) => {
     try {
       await weedstrueAPI.post(`/api/brands/${fkBrand}/reaction`, null, {
         params: {
-          isPositive
+          pkBrandReaction,
+          isPositive,
+          removeReaction
         }
       });
       if (onSuccessCallback) {
@@ -664,6 +710,7 @@ export const { Provider, Context } = createProvider(
     fetchProduct,
     fetchProducts,
     fetchUserDrafts,
+    fetchUserPostProductOptions,
     fetchUserPosts,
     fetchUserPost,
     fetchUserProfile,

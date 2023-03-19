@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import {
   ActionIcon,
+  Badge,
   Button,
   Card,
   Group,
@@ -9,28 +10,66 @@ import {
   Text,
   Title
 } from '@mantine/core';
+import dayjs from 'dayjs';
 import PropTypes from 'prop-types';
-import { useParams } from 'react-router-dom';
-import { Dots, Leaf, Message, Share } from 'tabler-icons-react';
-import { USER_POST_TYPE } from '../../../config/constants';
+import { Link, useParams } from 'react-router-dom';
+import { Dots, Leaf, Message, Point, Share } from 'tabler-icons-react';
+import { USER_POST_TYPE, USER_POST_TYPE_LIST } from '../../../config/constants';
+import { reactToItem } from '../../../helpers/reactionHelper';
 import { Context as ReviewsContext } from '../../../providers/ReviewsProvider';
+import ShareLinkModal from '../../common/ShareLinkModal';
 import BrandSidebarInfo from '../brands/BrandSidebarInfo';
 import CommentList from '../comments/CommentList';
 import CreateComment from '../comments/CreateComment';
+import ProductAttribute from '../products/ProductAttribute';
+import ProductEffect from '../products/ProductEffect';
 import ProductSidebarInfo from '../products/ProductSidebarInfo';
+const relativeTime = require('dayjs/plugin/relativeTime');
 
-const PostDetails = ({ postItem, isLoading }) => {
+const PostDetails = ({ postItem }) => {
+  dayjs.extend(relativeTime);
   const hasFetched = useRef(false);
   const { state, fetchUserPost, createUserPostReaction } =
     useContext(ReviewsContext);
-  const [reactionState, setReactionState] = useState(0);
+  const [showSharePostModal, setShowSharePostModal] = useState(false);
+  const [reactionState, setReactionState] = useState({
+    value: 0,
+    deleted: false
+  });
   const { uuid } = useParams();
   const { value: userPost } = state.userPost;
+  const postType =
+    userPost &&
+    USER_POST_TYPE_LIST.find(t => t.value === userPost.fkUserPostType);
+
+  const isUpvoted =
+    (userPost?.userReaction?.isPositive && reactionState.value === 0) ||
+    (reactionState.value > 0 && !reactionState.deleted);
+  const isDownVoted =
+    (userPost?.userReaction &&
+      !userPost.userReaction.isPositive &&
+      reactionState.value === 0) ||
+    (reactionState.value < 0 && !reactionState.deleted);
 
   useEffect(() => {
     fetchUserPost(uuid);
     hasFetched.current = true;
   }, []);
+
+  const createReaction = isPositive => {
+    reactToItem(
+      {
+        isUpvoted,
+        isDownVoted,
+        fkUserPost: userPost.pkUserPost,
+        isPositive,
+        deleted: reactionState.deleted
+      },
+      userPost?.userReaction,
+      createUserPostReaction,
+      setReactionState
+    );
+  };
 
   return (
     <Group
@@ -49,44 +88,22 @@ const PostDetails = ({ postItem, isLoading }) => {
                 <Group sx={{ placeItems: 'start', flex: 1 }}>
                   <Stack sx={{ gap: 0, placeItems: 'center', marginLeft: 5 }}>
                     <ActionIcon
-                      color={reactionState === 1 ? 'blue' : 'dark'}
-                      onClick={() => {
-                        setReactionState(1);
-                        createUserPostReaction(
-                          {
-                            fkUserPost: userPost.pkUserPost,
-                            isPositive: true
-                          },
-                          () => {},
-                          () => {
-                            setReactionState(0);
-                          }
-                        );
-                      }}
+                      color={isUpvoted ? 'blue' : 'dark'}
+                      onClick={() => createReaction(true)}
                       variant="transparent"
                     >
                       <Leaf />
                     </ActionIcon>
                     <Text weight={500}>
-                      {userPost.positiveReactionCount -
-                        userPost.negativeReactionCount +
-                        reactionState}
+                      {userPost?.positiveReactionCount -
+                        userPost?.negativeReactionCount +
+                        (!userPost?.userReaction && reactionState.deleted
+                          ? 0
+                          : reactionState.value)}
                     </Text>
                     <ActionIcon
-                      color={reactionState === -1 ? 'blue' : 'dark'}
-                      onClick={() => {
-                        setReactionState(-1);
-                        createUserPostReaction(
-                          {
-                            fkUserPost: userPost.pkUserPost,
-                            isPositive: false
-                          },
-                          () => {},
-                          () => {
-                            setReactionState(0);
-                          }
-                        );
-                      }}
+                      color={isDownVoted ? 'blue' : 'dark'}
+                      onClick={() => createReaction(false)}
                       variant="transparent"
                     >
                       <Leaf
@@ -101,20 +118,96 @@ const PostDetails = ({ postItem, isLoading }) => {
                   </Stack>
 
                   <Stack style={{ gap: 20, flex: 1 }}>
-                    <Stack>
-                      <Title
-                        order={4}
-                        sx={{
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis'
-                        }}
-                      >
-                        {userPost.title}
-                      </Title>
+                    <Stack
+                      sx={{
+                        gap: 10,
+                        overflow: 'hidden',
+                        marginLeft: 5
+                      }}
+                    >
+                      <Stack sx={{ gap: 0 }}>
+                        <Text
+                          color="grey"
+                          size={13}
+                          sx={{ flexWrap: 'nowrap', display: 'inline' }}
+                        >
+                          Posted by{' '}
+                          <Group sx={{ gap: 3, display: 'inline-flex' }}>
+                            <Text
+                              component={Link}
+                              sx={{
+                                '&:hover': { textDecoration: 'underline' }
+                              }}
+                              to={`/profile/${userPost.user.username}`}
+                            >
+                              {userPost.user.username}
+                            </Text>
+                            <Point size={10} />
+                            <Text color="grey" sx={{ fontSize: 12 }}>
+                              {dayjs(userPost.created).fromNow()}
+                            </Text>
+                          </Group>
+                        </Text>
+                        <Group
+                          sx={{
+                            gap: 5,
+                            flexWrap: 'nowrap',
+                            overflow: 'hidden',
+                            justifyContent: 'space-between',
+                            alignItems: 'start'
+                          }}
+                        >
+                          <Title
+                            order={4}
+                            sx={{
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis'
+                            }}
+                          >
+                            {userPost.title}
+                          </Title>
+                          <Badge
+                            color={postType.color}
+                            size="lg"
+                            sx={{ minWidth: 100 }}
+                            variant="filled"
+                          >
+                            {postType.label}
+                          </Badge>
+                        </Group>
+                      </Stack>
+
                       {userPost.fkUserPostType ===
                         USER_POST_TYPE.REVIEW.value &&
                         userPost.userRating && (
-                          <Rating readOnly value={userPost.userRating} />
+                          <>
+                            <Rating readOnly value={userPost.userRating} />
+                            {userPost.attributes.length > 0 && (
+                              <Group sx={{ gap: 10 }}>
+                                {userPost.attributes.map((a, index) => (
+                                  <React.Fragment
+                                    key={a.fkProductAttributeType}
+                                  >
+                                    <ProductAttribute attribute={a} />
+                                    {index !==
+                                      userPost.attributes.length - 1 && (
+                                      <Point size={10} />
+                                    )}
+                                  </React.Fragment>
+                                ))}
+                              </Group>
+                            )}
+                            {userPost.effectTypes.length > 0 && (
+                              <Group sx={{ gap: 10 }}>
+                                {userPost.effectTypes.map(e => (
+                                  <ProductEffect
+                                    fkProductEffectType={e}
+                                    key={e}
+                                  />
+                                ))}
+                              </Group>
+                            )}
+                          </>
                         )}
                       <Text
                         sx={{
@@ -139,6 +232,7 @@ const PostDetails = ({ postItem, isLoading }) => {
                         <Button
                           color="dark"
                           leftIcon={<Share size={20} />}
+                          onClick={() => setShowSharePostModal(true)}
                           size="xs"
                           sx={{ fontSize: 14 }}
                           variant="subtle"
@@ -180,6 +274,12 @@ const PostDetails = ({ postItem, isLoading }) => {
           </Stack>
         </>
       )}
+      <ShareLinkModal
+        onClose={() => setShowSharePostModal(false)}
+        opened={showSharePostModal}
+        pathname={window.location.pathname}
+        title={<Title order={3}>Share Post</Title>}
+      />
     </Group>
   );
 };

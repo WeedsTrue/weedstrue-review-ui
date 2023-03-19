@@ -31,7 +31,7 @@ const ResponsiveModal = ({ title, noHeader, onClose, children, ...rest }) => {
                 justifyContent: 'space-between'
               }}
             >
-              <Stack sx={{ flex: 1 }}>{title}</Stack>
+              <Stack style={{ flex: 1 }}>{title}</Stack>
               <ActionIcon onClick={onClose}>
                 <X />
               </ActionIcon>

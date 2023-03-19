@@ -5,7 +5,8 @@ import {
   Text,
   Group,
   Menu,
-  Button
+  Button,
+  Stack
 } from '@mantine/core';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { ChevronDown, Leaf, Logout, User } from 'tabler-icons-react';
@@ -58,26 +59,28 @@ const Header = () => {
           </Group>
           <Group sx={{ flex: 3, gap: 50 }}>
             {links.public.map(link => (
-              <Text
-                component={Link}
-                key={link.to}
-                sx={{
-                  padding: '5px 10px',
-                  fontSize: 18,
-                  lineHeight: '18px',
-                  fontWeight: link.isSelected(pathname) ? 700 : 500,
-                  borderBottom: link.isSelected(pathname)
-                    ? 'solid 1px black'
-                    : 'none',
-                  '&:hover': {
-                    fontWeight: 700,
-                    borderBottom: 'solid 2px black'
-                  }
-                }}
-                to={link.to}
-              >
-                {link.label}
-              </Text>
+              <Stack key={link.to} sx={{ width: 125 }}>
+                <Text
+                  component={Link}
+                  sx={{
+                    margin: 'auto',
+                    padding: '5px 10px',
+                    fontSize: 18,
+                    lineHeight: '18px',
+                    fontWeight: link.isSelected(pathname) ? 700 : 500,
+                    borderBottom: link.isSelected(pathname)
+                      ? 'solid 2px black'
+                      : 'none',
+                    '&:hover': {
+                      fontWeight: 700,
+                      borderBottom: 'solid 2px black'
+                    }
+                  }}
+                  to={link.to}
+                >
+                  {link.label}
+                </Text>
+              </Stack>
             ))}
           </Group>
         </Group>

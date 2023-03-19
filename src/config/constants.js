@@ -37,29 +37,65 @@ const USER_POST_TYPE = {
   }
 };
 
+const USER_POST_TYPE_LIST = [
+  {
+    value: 1,
+    label: 'Review',
+    color: 'blue'
+  },
+  {
+    value: 2,
+    label: 'News',
+    color: 'orange'
+  },
+  {
+    value: 3,
+    label: 'Question',
+    color: 'yellow'
+  },
+  {
+    value: 4,
+    label: 'Discussion',
+    color: 'green'
+  },
+  {
+    value: 5,
+    label: 'Images',
+    color: 'red'
+  }
+];
+
 const PRODUCT_ATTRIBUTE_TYPE = [
   {
     value: 1,
     inputValue: 'thc',
     label: 'THC %',
+    displayType: 'percentage',
+    displayLabel: 'THC',
     userPostType: 'product-review'
   },
   {
     value: 2,
     inputValue: 'cbd',
     label: 'CBD %',
+    displayType: 'percentage',
+    displayLabel: 'CBD',
     userPostType: 'product-review'
   },
   {
     value: 3,
     inputValue: 'terps',
     label: 'TERPS %',
+    displayType: 'percentage',
+    displayLabel: 'TERPS',
     userPostType: 'product-review'
   },
   {
     value: 4,
     inputValue: 'packagedDate',
     label: 'Packaged Date',
+    displayType: 'date',
+    displayLabel: 'Packaged',
     userPostType: 'product-review'
   }
 ];
@@ -119,6 +155,7 @@ export {
   AWS_COGNITO_SETTINGS,
   PRODUCT_TYPES,
   USER_POST_TYPE,
+  USER_POST_TYPE_LIST,
   PRODUCT_ATTRIBUTE_TYPE,
   LINK_SOURCE_TYPE
 };
