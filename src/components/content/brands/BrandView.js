@@ -22,11 +22,27 @@ const BrandView = () => {
     <Routes>
       <Route
         element={
-          <CreatePost
-            isPostItemLoading={state.brand.loading}
-            postItem={state.brand.value}
-            postType="brand"
-          />
+          hasFetched.current &&
+          !state.brand.loading && (
+            <CreatePost
+              isPostItemLoading={state.brand.loading}
+              postItem={state.brand.value}
+              postType="brand"
+            />
+          )
+        }
+        path="/submit/:postUuid"
+      />
+      <Route
+        element={
+          hasFetched.current &&
+          !state.brand.loading && (
+            <CreatePost
+              isPostItemLoading={state.brand.loading}
+              postItem={state.brand.value}
+              postType="brand"
+            />
+          )
         }
         path="/submit"
       />

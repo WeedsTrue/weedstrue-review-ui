@@ -14,7 +14,8 @@ import {
 import dayjs from 'dayjs';
 import PropTypes from 'prop-types';
 import { Link, useNavigate } from 'react-router-dom';
-import { Dots, Leaf, Message, Point, Share } from 'tabler-icons-react';
+import { Leaf, Message, Point, Share } from 'tabler-icons-react';
+import PostMenu from './PostMenu';
 import { USER_POST_TYPE, USER_POST_TYPE_LIST } from '../../../config/constants';
 import { reactToItem } from '../../../helpers/reactionHelper';
 import { Context as ReviewsContext } from '../../../providers/ReviewsProvider';
@@ -72,7 +73,7 @@ const PostListItem = ({ userPost }) => {
 
   return userPost ? (
     <>
-      <Card component={Link} to={postLink}>
+      <Card component={Link} sx={{ overflow: 'visible' }} to={postLink}>
         <Group sx={{ alignItems: 'start' }}>
           <Stack sx={{ gap: 0, placeItems: 'center', marginLeft: 5 }}>
             <ActionIcon
@@ -234,14 +235,7 @@ const PostListItem = ({ userPost }) => {
                 </Button>
               </Group>
               <Group>
-                <Button
-                  color="dark"
-                  size="xs"
-                  sx={{ padding: 3 }}
-                  variant="subtle"
-                >
-                  <Dots />
-                </Button>
+                <PostMenu userPost={userPost} />
               </Group>
             </Group>
           </Stack>

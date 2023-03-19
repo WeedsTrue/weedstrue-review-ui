@@ -13,7 +13,8 @@ import {
 import dayjs from 'dayjs';
 import PropTypes from 'prop-types';
 import { Link, useParams } from 'react-router-dom';
-import { Dots, Leaf, Message, Point, Share } from 'tabler-icons-react';
+import { Leaf, Message, Point, Share } from 'tabler-icons-react';
+import PostMenu from './PostMenu';
 import { USER_POST_TYPE, USER_POST_TYPE_LIST } from '../../../config/constants';
 import { reactToItem } from '../../../helpers/reactionHelper';
 import { Context as ReviewsContext } from '../../../providers/ReviewsProvider';
@@ -146,6 +147,14 @@ const PostDetails = ({ postItem }) => {
                             <Text color="grey" sx={{ fontSize: 12 }}>
                               {dayjs(userPost.created).fromNow()}
                             </Text>
+                            {userPost.updated && (
+                              <>
+                                <Point size={10} />
+                                <Text color="grey" sx={{ fontSize: 12 }}>
+                                  Updated {dayjs(userPost.updated).fromNow()}
+                                </Text>
+                              </>
+                            )}
                           </Group>
                         </Text>
                         <Group
@@ -241,9 +250,7 @@ const PostDetails = ({ postItem }) => {
                         </Button>
                       </Group>
                       <Group>
-                        <Button color="dark" size="xs" variant="subtle">
-                          <Dots />
-                        </Button>
+                        <PostMenu userPost={userPost} />
                       </Group>
                     </Group>
                     <Group

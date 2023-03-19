@@ -22,11 +22,27 @@ const ProductView = () => {
     <Routes>
       <Route
         element={
-          <CreatePost
-            isPostItemLoading={state.product.loading}
-            postItem={state.product.value}
-            postType="product"
-          />
+          hasFetched.current &&
+          !state.product.loading && (
+            <CreatePost
+              isPostItemLoading={state.product.loading}
+              postItem={state.product.value}
+              postType="product"
+            />
+          )
+        }
+        path="/submit/:postUuid"
+      />
+      <Route
+        element={
+          hasFetched.current &&
+          !state.product.loading && (
+            <CreatePost
+              isPostItemLoading={state.product.loading}
+              postItem={state.product.value}
+              postType="product"
+            />
+          )
         }
         path="/submit"
       />
@@ -39,6 +55,7 @@ const ProductView = () => {
         }
         path="/posts/:uuid/*"
       />
+
       <Route
         element={
           <ProductDetails
