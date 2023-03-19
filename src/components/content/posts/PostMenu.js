@@ -36,10 +36,24 @@ const PostMenu = ({ userPost, onAction }) => {
             >
               Edit
             </Menu.Item>
-            <Menu.Item onClick={() => onAction('DELETE')}>Delete</Menu.Item>
+            <Menu.Item
+              onClick={e => {
+                e.preventDefault();
+                onAction('DELETE');
+              }}
+            >
+              Delete
+            </Menu.Item>
           </>
         ) : (
-          <Menu.Item onClick={() => onAction('DELETE')}>Report</Menu.Item>
+          <Menu.Item
+            onClick={e => {
+              e.preventDefault();
+              onAction('REPORT');
+            }}
+          >
+            Report
+          </Menu.Item>
         )}
       </Menu.Dropdown>
     </Menu>

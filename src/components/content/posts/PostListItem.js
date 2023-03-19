@@ -15,6 +15,7 @@ import dayjs from 'dayjs';
 import PropTypes from 'prop-types';
 import { Link, useNavigate } from 'react-router-dom';
 import { Leaf, Message, Point, Share } from 'tabler-icons-react';
+import DeletePostModal from './DeletePostModal';
 import PostMenu from './PostMenu';
 import { USER_POST_TYPE, USER_POST_TYPE_LIST } from '../../../config/constants';
 import { reactToItem } from '../../../helpers/reactionHelper';
@@ -27,6 +28,7 @@ const PostListItem = ({ userPost }) => {
   const navigate = useNavigate();
   const { createUserPostReaction } = useContext(ReviewsContext);
   const [showSharePostModal, setShowSharePostModal] = useState(false);
+  const [showDeletePostModal, setShowDeletePostModal] = useState(false);
   const [reactionState, setReactionState] = useState({
     value: 0,
     deleted: false
@@ -235,7 +237,14 @@ const PostListItem = ({ userPost }) => {
                 </Button>
               </Group>
               <Group>
-                <PostMenu userPost={userPost} />
+                <PostMenu
+                  onAction={action => {
+                    if (action === 'DELETE') {
+                      setShowDeletePostModal(true);
+                    }
+                  }}
+                  userPost={userPost}
+                />
               </Group>
             </Group>
           </Stack>
@@ -246,6 +255,11 @@ const PostListItem = ({ userPost }) => {
         opened={showSharePostModal}
         pathname={postLink}
         title={<Title order={3}>Share Post</Title>}
+      />
+      <DeletePostModal
+        onClose={() => setShowDeletePostModal(false)}
+        opened={showDeletePostModal}
+        userPost={userPost}
       />
     </>
   ) : (

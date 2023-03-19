@@ -501,6 +501,14 @@ const deleteUserPost =
           filter: p => p.pkUserPost !== pkUserPost
         }
       });
+      dispatch({
+        type: 'REMOVE',
+        stateName: 'userPostDrafts',
+        payload: {
+          filter: p => p.pkUserPost !== pkUserPost
+        }
+      });
+
       if (onSuccessCallback) {
         onSuccessCallback();
       }

@@ -12,8 +12,9 @@ import {
 } from '@mantine/core';
 import dayjs from 'dayjs';
 import PropTypes from 'prop-types';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Leaf, Message, Point, Share } from 'tabler-icons-react';
+import DeletePostModal from './DeletePostModal';
 import PostMenu from './PostMenu';
 import { USER_POST_TYPE, USER_POST_TYPE_LIST } from '../../../config/constants';
 import { reactToItem } from '../../../helpers/reactionHelper';
@@ -28,11 +29,13 @@ import ProductSidebarInfo from '../products/ProductSidebarInfo';
 const relativeTime = require('dayjs/plugin/relativeTime');
 
 const PostDetails = ({ postItem }) => {
+  const navigate = useNavigate();
   dayjs.extend(relativeTime);
   const hasFetched = useRef(false);
   const { state, fetchUserPost, createUserPostReaction } =
     useContext(ReviewsContext);
   const [showSharePostModal, setShowSharePostModal] = useState(false);
+  const [showDeletePostModal, setShowDeletePostModal] = useState(false);
   const [reactionState, setReactionState] = useState({
     value: 0,
     deleted: false
@@ -250,7 +253,14 @@ const PostDetails = ({ postItem }) => {
                         </Button>
                       </Group>
                       <Group>
-                        <PostMenu userPost={userPost} />
+                        <PostMenu
+                          onAction={action => {
+                            if (action === 'DELETE') {
+                              setShowDeletePostModal(true);
+                            }
+                          }}
+                          userPost={userPost}
+                        />
                       </Group>
                     </Group>
                     <Group
@@ -286,6 +296,12 @@ const PostDetails = ({ postItem }) => {
         opened={showSharePostModal}
         pathname={window.location.pathname}
         title={<Title order={3}>Share Post</Title>}
+      />
+      <DeletePostModal
+        onClose={() => setShowDeletePostModal(false)}
+        onDelete={() => navigate('/')}
+        opened={showDeletePostModal}
+        userPost={userPost}
       />
     </Group>
   );
