@@ -571,13 +571,16 @@ const deleteComment =
         type: 'FETCHING',
         stateName: 'comments'
       });
-      await weedstrueAPI.delete(`/api/userPosts/comments/${pkComment}`);
+      const response = await weedstrueAPI.delete(
+        `/api/userPosts/comments/${pkComment}`
+      );
 
       dispatch({
-        type: 'REMOVE',
+        type: 'REPLACE',
         stateName: 'comments',
         payload: {
-          filter: p => p.pkComment !== pkComment
+          filter: p => p.pkComment !== pkComment,
+          value: response.data
         }
       });
       if (onSuccessCallback) {
@@ -732,15 +735,140 @@ const fetchUserProfile = dispatch => async username => {
   }
 };
 
+const createUserPostReport =
+  dispatch =>
+  async (
+    pkUserPost,
+    { extraInfo, fkContentReportType },
+    onSuccessCallback,
+    onErrorCallback
+  ) => {
+    try {
+      await weedstrueAPI.post(`/api/userPosts/${pkUserPost}/report`, {
+        extraInfo,
+        fkContentReportType
+      });
+      if (onSuccessCallback) {
+        onSuccessCallback();
+      }
+    } catch (e) {
+      const message = getErrorMessage(e);
+      if (onErrorCallback) {
+        onErrorCallback(message);
+      }
+    }
+  };
+
+const createCommentReport =
+  dispatch =>
+  async (
+    pkComment,
+    { extraInfo, fkContentReportType },
+    onSuccessCallback,
+    onErrorCallback
+  ) => {
+    try {
+      await weedstrueAPI.post(`/api/userPosts/comments/${pkComment}/report`, {
+        extraInfo,
+        fkContentReportType
+      });
+      if (onSuccessCallback) {
+        onSuccessCallback();
+      }
+    } catch (e) {
+      const message = getErrorMessage(e);
+      if (onErrorCallback) {
+        onErrorCallback(message);
+      }
+    }
+  };
+
+const createBrandReport =
+  dispatch =>
+  async (
+    pkBrand,
+    { extraInfo, fkContentReportType },
+    onSuccessCallback,
+    onErrorCallback
+  ) => {
+    try {
+      await weedstrueAPI.post(`/api/brands/${pkBrand}/report`, {
+        extraInfo,
+        fkContentReportType
+      });
+      if (onSuccessCallback) {
+        onSuccessCallback();
+      }
+    } catch (e) {
+      const message = getErrorMessage(e);
+      if (onErrorCallback) {
+        onErrorCallback(message);
+      }
+    }
+  };
+
+const createProductReport =
+  dispatch =>
+  async (
+    pkProduct,
+    { extraInfo, fkContentReportType },
+    onSuccessCallback,
+    onErrorCallback
+  ) => {
+    try {
+      await weedstrueAPI.post(`/api/products/${pkProduct}/report`, {
+        extraInfo,
+        fkContentReportType
+      });
+      if (onSuccessCallback) {
+        onSuccessCallback();
+      }
+    } catch (e) {
+      const message = getErrorMessage(e);
+      if (onErrorCallback) {
+        onErrorCallback(message);
+      }
+    }
+  };
+
+const createUserReport =
+  dispatch =>
+  async (
+    pkUser,
+    { extraInfo, fkContentReportType },
+    onSuccessCallback,
+    onErrorCallback
+  ) => {
+    try {
+      await weedstrueAPI.post(`/api/users/${pkUser}/report`, {
+        extraInfo,
+        fkContentReportType
+      });
+      if (onSuccessCallback) {
+        onSuccessCallback();
+      }
+    } catch (e) {
+      const message = getErrorMessage(e);
+      if (onErrorCallback) {
+        onErrorCallback(message);
+      }
+    }
+  };
+
 export const { Provider, Context } = createProvider(
   reducer,
   {
     createBrandReaction,
+    createBrandReport,
     createComment,
     createCommentReaction,
+    createCommentReport,
     createProductReaction,
+    createProductReport,
     createUserPost,
     createUserPostReaction,
+    createUserPostReport,
+    createUserReport,
     deleteComment,
     deleteUserPost,
     fetchBrand,

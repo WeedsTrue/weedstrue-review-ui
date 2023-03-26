@@ -8,16 +8,19 @@ import {
   Stack,
   Text,
   Title,
+  Tooltip,
   UnstyledButton
 } from '@mantine/core';
 import PropTypes from 'prop-types';
 import { Link, useNavigate } from 'react-router-dom';
-import { Leaf } from 'tabler-icons-react';
+import { AlertCircle, Leaf } from 'tabler-icons-react';
 import { reactToItem } from '../../../helpers/reactionHelper';
 import { Context as ReviewsContext } from '../../../providers/ReviewsProvider';
+import ReportContentModal from '../reports/ReportContentModal';
 
-const ProductListItem = ({ product }) => {
+const ProductListItem = ({ product, showReport }) => {
   const { createProductReaction } = useContext(ReviewsContext);
+  const [showReportModal, setShowReportModal] = useState(false);
   const [reactionState, setReactionState] = useState({
     value: 0,
     deleted: false
@@ -60,9 +63,22 @@ const ProductListItem = ({ product }) => {
           flex: 1,
           padding: 10,
           alignItems: 'center',
-          gap: 10
+          gap: 10,
+          position: 'relative'
         }}
       >
+        {showReport && (
+          <Tooltip label="Report">
+            <ActionIcon
+              color="red"
+              onClick={() => setShowReportModal(true)}
+              sx={{ position: 'absolute', right: -10, top: -10 }}
+              variant="outline"
+            >
+              <AlertCircle />
+            </ActionIcon>
+          </Tooltip>
+        )}
         <UnstyledButton
           onClick={e => {
             e.preventDefault();
@@ -128,6 +144,15 @@ const ProductListItem = ({ product }) => {
           </Group>
         </Group>
       </Stack>
+      {showReport && (
+        <ReportContentModal
+          contentType="product"
+          onClose={() => setShowReportModal(false)}
+          onReport={() => {}}
+          opened={showReportModal}
+          pkContent={product.pkProduct}
+        />
+      )}
     </Card>
   ) : (
     <Card shadow="xl" sx={{ height: 350, display: 'flex' }}>
@@ -141,7 +166,8 @@ const ProductListItem = ({ product }) => {
 };
 
 ProductListItem.propTypes = {
-  product: PropTypes.object
+  product: PropTypes.object,
+  showReport: PropTypes.bool
 };
 
 export default ProductListItem;
