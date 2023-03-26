@@ -1,10 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Avatar, Button, Card, Group, Stack, Text, Title } from '@mantine/core';
 import dayjs from 'dayjs';
 import PropTypes from 'prop-types';
 import { Calendar, Star } from 'tabler-icons-react';
+import ReportContentModal from '../reports/ReportContentModal';
 
-const ProfileSidebarInfo = ({ user, isLoading }) => {
+const ProfileSidebarInfo = ({ isCurrentUsersProfile, user, isLoading }) => {
+  const [showReportModal, setShowReportModal] = useState(false);
+
   return (
     user && (
       <>
@@ -19,6 +22,16 @@ const ProfileSidebarInfo = ({ user, isLoading }) => {
               >
                 <Avatar color="gray" size={100} sx={{}} variant="light" />
               </Card>
+              {!isCurrentUsersProfile && (
+                <Button
+                  color="dark"
+                  onClick={() => setShowReportModal(true)}
+                  sx={{ position: 'absolute', top: -90, right: 0 }}
+                  variant="outline"
+                >
+                  Report
+                </Button>
+              )}
               <Group>
                 <Title order={2}>{user.username}</Title>
               </Group>
@@ -41,21 +54,38 @@ const ProfileSidebarInfo = ({ user, isLoading }) => {
             </Stack>
 
             <Stack sx={{ alignItems: 'center' }}>
-              <Button
-                radius="xl"
-                sx={{ margin: '20px 0px', width: '100%', maxWidth: 250 }}
-              >
-                Follow
-              </Button>
+              {isCurrentUsersProfile ? (
+                <Button
+                  radius="xl"
+                  sx={{ margin: '20px 0px', width: '100%', maxWidth: 250 }}
+                >
+                  Edit
+                </Button>
+              ) : (
+                <Button
+                  radius="xl"
+                  sx={{ margin: '20px 0px', width: '100%', maxWidth: 250 }}
+                >
+                  Follow
+                </Button>
+              )}
             </Stack>
           </Stack>
         </Card>
+        <ReportContentModal
+          contentType="user"
+          onClose={() => setShowReportModal(false)}
+          onReport={() => {}}
+          opened={showReportModal}
+          pkContent={user.pkUser}
+        />
       </>
     )
   );
 };
 
 ProfileSidebarInfo.propTypes = {
+  isCurrentUsersProfile: PropTypes.bool,
   isLoading: PropTypes.bool,
   user: PropTypes.object
 };

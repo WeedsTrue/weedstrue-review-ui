@@ -21,6 +21,7 @@ import { USER_POST_TYPE, USER_POST_TYPE_LIST } from '../../../config/constants';
 import { reactToItem } from '../../../helpers/reactionHelper';
 import { Context as ReviewsContext } from '../../../providers/ReviewsProvider';
 import ShareLinkModal from '../../common/ShareLinkModal';
+import ReportContentModal from '../reports/ReportContentModal';
 const relativeTime = require('dayjs/plugin/relativeTime');
 
 const PostListItem = ({ userPost }) => {
@@ -29,6 +30,7 @@ const PostListItem = ({ userPost }) => {
   const { createUserPostReaction } = useContext(ReviewsContext);
   const [showSharePostModal, setShowSharePostModal] = useState(false);
   const [showDeletePostModal, setShowDeletePostModal] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
   const [reactionState, setReactionState] = useState({
     value: 0,
     deleted: false
@@ -37,12 +39,14 @@ const PostListItem = ({ userPost }) => {
   const postLink = userPost
     ? `/${userPost.postItemType}s/${userPost.postItemUuid}/posts/${
         userPost.uuid
-      }/${userPost.title
-        .replace(/[^a-zA-Z' ']/g, '')
-        .split(' ')
-        .slice(0, 6)
-        .join('_')
-        .toLowerCase()}`
+      }/${
+        userPost.title
+          ?.replace(/[^a-zA-Z' ']/g, '')
+          .split(' ')
+          .slice(0, 6)
+          .join('_')
+          .toLowerCase() ?? ''
+      }`
     : '';
 
   const postType =
@@ -239,8 +243,15 @@ const PostListItem = ({ userPost }) => {
               <Group>
                 <PostMenu
                   onAction={action => {
-                    if (action === 'DELETE') {
-                      setShowDeletePostModal(true);
+                    switch (action) {
+                      case 'DELETE':
+                        setShowDeletePostModal(true);
+                        break;
+                      case 'REPORT':
+                        setShowReportModal(true);
+                        break;
+                      default:
+                        break;
                     }
                   }}
                   userPost={userPost}
@@ -260,6 +271,12 @@ const PostListItem = ({ userPost }) => {
         onClose={() => setShowDeletePostModal(false)}
         opened={showDeletePostModal}
         userPost={userPost}
+      />
+      <ReportContentModal
+        contentType="post"
+        onClose={() => setShowReportModal(false)}
+        opened={showReportModal}
+        pkContent={userPost.pkUserPost}
       />
     </>
   ) : (

@@ -2,11 +2,13 @@ import React, { useContext, useEffect } from 'react';
 import { Group, Stack } from '@mantine/core';
 import { useParams } from 'react-router-dom';
 import ProfileSidebarInfo from './ProfileSidebarInfo';
+import { Context as AuthContext } from '../../../providers/AuthProvider';
 import { Context as ReviewsContext } from '../../../providers/ReviewsProvider';
 import PostList from '../posts/PostList';
 
 const ProfileDetails = () => {
   const { username } = useParams();
+  const { state: authState } = useContext(AuthContext);
   const { state, fetchUserProfile } = useContext(ReviewsContext);
 
   useEffect(() => {
@@ -29,7 +31,12 @@ const ProfileDetails = () => {
         </Stack>
 
         <Stack style={{ flex: 1, maxWidth: 332 }}>
-          <ProfileSidebarInfo user={state.userProfile.value} />
+          <ProfileSidebarInfo
+            isCurrentUsersProfile={
+              authState.userData?.pkUser === state.userProfile.value?.pkUser
+            }
+            user={state.userProfile.value}
+          />
         </Stack>
       </Group>
     </Stack>

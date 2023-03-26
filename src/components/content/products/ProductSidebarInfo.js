@@ -14,10 +14,10 @@ import { ChevronRight } from 'tabler-icons-react';
 import ProductListItem from './ProductListItem';
 import { LINK_SOURCE_TYPE } from '../../../config/constants';
 
-const ProductSidebarInfo = ({ product, isLoading }) => {
+const ProductSidebarInfo = ({ product, showReport, isLoading }) => {
   return (
     <>
-      <ProductListItem product={product} />
+      <ProductListItem product={product} showReport={showReport} />
       {product && (
         <>
           <Card style={{ padding: 0 }}>
@@ -89,7 +89,8 @@ const ProductSidebarInfo = ({ product, isLoading }) => {
 
 ProductSidebarInfo.propTypes = {
   isLoading: PropTypes.bool,
-  product: PropTypes.object
+  product: PropTypes.object,
+  showReport: PropTypes.bool
 };
 
 export default ProductSidebarInfo;

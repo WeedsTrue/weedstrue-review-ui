@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import {
   ActionIcon,
+  Alert,
   Badge,
   Button,
   Card,
@@ -26,6 +27,7 @@ import CreateComment from '../comments/CreateComment';
 import ProductAttribute from '../products/ProductAttribute';
 import ProductEffect from '../products/ProductEffect';
 import ProductSidebarInfo from '../products/ProductSidebarInfo';
+import ReportContentModal from '../reports/ReportContentModal';
 const relativeTime = require('dayjs/plugin/relativeTime');
 
 const PostDetails = ({ postItem }) => {
@@ -36,6 +38,7 @@ const PostDetails = ({ postItem }) => {
     useContext(ReviewsContext);
   const [showSharePostModal, setShowSharePostModal] = useState(false);
   const [showDeletePostModal, setShowDeletePostModal] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
   const [reactionState, setReactionState] = useState({
     value: 0,
     deleted: false
@@ -93,6 +96,7 @@ const PostDetails = ({ postItem }) => {
                   <Stack sx={{ gap: 0, placeItems: 'center', marginLeft: 5 }}>
                     <ActionIcon
                       color={isUpvoted ? 'blue' : 'dark'}
+                      disabled={userPost.hidden}
                       onClick={() => createReaction(true)}
                       variant="transparent"
                     >
@@ -107,6 +111,7 @@ const PostDetails = ({ postItem }) => {
                     </Text>
                     <ActionIcon
                       color={isDownVoted ? 'blue' : 'dark'}
+                      disabled={userPost.hidden}
                       onClick={() => createReaction(false)}
                       variant="transparent"
                     >
@@ -160,37 +165,40 @@ const PostDetails = ({ postItem }) => {
                             )}
                           </Group>
                         </Text>
-                        <Group
-                          sx={{
-                            gap: 5,
-                            flexWrap: 'nowrap',
-                            overflow: 'hidden',
-                            justifyContent: 'space-between',
-                            alignItems: 'start'
-                          }}
-                        >
-                          <Title
-                            order={4}
+                        {!userPost.hidden && (
+                          <Group
                             sx={{
+                              gap: 5,
+                              flexWrap: 'nowrap',
                               overflow: 'hidden',
-                              textOverflow: 'ellipsis'
+                              justifyContent: 'space-between',
+                              alignItems: 'start'
                             }}
                           >
-                            {userPost.title}
-                          </Title>
-                          <Badge
-                            color={postType.color}
-                            size="lg"
-                            sx={{ minWidth: 100 }}
-                            variant="filled"
-                          >
-                            {postType.label}
-                          </Badge>
-                        </Group>
+                            <Title
+                              order={4}
+                              sx={{
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis'
+                              }}
+                            >
+                              {userPost.title}
+                            </Title>
+                            <Badge
+                              color={postType.color}
+                              size="lg"
+                              sx={{ minWidth: 100 }}
+                              variant="filled"
+                            >
+                              {postType.label}
+                            </Badge>
+                          </Group>
+                        )}
                       </Stack>
 
-                      {userPost.fkUserPostType ===
-                        USER_POST_TYPE.REVIEW.value &&
+                      {!userPost.hidden &&
+                        userPost.fkUserPostType ===
+                          USER_POST_TYPE.REVIEW.value &&
                         userPost.userRating && (
                           <>
                             <Rating readOnly value={userPost.userRating} />
@@ -221,15 +229,27 @@ const PostDetails = ({ postItem }) => {
                             )}
                           </>
                         )}
-                      <Text
-                        sx={{
-                          fontSize: 16,
-                          whiteSpace: 'pre-wrap'
-                        }}
-                      >
-                        {userPost.content}
-                      </Text>
+                      {userPost.hidden ? (
+                        <Alert sx={{ margin: 40 }} variant="outline">
+                          <Text
+                            sx={{ padding: 30, textAlign: 'center' }}
+                            weight={500}
+                          >
+                            Content has been hidden.
+                          </Text>
+                        </Alert>
+                      ) : (
+                        <Text
+                          sx={{
+                            fontSize: 16,
+                            whiteSpace: 'pre-wrap'
+                          }}
+                        >
+                          {userPost.content}
+                        </Text>
+                      )}
                     </Stack>
+
                     <Group>
                       <Group sx={{ gap: 5 }}>
                         <Message size={20} />
@@ -240,37 +260,50 @@ const PostDetails = ({ postItem }) => {
                             : 'Comments'}
                         </Text>
                       </Group>
-                      <Group>
-                        <Button
-                          color="dark"
-                          leftIcon={<Share size={20} />}
-                          onClick={() => setShowSharePostModal(true)}
-                          size="xs"
-                          sx={{ fontSize: 14 }}
-                          variant="subtle"
-                        >
-                          Share
-                        </Button>
-                      </Group>
-                      <Group>
-                        <PostMenu
-                          onAction={action => {
-                            if (action === 'DELETE') {
-                              setShowDeletePostModal(true);
-                            }
-                          }}
-                          userPost={userPost}
-                        />
-                      </Group>
+                      {!userPost.hidden && (
+                        <>
+                          <Group>
+                            <Button
+                              color="dark"
+                              leftIcon={<Share size={20} />}
+                              onClick={() => setShowSharePostModal(true)}
+                              size="xs"
+                              sx={{ fontSize: 14 }}
+                              variant="subtle"
+                            >
+                              Share
+                            </Button>
+                          </Group>
+                          <Group>
+                            <PostMenu
+                              onAction={action => {
+                                switch (action) {
+                                  case 'DELETE':
+                                    setShowDeletePostModal(true);
+                                    break;
+                                  case 'REPORT':
+                                    setShowReportModal(true);
+                                    break;
+                                  default:
+                                    break;
+                                }
+                              }}
+                              userPost={userPost}
+                            />
+                          </Group>
+                        </>
+                      )}
                     </Group>
-                    <Group
-                      sx={{
-                        gap: 5,
-                        flex: 1
-                      }}
-                    >
-                      <CreateComment fkUserPost={userPost.pkUserPost} />
-                    </Group>
+                    {!userPost.hidden && (
+                      <Group
+                        sx={{
+                          gap: 5,
+                          flex: 1
+                        }}
+                      >
+                        <CreateComment fkUserPost={userPost.pkUserPost} />
+                      </Group>
+                    )}
                   </Stack>
                 </Group>
                 <CommentList
@@ -302,6 +335,13 @@ const PostDetails = ({ postItem }) => {
         onDelete={() => navigate('/')}
         opened={showDeletePostModal}
         userPost={userPost}
+      />
+      <ReportContentModal
+        contentType="post"
+        onClose={() => setShowReportModal(false)}
+        onReport={() => {}}
+        opened={showReportModal}
+        pkContent={userPost?.pkUserPost}
       />
     </Group>
   );

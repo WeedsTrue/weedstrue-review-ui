@@ -7,16 +7,19 @@ import {
   Skeleton,
   Stack,
   Text,
-  Title
+  Title,
+  Tooltip
 } from '@mantine/core';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
-import { Leaf } from 'tabler-icons-react';
+import { AlertCircle, Leaf } from 'tabler-icons-react';
 import { reactToItem } from '../../../helpers/reactionHelper';
 import { Context as ReviewsContext } from '../../../providers/ReviewsProvider';
+import ReportContentModal from '../reports/ReportContentModal';
 
-const BrandInfoListItem = ({ brand }) => {
+const BrandInfoListItem = ({ brand, showReport }) => {
   const { createBrandReaction } = useContext(ReviewsContext);
+  const [showReportModal, setShowReportModal] = useState(false);
   const [reactionState, setReactionState] = useState({
     value: 0,
     deleted: false
@@ -54,7 +57,28 @@ const BrandInfoListItem = ({ brand }) => {
       sx={{ height: 350, display: 'flex' }}
       to={`/brands/${brand.uuid}`}
     >
-      <Stack sx={{ flex: 1, padding: 10, alignItems: 'center', gap: 10 }}>
+      <Stack
+        sx={{
+          flex: 1,
+          padding: 10,
+          alignItems: 'center',
+          gap: 10,
+          position: 'relative'
+        }}
+      >
+        {showReport && (
+          <Tooltip label="Report">
+            <ActionIcon
+              color="red"
+              onClick={() => setShowReportModal(true)}
+              sx={{ position: 'absolute', right: -10, top: -10 }}
+              variant="outline"
+            >
+              <AlertCircle />
+            </ActionIcon>
+          </Tooltip>
+        )}
+
         <Title order={4} sx={{ textAlign: 'center' }}>
           {brand.name}
         </Title>
@@ -101,6 +125,13 @@ const BrandInfoListItem = ({ brand }) => {
           </Group>
         </Group>
       </Stack>
+      <ReportContentModal
+        contentType="brand"
+        onClose={() => setShowReportModal(false)}
+        onReport={() => {}}
+        opened={showReportModal}
+        pkContent={brand.pkBrand}
+      />
     </Card>
   ) : (
     <Card shadow="xl" sx={{ height: 350 }}>
@@ -113,7 +144,8 @@ const BrandInfoListItem = ({ brand }) => {
 };
 
 BrandInfoListItem.propTypes = {
-  brand: PropTypes.object
+  brand: PropTypes.object,
+  showReport: PropTypes.bool
 };
 
 export default BrandInfoListItem;

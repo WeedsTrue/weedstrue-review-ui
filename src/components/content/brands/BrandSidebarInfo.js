@@ -16,7 +16,7 @@ import { LINK_SOURCE_TYPE } from '../../../config/constants';
 const BrandSidebarInfo = ({ brand }) => {
   return (
     <>
-      <BrandInfoListItem brand={brand} />
+      <BrandInfoListItem brand={brand} showReport />
       {brand && (
         <Card style={{ padding: 0 }}>
           <Group sx={{ padding: '10px 20px' }}>

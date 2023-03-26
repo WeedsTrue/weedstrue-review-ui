@@ -25,7 +25,7 @@ const ProductDetails = ({ product, isLoading }) => {
         </Stack>
 
         <Stack style={{ flex: 1, maxWidth: 332 }}>
-          <ProductSidebarInfo product={product} />
+          <ProductSidebarInfo product={product} showReport />
         </Stack>
       </Group>
     </Stack>

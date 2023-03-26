@@ -11,16 +11,21 @@ import {
 import dayjs from 'dayjs';
 import PropTypes from 'prop-types';
 import { Leaf, Message, Point, Share } from 'tabler-icons-react';
+import CommentMenu from './CommentMenu';
 import CreateComment from './CreateComment';
+import DeleteCommentModal from './DeleteCommentModal';
 import { reactToItem } from '../../../helpers/reactionHelper';
 import { Context as ReviewsContext } from '../../../providers/ReviewsProvider';
 import ShareLinkModal from '../../common/ShareLinkModal';
+import ReportContentModal from '../reports/ReportContentModal';
 const relativeTime = require('dayjs/plugin/relativeTime');
 
 const CommentListItem = ({ comment, replyComments }) => {
   dayjs.extend(relativeTime);
   const { createCommentReaction } = useContext(ReviewsContext);
   const [showSharePostModal, setShowSharePostModal] = useState(false);
+  const [showDeleteCommentModal, setShowDeleteCommentModal] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
   const [showReplyBox, setShowReplyBox] = useState(false);
   const replies = replyComments.filter(
     c => c.fkCommentParent === comment.pkComment
@@ -29,12 +34,13 @@ const CommentListItem = ({ comment, replyComments }) => {
     value: 0,
     deleted: false
   });
+  const isDisabled = comment.hidden || comment.deleted;
 
   const isUpvoted =
-    (comment?.userReaction?.isPositive && reactionState.value === 0) ||
+    (comment.userReaction?.isPositive && reactionState.value === 0) ||
     (reactionState.value > 0 && !reactionState.deleted);
   const isDownVoted =
-    (comment?.userReaction &&
+    (comment.userReaction &&
       !comment.userReaction.isPositive &&
       reactionState.value === 0) ||
     (reactionState.value < 0 && !reactionState.deleted);
@@ -49,7 +55,7 @@ const CommentListItem = ({ comment, replyComments }) => {
         isPositive,
         deleted: reactionState.deleted
       },
-      comment?.userReaction,
+      comment.userReaction,
       createCommentReaction,
       setReactionState
     );
@@ -78,18 +84,30 @@ const CommentListItem = ({ comment, replyComments }) => {
           paddingLeft: 30
         }}
       >
-        <Text
-          sx={{
-            fontSize: 14,
-            whiteSpace: 'pre-wrap'
-          }}
-        >
-          {comment.content}
-        </Text>
+        {isDisabled ? (
+          <Text
+            color="grey"
+            size={12}
+            sx={{ fontStyle: 'italic' }}
+            weight={500}
+          >
+            Comment has been {comment.deleted ? 'deleted' : 'hidden'}.
+          </Text>
+        ) : (
+          <Text
+            sx={{
+              fontSize: 14,
+              whiteSpace: 'pre-wrap'
+            }}
+          >
+            {comment.content}
+          </Text>
+        )}
         <Group sx={{ gap: 5 }}>
           <Group sx={{ gap: 5, marginRight: 5 }}>
             <ActionIcon
               color={isUpvoted ? 'blue' : 'dark'}
+              disabled={isDisabled}
               onClick={() => createReaction(true)}
               size={24}
               variant="transparent"
@@ -99,12 +117,13 @@ const CommentListItem = ({ comment, replyComments }) => {
             <Text size={14} weight={500}>
               {comment.positiveReactionCount -
                 comment.negativeReactionCount +
-                (!comment?.userReaction && reactionState.deleted
+                (!comment.userReaction && reactionState.deleted
                   ? 0
                   : reactionState.value)}
             </Text>
             <ActionIcon
               color={isDownVoted ? 'blue' : 'dark'}
+              disabled={isDisabled}
               onClick={() => createReaction(false)}
               size={24}
               variant="transparent"
@@ -120,26 +139,47 @@ const CommentListItem = ({ comment, replyComments }) => {
             </ActionIcon>
           </Group>
 
-          <Button
-            color="dark"
-            leftIcon={<Message size={22} />}
-            onClick={() => setShowReplyBox(true)}
-            size="xs"
-            sx={{ padding: 5 }}
-            variant="subtle"
-          >
-            Reply
-          </Button>
-          <Button
-            color="dark"
-            leftIcon={<Share size={22} />}
-            onClick={() => setShowSharePostModal(true)}
-            size="xs"
-            sx={{ padding: 5 }}
-            variant="subtle"
-          >
-            Share
-          </Button>
+          {!isDisabled && (
+            <>
+              <Button
+                color="dark"
+                leftIcon={<Message size={22} />}
+                onClick={() => setShowReplyBox(true)}
+                size="xs"
+                sx={{ padding: 5 }}
+                variant="subtle"
+              >
+                Reply
+              </Button>
+              <Button
+                color="dark"
+                leftIcon={<Share size={22} />}
+                onClick={() => setShowSharePostModal(true)}
+                size="xs"
+                sx={{ padding: 5 }}
+                variant="subtle"
+              >
+                Share
+              </Button>
+              <Group>
+                <CommentMenu
+                  comment={comment}
+                  onAction={action => {
+                    switch (action) {
+                      case 'DELETE':
+                        setShowDeleteCommentModal(true);
+                        break;
+                      case 'REPORT':
+                        setShowReportModal(true);
+                        break;
+                      default:
+                        break;
+                    }
+                  }}
+                />
+              </Group>
+            </>
+          )}
         </Group>
         {showReplyBox && (
           <Stack
@@ -172,6 +212,18 @@ const CommentListItem = ({ comment, replyComments }) => {
         opened={showSharePostModal}
         pathname={window.location.pathname}
         title={<Title order={3}>Share Post</Title>}
+      />
+      <DeleteCommentModal
+        comment={comment}
+        onClose={() => setShowDeleteCommentModal(false)}
+        opened={showDeleteCommentModal}
+      />
+      <ReportContentModal
+        contentType="comment"
+        onClose={() => setShowReportModal(false)}
+        onReport={() => {}}
+        opened={showReportModal}
+        pkContent={comment.pkComment}
       />
     </Stack>
   );
