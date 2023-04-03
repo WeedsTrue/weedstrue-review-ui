@@ -1,4 +1,14 @@
+import React from 'react';
 import Auth from '@aws-amplify/auth';
+import {
+  BrandInstagram,
+  BrandReddit,
+  BrandTiktok,
+  BrandTwitch,
+  BrandTwitter,
+  BrandYoutube,
+  Link
+} from 'tabler-icons-react';
 
 const PRODUCTION = false;
 
@@ -150,12 +160,70 @@ const PRODUCT_TYPES = [
   }
 ];
 
+const USER_SOCIAL_LINK_TYPES = [
+  {
+    value: 1,
+    label: 'Custom',
+    hasCustomLabel: true,
+    placeholder: 'https://www.website.com',
+    icon: <Link />
+  },
+  {
+    value: 2,
+    label: 'Reddit',
+    hasCustomLabel: false,
+    placeholder: 'u/user',
+    website: 'https://www.reddit.com/',
+    icon: <BrandReddit />
+  },
+  {
+    value: 3,
+    label: 'Instagram',
+    hasCustomLabel: false,
+    placeholder: '@username',
+    website: 'https://www.instagram.com/',
+    icon: <BrandInstagram />
+  },
+  {
+    value: 4,
+    label: 'Twitter',
+    hasCustomLabel: false,
+    placeholder: '@username',
+    website: 'https://www.twitter.com/',
+    icon: <BrandTwitter />
+  },
+  {
+    value: 5,
+    label: 'TikTok',
+    hasCustomLabel: false,
+    placeholder: '@username',
+    website: 'https://www.tiktok.com/@',
+    icon: <BrandTiktok />
+  },
+  {
+    value: 6,
+    label: 'Twitch',
+    hasCustomLabel: false,
+    placeholder: '@username',
+    website: 'https://www.twitch.com/',
+    icon: <BrandTwitch />
+  },
+  {
+    value: 7,
+    label: 'YouTube',
+    hasCustomLabel: true,
+    placeholder: 'https://www.youtube.com',
+    icon: <BrandYoutube />
+  }
+];
+
 export {
   PRODUCTION,
   AWS_COGNITO_SETTINGS,
   PRODUCT_TYPES,
   USER_POST_TYPE,
   USER_POST_TYPE_LIST,
+  USER_SOCIAL_LINK_TYPES,
   PRODUCT_ATTRIBUTE_TYPE,
   LINK_SOURCE_TYPE
 };

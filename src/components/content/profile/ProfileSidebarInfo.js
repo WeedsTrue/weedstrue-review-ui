@@ -1,11 +1,23 @@
 import React, { useState } from 'react';
-import { Avatar, Button, Card, Group, Stack, Text, Title } from '@mantine/core';
+import {
+  Avatar,
+  Button,
+  Card,
+  Divider,
+  Group,
+  Stack,
+  Text,
+  Title
+} from '@mantine/core';
 import dayjs from 'dayjs';
 import PropTypes from 'prop-types';
+import { useNavigate } from 'react-router-dom';
 import { Calendar, Star } from 'tabler-icons-react';
+import ProfileSocialLink from './ProfileSocialLink';
 import ReportContentModal from '../reports/ReportContentModal';
 
 const ProfileSidebarInfo = ({ isCurrentUsersProfile, user, isLoading }) => {
+  const navigate = useNavigate();
   const [showReportModal, setShowReportModal] = useState(false);
 
   return (
@@ -53,13 +65,20 @@ const ProfileSidebarInfo = ({ isCurrentUsersProfile, user, isLoading }) => {
               </Group>
             </Stack>
 
+            {user.bio && (
+              <Stack sx={{ marginTop: 10 }}>
+                <Text>{user.bio}</Text>
+              </Stack>
+            )}
+
             <Stack sx={{ alignItems: 'center' }}>
               {isCurrentUsersProfile ? (
                 <Button
+                  onClick={() => navigate('/settings')}
                   radius="xl"
                   sx={{ margin: '20px 0px', width: '100%', maxWidth: 250 }}
                 >
-                  Edit
+                  Settings
                 </Button>
               ) : (
                 <Button
@@ -72,6 +91,24 @@ const ProfileSidebarInfo = ({ isCurrentUsersProfile, user, isLoading }) => {
             </Stack>
           </Stack>
         </Card>
+
+        {user.userSocialLinks.length > 0 && (
+          <Card style={{ padding: 0 }}>
+            <Group sx={{ padding: '10px 20px' }}>
+              <Title order={4}>Social Links</Title>
+            </Group>
+            <Divider />
+            <Stack sx={{ padding: 20, gap: 10 }}>
+              {user.userSocialLinks.map(socialLink => (
+                <ProfileSocialLink
+                  key={socialLink.pkUserSocialLink}
+                  socialLink={socialLink}
+                />
+              ))}
+            </Stack>
+          </Card>
+        )}
+
         <ReportContentModal
           contentType="user"
           onClose={() => setShowReportModal(false)}
