@@ -1,7 +1,11 @@
 import React, { useContext, useEffect } from 'react';
 import { Card, Group, Stack } from '@mantine/core';
 import { useNavigate, useParams } from 'react-router-dom';
+import ProfileCommentsList from './ProfileCommentsList';
+import ProfileDownvoteList from './ProfileDownVoteList';
+import ProfileHiddenList from './ProfileHiddenList';
 import ProfileSidebarInfo from './ProfileSidebarInfo';
+import ProfileUpvoteList from './ProfileUpVoteList';
 import { Context as AuthContext } from '../../../providers/AuthProvider';
 import { Context as ReviewsContext } from '../../../providers/ReviewsProvider';
 import CustomTab from '../../common/CustomTab';
@@ -99,15 +103,16 @@ const ProfileDetails = () => {
               <PostList
                 fkUser={state.userProfile.value?.pkUser}
                 hidePostSubmit
+                noPostsAvailableTextOverride="No Posts Available"
               />
             ) : view === 'comments' ? (
-              <></>
+              <ProfileCommentsList pkUser={state.userProfile.value?.pkUser} />
             ) : view === 'hidden' ? (
-              <></>
+              <ProfileHiddenList />
             ) : view === 'upvoted' ? (
-              <></>
+              <ProfileUpvoteList />
             ) : view === 'downvoted' ? (
-              <></>
+              <ProfileDownvoteList />
             ) : (
               <></>
             )}

@@ -22,7 +22,8 @@ const PostList = ({
   fkBrand,
   fkProduct,
   hidePostSubmit,
-  searchOnRender
+  searchOnRender,
+  noPostsAvailableTextOverride
 }) => {
   const navigate = useNavigate();
   const { state, fetchUserPosts } = useContext(ReviewsContext);
@@ -119,7 +120,9 @@ const PostList = ({
         <Card>
           <Stack sx={{ padding: 60 }}>
             <Text sx={{ margin: 'auto' }} weight={500}>
-              No posts available
+              {!noPostsAvailableTextOverride
+                ? 'Be the first to post!'
+                : noPostsAvailableTextOverride}
             </Text>
           </Stack>
         </Card>
@@ -153,6 +156,7 @@ PostList.propTypes = {
   fkUser: PropTypes.number,
   hidePostSubmit: PropTypes.bool,
   isLoading: PropTypes.bool,
+  noPostsAvailableTextOverride: PropTypes.string,
   searchOnRender: PropTypes.bool
 };
 

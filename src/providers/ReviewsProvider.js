@@ -10,6 +10,7 @@ const initialState = {
   userPostSummary: { value: null, loading: false, error: null },
   userPostDrafts: { value: [], loading: false, error: null },
   userProfile: { value: null, loading: false, error: null },
+  userProfileComments: { value: [], loading: false, error: null },
   products: { value: [], loading: false, error: null },
   product: { value: null, loading: false, error: null }
 };
@@ -735,6 +736,34 @@ const fetchUserProfile = dispatch => async username => {
   }
 };
 
+const fetchUserProfileComments = dispatch => async pkUser => {
+  try {
+    dispatch({
+      type: 'FETCHING',
+      stateName: 'userProfile'
+    });
+    const response = await weedstrueAPI.get(`/api/users/${pkUser}/comments`);
+
+    dispatch({
+      type: 'SUCCESS',
+      stateName: 'userProfileComments',
+      payload: { value: response.data }
+    });
+
+    dispatch({
+      type: 'SUCCESS',
+      stateName: 'userProfileComments',
+      payload: { value: response.data }
+    });
+  } catch (e) {
+    dispatch({
+      type: 'ERROR',
+      stateName: 'userProfileComments',
+      payload: 'Oops something went wrong.'
+    });
+  }
+};
+
 const createUserPostReport =
   dispatch =>
   async (
@@ -881,6 +910,7 @@ export const { Provider, Context } = createProvider(
     fetchUserPost,
     fetchUserPostSummary,
     fetchUserProfile,
+    fetchUserProfileComments,
     updateUserPost
   },
   initialState

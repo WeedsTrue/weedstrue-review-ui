@@ -350,6 +350,30 @@ const updateUserProfile =
     }
   };
 
+const updateUserPrivacy =
+  dispatch =>
+  async ({ followersDisabled }, onSuccessCallback, onErrorCallback) => {
+    try {
+      const response = await weedstrueAPI.put('/api/auth/privacy', {
+        followersDisabled
+      });
+      dispatch({
+        type: 'SUCCESS',
+        payload: {
+          userData: response.data
+        }
+      });
+      if (onSuccessCallback) {
+        onSuccessCallback();
+      }
+    } catch (e) {
+      const message = getErrorMessage(e);
+      if (onErrorCallback) {
+        onErrorCallback(message);
+      }
+    }
+  };
+
 export const { Provider, Context } = createProvider(
   reducer,
   {
@@ -364,7 +388,8 @@ export const { Provider, Context } = createProvider(
     signUp,
     toggleAuthModal,
     tokenLogin,
-    updateUserProfile
+    updateUserProfile,
+    updateUserPrivacy
   },
   initialState
 );
