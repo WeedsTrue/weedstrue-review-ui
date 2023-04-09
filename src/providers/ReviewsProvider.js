@@ -331,7 +331,6 @@ const fetchUserPostReactionPosts =
         onSuccessCallback(response.data.totalCount);
       }
     } catch (e) {
-      console.log(e.response);
       dispatch({
         type: 'ERROR',
         stateName: 'userPosts',
@@ -969,6 +968,36 @@ const createUserReport =
     }
   };
 
+const followUser =
+  dispatch => async (pkUser, onSuccessCallback, onErrorCallback) => {
+    try {
+      await weedstrueAPI.post(`/api/users/${pkUser}/follow`);
+      if (onSuccessCallback) {
+        onSuccessCallback();
+      }
+    } catch (e) {
+      const message = getErrorMessage(e);
+      if (onErrorCallback) {
+        onErrorCallback(message);
+      }
+    }
+  };
+
+const unfollowUser =
+  dispatch => async (pkUser, onSuccessCallback, onErrorCallback) => {
+    try {
+      await weedstrueAPI.post(`/api/users/${pkUser}/unfollow`);
+      if (onSuccessCallback) {
+        onSuccessCallback();
+      }
+    } catch (e) {
+      const message = getErrorMessage(e);
+      if (onErrorCallback) {
+        onErrorCallback(message);
+      }
+    }
+  };
+
 export const { Provider, Context } = createProvider(
   reducer,
   {
@@ -998,6 +1027,8 @@ export const { Provider, Context } = createProvider(
     fetchUserPostSummary,
     fetchUserProfile,
     fetchUserProfileComments,
+    followUser,
+    unfollowUser,
     updateUserPost
   },
   initialState
