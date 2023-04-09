@@ -1,16 +1,78 @@
-import React, { useContext, useEffect } from 'react';
-import { Card, Group, Stack } from '@mantine/core';
-import { useNavigate, useParams } from 'react-router-dom';
-import ProfileSidebarInfo from './ProfileSidebarInfo';
-import { Context as AuthContext } from '../../../providers/AuthProvider';
+import React, { useContext, useEffect, useState } from 'react';
+import { Button, Card, Stack, Text } from '@mantine/core';
+import PropTypes from 'prop-types';
 import { Context as ReviewsContext } from '../../../providers/ReviewsProvider';
-import CustomTab from '../../common/CustomTab';
-import PostList from '../posts/PostList';
+import PostListItem from '../posts/PostListItem';
 
-const ProfileDownvoteList = () => {
-  return <Stack sx={{ gap: 20 }}></Stack>;
+const ProfileDownvoteList = ({}) => {
+  const { state, fetchUserPostReactionPosts } = useContext(ReviewsContext);
+  const [filterState, setFilterState] = useState({
+    totalCount: 0,
+    isLoading: false
+  });
+
+  useEffect(() => {
+    setFilterState({
+      ...filterState,
+      isLoading: true
+    });
+    fetchUserPostReactionPosts({ isPositive: false }, totalCount =>
+      setFilterState({
+        ...filterState,
+        totalCount,
+        isLoading: false
+      })
+    );
+  }, []);
+
+  return (
+    <Stack sx={{ flex: 1, gap: 15 }}>
+      {filterState.isLoading ? (
+        <>
+          <PostListItem />
+          <PostListItem />
+          <PostListItem />
+          <PostListItem />
+        </>
+      ) : state.userNegativeReactionPosts.value.length === 0 ? (
+        <Card>
+          <Stack sx={{ padding: 60 }}>
+            <Text sx={{ margin: 'auto' }} weight={500}>
+              No posts available
+            </Text>
+          </Stack>
+        </Card>
+      ) : (
+        state.userNegativeReactionPosts.value.map(p => (
+          <PostListItem key={p.pkUserPost} userPost={p} />
+        ))
+      )}
+      {!filterState.isLoading &&
+        filterState.totalCount >
+          state.userNegativeReactionPosts.value.length && (
+          <Button
+            color="dark"
+            onClick={() =>
+              fetchUserPostReactionPosts({
+                isPositive: false,
+                lastUserPost:
+                  state.userNegativeReactionPosts.value[
+                    state.userNegativeReactionPosts.value.length - 1
+                  ]
+              })
+            }
+            sx={{ margin: 'auto', marginTop: 10 }}
+            variant="outline"
+          >
+            Show More
+          </Button>
+        )}
+    </Stack>
+  );
 };
 
-ProfileDownvoteList.propTypes = {};
+ProfileDownvoteList.propTypes = {
+  pkUser: PropTypes.number
+};
 
 export default ProfileDownvoteList;

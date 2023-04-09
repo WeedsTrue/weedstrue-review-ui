@@ -7,6 +7,9 @@ const initialState = {
   comments: { value: [], loading: false, error: null },
   userPosts: { value: [], loading: false, error: null },
   userPost: { value: null, loading: false, error: null },
+  userPositiveReactionPosts: { value: [], loading: false, error: null },
+  userNegativeReactionPosts: { value: [], loading: false, error: null },
+  userHiddenPosts: { value: [], loading: false, error: null },
   userPostSummary: { value: null, loading: false, error: null },
   userPostDrafts: { value: [], loading: false, error: null },
   userProfile: { value: null, loading: false, error: null },
@@ -278,6 +281,88 @@ const fetchUserPosts =
         dispatch({
           type: 'SUCCESS',
           stateName: 'userPosts',
+          payload: { value: response.data.data }
+        });
+      }
+      if (onSuccessCallback) {
+        onSuccessCallback(response.data.totalCount);
+      }
+    } catch (e) {
+      dispatch({
+        type: 'ERROR',
+        stateName: 'userPosts',
+        payload: 'Oops something went wrong.'
+      });
+    }
+  };
+
+const fetchUserPostReactionPosts =
+  dispatch =>
+  async ({ isPositive, lastUserPost }, onSuccessCallback, onErrorCallback) => {
+    try {
+      dispatch({
+        type: 'FETCHING',
+        stateName: 'userPosts'
+      });
+      const response = await weedstrueAPI.get('/api/users/reaction-posts', {
+        params: {
+          isPositive,
+          lastUserPost
+        }
+      });
+      if (lastUserPost) {
+        dispatch({
+          type: 'APPEND',
+          stateName: isPositive
+            ? 'userPositiveReactionPosts'
+            : 'userNegativeReactionPosts',
+          payload: response.data.data
+        });
+      } else {
+        dispatch({
+          type: 'SUCCESS',
+          stateName: isPositive
+            ? 'userPositiveReactionPosts'
+            : 'userNegativeReactionPosts',
+          payload: { value: response.data.data }
+        });
+      }
+      if (onSuccessCallback) {
+        onSuccessCallback(response.data.totalCount);
+      }
+    } catch (e) {
+      console.log(e.response);
+      dispatch({
+        type: 'ERROR',
+        stateName: 'userPosts',
+        payload: 'Oops something went wrong.'
+      });
+    }
+  };
+
+const fetchUserHiddenPosts =
+  dispatch =>
+  async ({ lastUserPost }, onSuccessCallback, onErrorCallback) => {
+    try {
+      dispatch({
+        type: 'FETCHING',
+        stateName: 'userPosts'
+      });
+      const response = await weedstrueAPI.get('/api/users/hidden-posts', {
+        params: {
+          lastUserPost
+        }
+      });
+      if (lastUserPost) {
+        dispatch({
+          type: 'APPEND',
+          stateName: 'userHiddenPosts',
+          payload: response.data.data
+        });
+      } else {
+        dispatch({
+          type: 'SUCCESS',
+          stateName: 'userHiddenPosts',
           payload: { value: response.data.data }
         });
       }
@@ -905,9 +990,11 @@ export const { Provider, Context } = createProvider(
     fetchProduct,
     fetchProducts,
     fetchUserDrafts,
+    fetchUserHiddenPosts,
     fetchUserPostProductOptions,
     fetchUserPosts,
     fetchUserPost,
+    fetchUserPostReactionPosts,
     fetchUserPostSummary,
     fetchUserProfile,
     fetchUserProfileComments,

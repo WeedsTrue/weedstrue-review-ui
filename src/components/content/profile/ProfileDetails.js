@@ -110,9 +110,9 @@ const ProfileDetails = () => {
             ) : view === 'hidden' ? (
               <ProfileHiddenList />
             ) : view === 'upvoted' ? (
-              <ProfileUpvoteList />
+              <ProfileUpvoteList pkUser={state.userProfile.value?.pkUser} />
             ) : view === 'downvoted' ? (
-              <ProfileDownvoteList />
+              <ProfileDownvoteList pkUser={state.userProfile.value?.pkUser} />
             ) : (
               <></>
             )}
