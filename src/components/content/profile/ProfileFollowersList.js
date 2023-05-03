@@ -5,7 +5,7 @@ import ProfileFollowerListItem from './ProfileFollowerListItem';
 import { triggerNotification } from '../../../helpers/notificationHelper';
 import { Context as ReviewsContext } from '../../../providers/ReviewsProvider';
 
-const ProfileFollowersList = ({ pkUser }) => {
+const ProfileFollowersList = ({ pkUser, isCurrentUsersProfile }) => {
   const hasFetched = useRef(false);
   const { state, fetchUserFollowers } = useContext(ReviewsContext);
   const [filterState, setFilterState] = useState({ username: '' });
@@ -40,13 +40,13 @@ const ProfileFollowersList = ({ pkUser }) => {
       {isLoading ? (
         <Grid>
           <Grid.Col lg={4} md={4} sm={4} xl={4} xs={4}>
-            <ProfileFollowerListItem />
+            <ProfileFollowerListItem canEdit={isCurrentUsersProfile} />
           </Grid.Col>
           <Grid.Col lg={4} md={4} sm={4} xl={4} xs={4}>
-            <ProfileFollowerListItem />
+            <ProfileFollowerListItem canEdit={isCurrentUsersProfile} />
           </Grid.Col>
           <Grid.Col lg={4} md={4} sm={4} xl={4} xs={4}>
-            <ProfileFollowerListItem />
+            <ProfileFollowerListItem canEdit={isCurrentUsersProfile} />
           </Grid.Col>
         </Grid>
       ) : filteredFollowers.length === 0 ? (
@@ -61,7 +61,10 @@ const ProfileFollowersList = ({ pkUser }) => {
         <Grid>
           {filteredFollowers.map(f => (
             <Grid.Col key={f.pkUser} lg={4} md={4} sm={4} xl={4} xs={4}>
-              <ProfileFollowerListItem follower={f} />
+              <ProfileFollowerListItem
+                canEdit={isCurrentUsersProfile}
+                follower={f}
+              />
             </Grid.Col>
           ))}
         </Grid>
@@ -71,6 +74,7 @@ const ProfileFollowersList = ({ pkUser }) => {
 };
 
 ProfileFollowersList.propTypes = {
+  isCurrentUsersProfile: PropTypes.bool,
   pkUser: PropTypes.number
 };
 

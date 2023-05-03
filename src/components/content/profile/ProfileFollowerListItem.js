@@ -12,7 +12,7 @@ import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { Context as ReviewsContext } from '../../../providers/ReviewsProvider';
 
-const ProfileFollowerListItem = ({ follower }) => {
+const ProfileFollowerListItem = ({ follower, canEdit }) => {
   const { deleteFollower } = useContext(ReviewsContext);
   const [followingState, setFollowingState] = useState({
     isFollowing: true,
@@ -31,63 +31,67 @@ const ProfileFollowerListItem = ({ follower }) => {
           <Text sx={{ lineHeight: '18px' }} weight={500}>
             {follower.username}
           </Text>
-          {followingState.isFollowing ? (
-            <Button
-              compact
-              loading={followingState.loading}
-              onClick={e => {
-                e.preventDefault();
-                setFollowingState({
-                  ...followingState,
-                  loading: true
-                });
-                deleteFollower(
-                  follower.pkUser,
-                  { undo: false },
-                  () =>
-                    setFollowingState({
-                      loading: false,
-                      isFollowing: false
-                    }),
-                  () =>
-                    setFollowingState({
-                      loading: false,
-                      isFollowing: true
-                    })
-                );
-              }}
-            >
-              Remove
-            </Button>
-          ) : (
-            <Button
-              compact
-              loading={followingState.loading}
-              onClick={e => {
-                e.preventDefault();
-                setFollowingState({
-                  ...followingState,
-                  loading: true
-                });
-                deleteFollower(
-                  follower.pkUser,
-                  { undo: true },
-                  () =>
-                    setFollowingState({
-                      loading: false,
-                      isFollowing: true
-                    }),
-                  () =>
+          {canEdit && (
+            <>
+              {followingState.isFollowing ? (
+                <Button
+                  compact
+                  loading={followingState.loading}
+                  onClick={e => {
+                    e.preventDefault();
                     setFollowingState({
                       ...followingState,
-                      loading: false
-                    })
-                );
-              }}
-              variant="outline"
-            >
-              Undo
-            </Button>
+                      loading: true
+                    });
+                    deleteFollower(
+                      follower.pkUser,
+                      { undo: false },
+                      () =>
+                        setFollowingState({
+                          loading: false,
+                          isFollowing: false
+                        }),
+                      () =>
+                        setFollowingState({
+                          loading: false,
+                          isFollowing: true
+                        })
+                    );
+                  }}
+                >
+                  Remove
+                </Button>
+              ) : (
+                <Button
+                  compact
+                  loading={followingState.loading}
+                  onClick={e => {
+                    e.preventDefault();
+                    setFollowingState({
+                      ...followingState,
+                      loading: true
+                    });
+                    deleteFollower(
+                      follower.pkUser,
+                      { undo: true },
+                      () =>
+                        setFollowingState({
+                          loading: false,
+                          isFollowing: true
+                        }),
+                      () =>
+                        setFollowingState({
+                          ...followingState,
+                          loading: false
+                        })
+                    );
+                  }}
+                  variant="outline"
+                >
+                  Undo
+                </Button>
+              )}
+            </>
           )}
         </Stack>
       </Group>
@@ -100,7 +104,7 @@ const ProfileFollowerListItem = ({ follower }) => {
           <Text weight={500}>
             <Skeleton height={14} width="75%" />
           </Text>
-          <Skeleton height={24} width="100%" />
+          {canEdit && <Skeleton height={24} width="100%" />}
         </Stack>
       </Group>
     </Card>
@@ -108,6 +112,7 @@ const ProfileFollowerListItem = ({ follower }) => {
 };
 
 ProfileFollowerListItem.propTypes = {
+  canEdit: PropTypes.bool,
   follower: PropTypes.object
 };
 

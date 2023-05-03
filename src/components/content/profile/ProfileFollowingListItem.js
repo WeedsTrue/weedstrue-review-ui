@@ -12,7 +12,7 @@ import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { Context as ReviewsContext } from '../../../providers/ReviewsProvider';
 
-const ProfileFollowingListItem = ({ following }) => {
+const ProfileFollowingListItem = ({ following, canEdit }) => {
   const { followUser, unfollowUser } = useContext(ReviewsContext);
   const [followingState, setFollowingState] = useState({
     isFollowing: true,
@@ -31,63 +31,67 @@ const ProfileFollowingListItem = ({ following }) => {
           <Text sx={{ lineHeight: '18px' }} weight={500}>
             {following.username}
           </Text>
-          {followingState.isFollowing ? (
-            <Button
-              compact
-              loading={followingState.loading}
-              onClick={e => {
-                e.stopPropagation();
-                e.preventDefault();
-                setFollowingState({
-                  ...followingState,
-                  loading: true
-                });
-                unfollowUser(
-                  following.pkUser,
-                  () =>
-                    setFollowingState({
-                      loading: false,
-                      isFollowing: false
-                    }),
-                  () =>
-                    setFollowingState({
-                      loading: false,
-                      isFollowing: true
-                    })
-                );
-              }}
-            >
-              Unfollow
-            </Button>
-          ) : (
-            <Button
-              compact
-              loading={followingState.loading}
-              onClick={e => {
-                e.stopPropagation();
-                e.preventDefault();
-                setFollowingState({
-                  ...followingState,
-                  loading: true
-                });
-                followUser(
-                  following.pkUser,
-                  () =>
-                    setFollowingState({
-                      loading: false,
-                      isFollowing: true
-                    }),
-                  () =>
+          {canEdit && (
+            <>
+              {followingState.isFollowing ? (
+                <Button
+                  compact
+                  loading={followingState.loading}
+                  onClick={e => {
+                    e.stopPropagation();
+                    e.preventDefault();
                     setFollowingState({
                       ...followingState,
-                      loading: false
-                    })
-                );
-              }}
-              variant="outline"
-            >
-              Follow
-            </Button>
+                      loading: true
+                    });
+                    unfollowUser(
+                      following.pkUser,
+                      () =>
+                        setFollowingState({
+                          loading: false,
+                          isFollowing: false
+                        }),
+                      () =>
+                        setFollowingState({
+                          loading: false,
+                          isFollowing: true
+                        })
+                    );
+                  }}
+                >
+                  Unfollow
+                </Button>
+              ) : (
+                <Button
+                  compact
+                  loading={followingState.loading}
+                  onClick={e => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    setFollowingState({
+                      ...followingState,
+                      loading: true
+                    });
+                    followUser(
+                      following.pkUser,
+                      () =>
+                        setFollowingState({
+                          loading: false,
+                          isFollowing: true
+                        }),
+                      () =>
+                        setFollowingState({
+                          ...followingState,
+                          loading: false
+                        })
+                    );
+                  }}
+                  variant="outline"
+                >
+                  Follow
+                </Button>
+              )}
+            </>
           )}
         </Stack>
       </Group>
@@ -108,6 +112,7 @@ const ProfileFollowingListItem = ({ following }) => {
 };
 
 ProfileFollowingListItem.propTypes = {
+  canEdit: PropTypes.bool,
   following: PropTypes.object
 };
 

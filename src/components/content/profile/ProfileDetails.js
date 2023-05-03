@@ -141,9 +141,15 @@ const ProfileDetails = () => {
             ) : view === 'downvoted' ? (
               <ProfileDownvoteList pkUser={state.userProfile.value?.pkUser} />
             ) : view === 'followers' ? (
-              <ProfileFollowersList pkUser={state.userProfile.value?.pkUser} />
+              <ProfileFollowersList
+                isCurrentUsersProfile={isCurrentUsersProfile}
+                pkUser={state.userProfile.value?.pkUser}
+              />
             ) : view === 'following' ? (
-              <ProfileFollowingList pkUser={state.userProfile.value?.pkUser} />
+              <ProfileFollowingList
+                isCurrentUsersProfile={isCurrentUsersProfile}
+                pkUser={state.userProfile.value?.pkUser}
+              />
             ) : (
               <></>
             )}
