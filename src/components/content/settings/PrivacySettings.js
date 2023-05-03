@@ -4,16 +4,16 @@ import { triggerNotification } from '../../../helpers/notificationHelper';
 import { Context as AuthContext } from '../../../providers/AuthProvider';
 
 const PrivacySettings = () => {
-  const { updateUserPrivacy } = useContext(AuthContext);
+  const { state, updateUserPrivacy } = useContext(AuthContext);
   const [formState, setFormState] = useState({
-    followersDisabled: false,
+    followersDisabled: state.userData?.followersDisabled ?? false,
     hasChanges: false,
     isLoading: false
   });
 
   useEffect(() => {
     setFormState({
-      followersDisabled: false,
+      followersDisabled: state.userData?.followersDisabled ?? false,
       hasChanges: false,
       isLoading: false
     });

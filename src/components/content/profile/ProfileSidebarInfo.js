@@ -18,7 +18,7 @@ import { Context as ReviewsContext } from '../../../providers/ReviewsProvider';
 import ReportContentModal from '../reports/ReportContentModal';
 
 const ProfileSidebarInfo = ({ isCurrentUsersProfile, user, isLoading }) => {
-  const { state, followUser, unfollowUser } = useContext(ReviewsContext);
+  const { followUser, unfollowUser } = useContext(ReviewsContext);
   const navigate = useNavigate();
   const [followState, setFollowState] = useState({
     isLoading: false,

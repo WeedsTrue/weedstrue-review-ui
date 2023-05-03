@@ -9,6 +9,8 @@ const initialState = {
   userPost: { value: null, loading: false, error: null },
   userPositiveReactionPosts: { value: [], loading: false, error: null },
   userNegativeReactionPosts: { value: [], loading: false, error: null },
+  userFollowers: { value: [], loading: false, error: null },
+  userFollowing: { value: [], loading: false, error: null },
   userHiddenPosts: { value: [], loading: false, error: null },
   userPostSummary: { value: null, loading: false, error: null },
   userPostDrafts: { value: [], loading: false, error: null },
@@ -250,7 +252,8 @@ const fetchUserPosts =
       lastUserPost,
       fkBrand,
       fkProduct,
-      fkUser
+      fkUser,
+      showFollowingOnly
     },
     onSuccessCallback,
     onErrorCallback
@@ -268,7 +271,8 @@ const fetchUserPosts =
           lastUserPost,
           fkBrand,
           fkProduct,
-          fkUser
+          fkUser,
+          showFollowingOnly
         }
       });
       if (lastUserPost) {
@@ -998,6 +1002,68 @@ const unfollowUser =
     }
   };
 
+const deleteFollower =
+  dispatch =>
+  async (pkUser, { undo }, onSuccessCallback, onErrorCallback) => {
+    try {
+      await weedstrueAPI.post(
+        `/api/users/${pkUser}/remove-follower?undo=${undo}`
+      );
+      if (onSuccessCallback) {
+        onSuccessCallback();
+      }
+    } catch (e) {
+      const message = getErrorMessage(e);
+      if (onErrorCallback) {
+        onErrorCallback(message);
+      }
+    }
+  };
+
+const fetchUserFollowers =
+  dispatch => async (pkUser, onSuccessCallback, onErrorCallback) => {
+    try {
+      dispatch({
+        type: 'FETCHING',
+        stateName: 'userFollowers'
+      });
+      const response = await weedstrueAPI.get(`/api/users/${pkUser}/followers`);
+
+      dispatch({
+        type: 'SUCCESS',
+        stateName: 'userFollowers',
+        payload: { value: response.data }
+      });
+    } catch (e) {
+      const message = getErrorMessage(e);
+      if (onErrorCallback) {
+        onErrorCallback(message);
+      }
+    }
+  };
+
+const fetchUserFollowing =
+  dispatch => async (pkUser, onSuccessCallback, onErrorCallback) => {
+    try {
+      dispatch({
+        type: 'FETCHING',
+        stateName: 'userFollowing'
+      });
+      const response = await weedstrueAPI.get(`/api/users/${pkUser}/following`);
+
+      dispatch({
+        type: 'SUCCESS',
+        stateName: 'userFollowing',
+        payload: { value: response.data }
+      });
+    } catch (e) {
+      const message = getErrorMessage(e);
+      if (onErrorCallback) {
+        onErrorCallback(message);
+      }
+    }
+  };
+
 export const { Provider, Context } = createProvider(
   reducer,
   {
@@ -1013,12 +1079,15 @@ export const { Provider, Context } = createProvider(
     createUserPostReport,
     createUserReport,
     deleteComment,
+    deleteFollower,
     deleteUserPost,
     fetchBrand,
     fetchBrands,
     fetchProduct,
     fetchProducts,
     fetchUserDrafts,
+    fetchUserFollowers,
+    fetchUserFollowing,
     fetchUserHiddenPosts,
     fetchUserPostProductOptions,
     fetchUserPosts,

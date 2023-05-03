@@ -3,6 +3,8 @@ import { Card, Group, Stack } from '@mantine/core';
 import { useNavigate, useParams } from 'react-router-dom';
 import ProfileCommentsList from './ProfileCommentsList';
 import ProfileDownvoteList from './ProfileDownvoteList';
+import ProfileFollowersList from './ProfileFollowersList';
+import ProfileFollowingList from './ProfileFollowingList';
 import ProfileHiddenList from './ProfileHiddenList';
 import ProfileSidebarInfo from './ProfileSidebarInfo';
 import ProfileUpvoteList from './ProfileUpvoteList';
@@ -43,6 +45,7 @@ const ProfileDetails = () => {
   const { state: authState } = useContext(AuthContext);
   const { state, fetchUserProfile } = useContext(ReviewsContext);
   const isCurrentUsersProfile =
+    state.userProfile.value &&
     authState.userData?.pkUser === state.userProfile.value?.pkUser;
 
   useEffect(() => {
@@ -86,6 +89,30 @@ const ProfileDetails = () => {
                     value={t.value}
                   />
                 ))}
+
+              {state.userProfile.value &&
+                (!state.userProfile.value.followersDisabled ||
+                  authState.userData?.pkUser ===
+                    state.userProfile.value?.pkUser) && (
+                  <>
+                    <CustomTab
+                      isSelected={view === 'followers'}
+                      label={`FOLLOWERS (${state.userProfile.value.userFollowersCount})`}
+                      onTabChange={() =>
+                        navigate(`/profile/${username}/followers`)
+                      }
+                      value={'followers'}
+                    />
+                    <CustomTab
+                      isSelected={view === 'following'}
+                      label={`FOLLOWING (${state.userProfile.value.userFollowingCount})`}
+                      onTabChange={() =>
+                        navigate(`/profile/${username}/following`)
+                      }
+                      value={'following'}
+                    />
+                  </>
+                )}
             </Group>
           </Group>
         </Group>
@@ -113,6 +140,10 @@ const ProfileDetails = () => {
               <ProfileUpvoteList pkUser={state.userProfile.value?.pkUser} />
             ) : view === 'downvoted' ? (
               <ProfileDownvoteList pkUser={state.userProfile.value?.pkUser} />
+            ) : view === 'followers' ? (
+              <ProfileFollowersList pkUser={state.userProfile.value?.pkUser} />
+            ) : view === 'following' ? (
+              <ProfileFollowingList pkUser={state.userProfile.value?.pkUser} />
             ) : (
               <></>
             )}

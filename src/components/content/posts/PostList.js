@@ -21,6 +21,7 @@ const PostList = ({
   fkUser,
   fkBrand,
   fkProduct,
+  showFollowingOnly,
   hidePostSubmit,
   searchOnRender,
   noPostsAvailableTextOverride
@@ -42,7 +43,7 @@ const PostList = ({
         ...filterState,
         isLoading: true
       });
-      fetchUserPosts(filterState, totalCount =>
+      fetchUserPosts({ ...filterState, showFollowingOnly }, totalCount =>
         setFilterState({
           ...filterState,
           totalCount,
@@ -59,11 +60,13 @@ const PostList = ({
       isLoading: true
     };
     setFilterState(newState);
-    fetchUserPosts({ ...newState, fkUser, fkBrand, fkProduct }, totalCount =>
-      setFilterState({
-        ...newState,
-        totalCount
-      })
+    fetchUserPosts(
+      { ...newState, fkUser, fkBrand, fkProduct, showFollowingOnly },
+      totalCount =>
+        setFilterState({
+          ...newState,
+          totalCount
+        })
     );
   };
 
@@ -157,7 +160,8 @@ PostList.propTypes = {
   hidePostSubmit: PropTypes.bool,
   isLoading: PropTypes.bool,
   noPostsAvailableTextOverride: PropTypes.string,
-  searchOnRender: PropTypes.bool
+  searchOnRender: PropTypes.bool,
+  showFollowingOnly: PropTypes.bool
 };
 
 export default PostList;
