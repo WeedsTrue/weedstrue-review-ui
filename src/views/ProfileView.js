@@ -8,11 +8,22 @@ const ProfileView = () => {
 
   return (
     <Routes>
-      <Route element={<ProfileDetails />} path="/:username/*" />
+      <Route
+        element={
+          <Routes>
+            <Route element={<ProfileDetails />} path="/:view/*" />
+            <Route element={<Navigate replace to="posts" />} path="*" />
+          </Routes>
+        }
+        path="/:username/*"
+      />
       <Route
         element={
           state.isAuthenticated ? (
-            <Navigate replace to={`/profile/${state.userData?.username}`} />
+            <Navigate
+              replace
+              to={`/profile/${state.userData?.username}/posts`}
+            />
           ) : (
             <Navigate replace to={'/'} />
           )

@@ -23,7 +23,7 @@ const CommentList = ({ userPost, comments, isLoading }) => {
         <Card>
           <Stack sx={{ padding: 60 }}>
             <Text sx={{ margin: 'auto' }} weight={500}>
-              No comments available
+              Be the first to comment!
             </Text>
           </Stack>
         </Card>

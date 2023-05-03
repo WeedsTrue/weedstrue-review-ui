@@ -320,6 +320,60 @@ const confirmAgeRequirements = dispatch => async () => {
   });
 };
 
+const updateUserProfile =
+  dispatch =>
+  async (
+    { avatar, bio, userSocialLinks },
+    onSuccessCallback,
+    onErrorCallback
+  ) => {
+    try {
+      const response = await weedstrueAPI.put('/api/auth/profile', {
+        avatar,
+        bio,
+        userSocialLinks
+      });
+      dispatch({
+        type: 'SUCCESS',
+        payload: {
+          userData: response.data
+        }
+      });
+      if (onSuccessCallback) {
+        onSuccessCallback();
+      }
+    } catch (e) {
+      const message = getErrorMessage(e);
+      if (onErrorCallback) {
+        onErrorCallback(message);
+      }
+    }
+  };
+
+const updateUserPrivacy =
+  dispatch =>
+  async ({ followersDisabled }, onSuccessCallback, onErrorCallback) => {
+    try {
+      const response = await weedstrueAPI.put('/api/auth/privacy', {
+        followersDisabled
+      });
+      dispatch({
+        type: 'SUCCESS',
+        payload: {
+          userData: response.data
+        }
+      });
+      if (onSuccessCallback) {
+        onSuccessCallback();
+      }
+    } catch (e) {
+      const message = getErrorMessage(e);
+      if (onErrorCallback) {
+        onErrorCallback(message);
+      }
+    }
+  };
+
 export const { Provider, Context } = createProvider(
   reducer,
   {
@@ -328,12 +382,14 @@ export const { Provider, Context } = createProvider(
     confirmAgeRequirements,
     login,
     logout,
-    signUp,
     resetPassword,
     sendConfirmationCode,
     sendPasswordReset,
+    signUp,
     toggleAuthModal,
-    tokenLogin
+    tokenLogin,
+    updateUserProfile,
+    updateUserPrivacy
   },
   initialState
 );

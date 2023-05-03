@@ -23,6 +23,7 @@ import BrandsView from './views/BrandsView';
 import PostsView from './views/PostsView';
 import ProductsView from './views/ProductsView';
 import ProfileView from './views/ProfileView';
+import SettingsView from './views/SettingsView';
 
 const App = () => {
   const hasAttemptedToken = useRef(false);
@@ -66,6 +67,9 @@ const App = () => {
             <Route element={<CreatePost />} path="/submit" />
             <Route element={<ProductsView />} path="/products/*" />
             <Route element={<ProfileView />} path="/profile/*" />
+            {state.isAuthenticated && (
+              <Route element={<SettingsView />} path="/settings/*" />
+            )}
             <Route element={<PostsView />} path="/" />
             <Route element={<Navigate replace to="/" />} path="*" />
           </Routes>

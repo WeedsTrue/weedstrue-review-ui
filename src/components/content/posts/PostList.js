@@ -21,8 +21,10 @@ const PostList = ({
   fkUser,
   fkBrand,
   fkProduct,
+  showFollowingOnly,
   hidePostSubmit,
-  searchOnRender
+  searchOnRender,
+  noPostsAvailableTextOverride
 }) => {
   const navigate = useNavigate();
   const { state, fetchUserPosts } = useContext(ReviewsContext);
@@ -41,7 +43,7 @@ const PostList = ({
         ...filterState,
         isLoading: true
       });
-      fetchUserPosts(filterState, totalCount =>
+      fetchUserPosts({ ...filterState, showFollowingOnly }, totalCount =>
         setFilterState({
           ...filterState,
           totalCount,
@@ -58,11 +60,13 @@ const PostList = ({
       isLoading: true
     };
     setFilterState(newState);
-    fetchUserPosts({ ...newState, fkUser, fkBrand, fkProduct }, totalCount =>
-      setFilterState({
-        ...newState,
-        totalCount
-      })
+    fetchUserPosts(
+      { ...newState, fkUser, fkBrand, fkProduct, showFollowingOnly },
+      totalCount =>
+        setFilterState({
+          ...newState,
+          totalCount
+        })
     );
   };
 
@@ -119,7 +123,9 @@ const PostList = ({
         <Card>
           <Stack sx={{ padding: 60 }}>
             <Text sx={{ margin: 'auto' }} weight={500}>
-              No posts available
+              {!noPostsAvailableTextOverride
+                ? 'Be the first to post!'
+                : noPostsAvailableTextOverride}
             </Text>
           </Stack>
         </Card>
@@ -153,7 +159,9 @@ PostList.propTypes = {
   fkUser: PropTypes.number,
   hidePostSubmit: PropTypes.bool,
   isLoading: PropTypes.bool,
-  searchOnRender: PropTypes.bool
+  noPostsAvailableTextOverride: PropTypes.string,
+  searchOnRender: PropTypes.bool,
+  showFollowingOnly: PropTypes.bool
 };
 
 export default PostList;

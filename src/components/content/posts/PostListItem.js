@@ -18,6 +18,7 @@ import { Leaf, Message, Point, Share } from 'tabler-icons-react';
 import DeletePostModal from './DeletePostModal';
 import PostMenu from './PostMenu';
 import { USER_POST_TYPE, USER_POST_TYPE_LIST } from '../../../config/constants';
+import { getUserPostLink } from '../../../helpers/format';
 import { reactToItem } from '../../../helpers/reactionHelper';
 import { Context as ReviewsContext } from '../../../providers/ReviewsProvider';
 import ShareLinkModal from '../../common/ShareLinkModal';
@@ -35,20 +36,7 @@ const PostListItem = ({ userPost }) => {
     value: 0,
     deleted: false
   });
-
-  const postLink = userPost
-    ? `/${userPost.postItemType}s/${userPost.postItemUuid}/posts/${
-        userPost.uuid
-      }/${
-        userPost.title
-          ?.replace(/[^a-zA-Z' ']/g, '')
-          .split(' ')
-          .slice(0, 6)
-          .join('_')
-          .toLowerCase() ?? ''
-      }`
-    : '';
-
+  const postLink = getUserPostLink(userPost);
   const postType =
     userPost &&
     USER_POST_TYPE_LIST.find(t => t.value === userPost.fkUserPostType);

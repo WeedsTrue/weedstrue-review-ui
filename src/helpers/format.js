@@ -11,4 +11,19 @@ const stripDateOfUTC = date => {
   return date.replace('Z', '');
 };
 
-export { stripDateOfUTC, toTitleCase };
+const getUserPostLink = userPost => {
+  return userPost
+    ? `/${userPost.postItemType}s/${userPost.postItemUuid}/posts/${
+        userPost.uuid
+      }/${
+        userPost.title
+          ?.replace(/[^a-zA-Z' ']/g, '')
+          .split(' ')
+          .slice(0, 6)
+          .join('_')
+          .toLowerCase() ?? ''
+      }`
+    : '';
+};
+
+export { stripDateOfUTC, toTitleCase, getUserPostLink };

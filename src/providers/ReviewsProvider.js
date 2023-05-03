@@ -7,9 +7,15 @@ const initialState = {
   comments: { value: [], loading: false, error: null },
   userPosts: { value: [], loading: false, error: null },
   userPost: { value: null, loading: false, error: null },
+  userPositiveReactionPosts: { value: [], loading: false, error: null },
+  userNegativeReactionPosts: { value: [], loading: false, error: null },
+  userFollowers: { value: [], loading: false, error: null },
+  userFollowing: { value: [], loading: false, error: null },
+  userHiddenPosts: { value: [], loading: false, error: null },
   userPostSummary: { value: null, loading: false, error: null },
   userPostDrafts: { value: [], loading: false, error: null },
   userProfile: { value: null, loading: false, error: null },
+  userProfileComments: { value: [], loading: false, error: null },
   products: { value: [], loading: false, error: null },
   product: { value: null, loading: false, error: null }
 };
@@ -246,7 +252,8 @@ const fetchUserPosts =
       lastUserPost,
       fkBrand,
       fkProduct,
-      fkUser
+      fkUser,
+      showFollowingOnly
     },
     onSuccessCallback,
     onErrorCallback
@@ -264,7 +271,8 @@ const fetchUserPosts =
           lastUserPost,
           fkBrand,
           fkProduct,
-          fkUser
+          fkUser,
+          showFollowingOnly
         }
       });
       if (lastUserPost) {
@@ -277,6 +285,87 @@ const fetchUserPosts =
         dispatch({
           type: 'SUCCESS',
           stateName: 'userPosts',
+          payload: { value: response.data.data }
+        });
+      }
+      if (onSuccessCallback) {
+        onSuccessCallback(response.data.totalCount);
+      }
+    } catch (e) {
+      dispatch({
+        type: 'ERROR',
+        stateName: 'userPosts',
+        payload: 'Oops something went wrong.'
+      });
+    }
+  };
+
+const fetchUserPostReactionPosts =
+  dispatch =>
+  async ({ isPositive, lastUserPost }, onSuccessCallback, onErrorCallback) => {
+    try {
+      dispatch({
+        type: 'FETCHING',
+        stateName: 'userPosts'
+      });
+      const response = await weedstrueAPI.get('/api/users/reaction-posts', {
+        params: {
+          isPositive,
+          lastUserPost
+        }
+      });
+      if (lastUserPost) {
+        dispatch({
+          type: 'APPEND',
+          stateName: isPositive
+            ? 'userPositiveReactionPosts'
+            : 'userNegativeReactionPosts',
+          payload: response.data.data
+        });
+      } else {
+        dispatch({
+          type: 'SUCCESS',
+          stateName: isPositive
+            ? 'userPositiveReactionPosts'
+            : 'userNegativeReactionPosts',
+          payload: { value: response.data.data }
+        });
+      }
+      if (onSuccessCallback) {
+        onSuccessCallback(response.data.totalCount);
+      }
+    } catch (e) {
+      dispatch({
+        type: 'ERROR',
+        stateName: 'userPosts',
+        payload: 'Oops something went wrong.'
+      });
+    }
+  };
+
+const fetchUserHiddenPosts =
+  dispatch =>
+  async ({ lastUserPost }, onSuccessCallback, onErrorCallback) => {
+    try {
+      dispatch({
+        type: 'FETCHING',
+        stateName: 'userPosts'
+      });
+      const response = await weedstrueAPI.get('/api/users/hidden-posts', {
+        params: {
+          lastUserPost
+        }
+      });
+      if (lastUserPost) {
+        dispatch({
+          type: 'APPEND',
+          stateName: 'userHiddenPosts',
+          payload: response.data.data
+        });
+      } else {
+        dispatch({
+          type: 'SUCCESS',
+          stateName: 'userHiddenPosts',
           payload: { value: response.data.data }
         });
       }
@@ -735,6 +824,34 @@ const fetchUserProfile = dispatch => async username => {
   }
 };
 
+const fetchUserProfileComments = dispatch => async pkUser => {
+  try {
+    dispatch({
+      type: 'FETCHING',
+      stateName: 'userProfile'
+    });
+    const response = await weedstrueAPI.get(`/api/users/${pkUser}/comments`);
+
+    dispatch({
+      type: 'SUCCESS',
+      stateName: 'userProfileComments',
+      payload: { value: response.data }
+    });
+
+    dispatch({
+      type: 'SUCCESS',
+      stateName: 'userProfileComments',
+      payload: { value: response.data }
+    });
+  } catch (e) {
+    dispatch({
+      type: 'ERROR',
+      stateName: 'userProfileComments',
+      payload: 'Oops something went wrong.'
+    });
+  }
+};
+
 const createUserPostReport =
   dispatch =>
   async (
@@ -855,6 +972,98 @@ const createUserReport =
     }
   };
 
+const followUser =
+  dispatch => async (pkUser, onSuccessCallback, onErrorCallback) => {
+    try {
+      await weedstrueAPI.post(`/api/users/${pkUser}/follow`);
+      if (onSuccessCallback) {
+        onSuccessCallback();
+      }
+    } catch (e) {
+      const message = getErrorMessage(e);
+      if (onErrorCallback) {
+        onErrorCallback(message);
+      }
+    }
+  };
+
+const unfollowUser =
+  dispatch => async (pkUser, onSuccessCallback, onErrorCallback) => {
+    try {
+      await weedstrueAPI.post(`/api/users/${pkUser}/unfollow`);
+      if (onSuccessCallback) {
+        onSuccessCallback();
+      }
+    } catch (e) {
+      const message = getErrorMessage(e);
+      if (onErrorCallback) {
+        onErrorCallback(message);
+      }
+    }
+  };
+
+const deleteFollower =
+  dispatch =>
+  async (pkUser, { undo }, onSuccessCallback, onErrorCallback) => {
+    try {
+      await weedstrueAPI.post(
+        `/api/users/${pkUser}/remove-follower?undo=${undo}`
+      );
+      if (onSuccessCallback) {
+        onSuccessCallback();
+      }
+    } catch (e) {
+      const message = getErrorMessage(e);
+      if (onErrorCallback) {
+        onErrorCallback(message);
+      }
+    }
+  };
+
+const fetchUserFollowers =
+  dispatch => async (pkUser, onSuccessCallback, onErrorCallback) => {
+    try {
+      dispatch({
+        type: 'FETCHING',
+        stateName: 'userFollowers'
+      });
+      const response = await weedstrueAPI.get(`/api/users/${pkUser}/followers`);
+
+      dispatch({
+        type: 'SUCCESS',
+        stateName: 'userFollowers',
+        payload: { value: response.data }
+      });
+    } catch (e) {
+      const message = getErrorMessage(e);
+      if (onErrorCallback) {
+        onErrorCallback(message);
+      }
+    }
+  };
+
+const fetchUserFollowing =
+  dispatch => async (pkUser, onSuccessCallback, onErrorCallback) => {
+    try {
+      dispatch({
+        type: 'FETCHING',
+        stateName: 'userFollowing'
+      });
+      const response = await weedstrueAPI.get(`/api/users/${pkUser}/following`);
+
+      dispatch({
+        type: 'SUCCESS',
+        stateName: 'userFollowing',
+        payload: { value: response.data }
+      });
+    } catch (e) {
+      const message = getErrorMessage(e);
+      if (onErrorCallback) {
+        onErrorCallback(message);
+      }
+    }
+  };
+
 export const { Provider, Context } = createProvider(
   reducer,
   {
@@ -870,17 +1079,25 @@ export const { Provider, Context } = createProvider(
     createUserPostReport,
     createUserReport,
     deleteComment,
+    deleteFollower,
     deleteUserPost,
     fetchBrand,
     fetchBrands,
     fetchProduct,
     fetchProducts,
     fetchUserDrafts,
+    fetchUserFollowers,
+    fetchUserFollowing,
+    fetchUserHiddenPosts,
     fetchUserPostProductOptions,
     fetchUserPosts,
     fetchUserPost,
+    fetchUserPostReactionPosts,
     fetchUserPostSummary,
     fetchUserProfile,
+    fetchUserProfileComments,
+    followUser,
+    unfollowUser,
     updateUserPost
   },
   initialState
