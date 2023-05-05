@@ -7,12 +7,15 @@ import {
   Indicator,
   Select,
   Stack,
+  Text,
   Textarea,
   TextInput,
   Title
 } from '@mantine/core';
 import PropTypes from 'prop-types';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import CreatePostImageList from './CreatePostImageList';
+import CreatePostImageModal from './CreatePostImageModal';
 import CreatePostReviewAdditions from './CreatePostReviewAdditions';
 import DraftSelectModal from './DraftSelectModal';
 import {
@@ -20,8 +23,13 @@ import {
   USER_POST_TYPE
 } from '../../../config/constants';
 import { USER_POST_EFFECT_TYPE } from '../../../config/effectConstants';
+import {
+  deleteFilesFromStorageRecursively,
+  uploadFileToStorage
+} from '../../../helpers/awsHelper';
 import { triggerNotification } from '../../../helpers/notificationHelper';
 import { usePrompt } from '../../../helpers/usePrompt';
+import { Context as AuthContext } from '../../../providers/AuthProvider';
 import { Context as ReviewsContext } from '../../../providers/ReviewsProvider';
 import CustomSearchItem from '../../common/CustomSearchItem';
 import FormSection from '../../common/FormSection';
@@ -44,6 +52,7 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
     fetchUserPostProductOptions,
     fetchUserPostSummary
   } = useContext(ReviewsContext);
+  const { state: authState } = useContext(AuthContext);
   const [searchData, setSearchData] = useState({ brands: [], products: [] });
   const [formState, setFormState] = useState({
     userPost: null,
@@ -55,6 +64,7 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
       : USER_POST_TYPE.DISCUSSION.value,
     fkPostItem: null,
     postItemType: postType,
+    userPostImages: [],
     reviewState: {
       rating: null,
       attributes: {
@@ -67,6 +77,10 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
     },
     hasUnsavedChanges: false,
     isLoading: false,
+    imageModal: {
+      isOpen: false,
+      selectedImage: null
+    },
     isDraftSelectOpen: false
   });
   const userDrafts = state.userPostDrafts.value.filter(p => p.draft);
@@ -127,6 +141,7 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
             : USER_POST_TYPE.DISCUSSION.value,
           fkPostItem: postItemInfo.pkPostItem,
           postItemType: postType,
+          userPostImages: [],
           reviewState: {
             rating: null,
             attributes: {
@@ -139,7 +154,11 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
           },
           hasUnsavedChanges: false,
           isLoading: false,
-          isDraftSelectOpen: false
+          isDraftSelectOpen: false,
+          imageModal: {
+            isOpen: false,
+            selectedImage: null
+          }
         });
       }
     }
@@ -147,12 +166,12 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
 
   useEffect(() => {
     if (forceSaveDraft) {
-      saveDraft();
+      savePostPreflight(true);
       setForceSaveDraft(false);
     }
   }, [forceSaveDraft]);
 
-  const onSuccess = userPost => {
+  const onSuccess = (userPost, deletedImages) => {
     if (userPost.draft) {
       triggerNotification(
         formState.userPost
@@ -175,9 +194,14 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
     setFormState({
       ...formState,
       userPost,
+      userPostImages: userPost.userPostImages.sort((a, b) => a.index - b.index),
       isLoading: false,
       hasUnsavedChanges: false
     });
+
+    deleteFilesFromStorageRecursively(
+      deletedImages.filter(i => i.src).map(i => i.src)
+    );
   };
 
   const onError = message => {
@@ -215,25 +239,108 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
     };
   };
 
-  const saveDraft = () => {
+  const savePostPreflight = isDraft => {
     setFormState({
       ...formState,
-      draft: true,
+      draft: isDraft,
       isLoading: true
     });
+
+    saveImagesToStorageRecursively(
+      formState.userPostImages,
+      results => saveUserPost(results, isDraft),
+      results => saveUserPost(results, isDraft)
+    );
+  };
+
+  const saveUserPost = (results, isDraft) => {
     if (formState.userPost) {
       updateUserPost(
         formState.userPost.pkUserPost,
-        getFormStateRequestData(formState, true),
-        onSuccess,
+        getFormStateRequestData(
+          { ...formState, userPostImages: results.images },
+          isDraft
+        ),
+        post => onSuccess(post, results.deletedImages),
         onError
       );
     } else {
       createUserPost(
-        getFormStateRequestData(formState, true),
-        onSuccess,
+        getFormStateRequestData(
+          { ...formState, userPostImages: results.images },
+          isDraft
+        ),
+        post => onSuccess(post, results.deletedImages),
         onError
       );
+    }
+  };
+
+  const saveImagesToStorageRecursively = (
+    userPostImages,
+    onSuccess,
+    onError,
+    currentResults = {
+      images: [],
+      deletedImages: []
+    }
+  ) => {
+    const images = [...userPostImages];
+    if (images.length === 0) {
+      onSuccess(currentResults);
+    } else {
+      const image = images.splice(0, 1)[0];
+      let isUploading = false;
+      if (image.deleted) {
+        currentResults.deletedImages.push({
+          ...image
+        });
+      } else if (!image.previewImage) {
+        currentResults.images.push({
+          ...image
+        });
+      } else {
+        if (image.src) {
+          currentResults.deletedImages.push({ ...image });
+        }
+
+        isUploading = true;
+        uploadFileToStorage(
+          `user-${authState.userData.pkUser}-post-image-${
+            image.index
+          }-${new Date().getTime()}`,
+          image.file,
+          src => {
+            currentResults.images.push({
+              ...image,
+              src
+            });
+            saveImagesToStorageRecursively(
+              images,
+              onSuccess,
+              onError,
+              currentResults
+            );
+          },
+          () => {
+            saveImagesToStorageRecursively(
+              images,
+              onSuccess,
+              onError,
+              currentResults
+            );
+          }
+        );
+      }
+
+      if (!isUploading) {
+        saveImagesToStorageRecursively(
+          images,
+          onSuccess,
+          onError,
+          currentResults
+        );
+      }
     }
   };
 
@@ -245,6 +352,7 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
       content: userPost.content,
       draft: userPost.draft,
       fkUserPostType: userPost.fkUserPostType,
+      userPostImages: userPost.userPostImages.sort((a, b) => a.index - b.index),
       reviewState: {
         rating: userPost.userRating,
         attributes: userPost.attributes.reduce((a, v) => {
@@ -262,7 +370,11 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
       },
       hasUnsavedChanges: false,
       isLoading: false,
-      isDraftSelectOpen: false
+      isDraftSelectOpen: false,
+      imageModal: {
+        isOpen: false,
+        selectedImage: null
+      }
     });
   };
 
@@ -284,26 +396,7 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
               <FormSection
                 hideButtons
                 onSubmit={() => {
-                  setFormState({
-                    ...formState,
-                    draft: false,
-                    isLoading: true
-                  });
-
-                  if (formState.userPost) {
-                    updateUserPost(
-                      formState.userPost.pkUserPost,
-                      getFormStateRequestData(formState, false),
-                      onSuccess,
-                      onError
-                    );
-                  } else {
-                    createUserPost(
-                      getFormStateRequestData(formState, false),
-                      onSuccess,
-                      onError
-                    );
-                  }
+                  savePostPreflight(false);
                 }}
                 sx={{ gap: 20 }}
               >
@@ -437,6 +530,111 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
                     required
                     value={formState.content}
                   />
+
+                  <Stack sx={{ gap: 5 }}>
+                    <Group sx={{ justifyContent: 'space-between' }}>
+                      <Group sx={{ gap: 10 }}>
+                        <Text weight={500}>Images</Text>
+                        <Text color="grey" sx={{ fontSize: 12 }}>
+                          (Add up to 5)
+                        </Text>
+                      </Group>
+                      {formState.userPostImages.length < 5 && (
+                        <Button
+                          compact
+                          onClick={() =>
+                            setFormState({
+                              ...formState,
+                              imageModal: {
+                                isOpen: true,
+                                selectedImage: null
+                              }
+                            })
+                          }
+                          variant="outline"
+                        >
+                          Add Image
+                        </Button>
+                      )}
+                    </Group>
+                    <Stack sx={{ gap: 10 }}>
+                      {formState.userPostImages.filter(i => !i.deleted)
+                        .length === 0 ? (
+                        <Group
+                          sx={{ border: 'solid 1px lightgrey', padding: 10 }}
+                        >
+                          <Stack sx={{ gap: 3, alignItems: 'center', flex: 1 }}>
+                            <Text color="grey" sx={{ fontSize: 14 }}>
+                              Add your first image!
+                            </Text>
+                            <Button
+                              compact
+                              onClick={() =>
+                                setFormState({
+                                  ...formState,
+                                  imageModal: {
+                                    isOpen: true,
+                                    selectedImage: null
+                                  }
+                                })
+                              }
+                              variant="outline"
+                            >
+                              Add Image
+                            </Button>
+                          </Stack>
+                        </Group>
+                      ) : (
+                        <CreatePostImageList
+                          onAction={(action, image) => {
+                            if (action === 'REMOVE') {
+                              const postImagesCopy = [
+                                ...formState.userPostImages
+                              ];
+                              const index = postImagesCopy.findIndex(
+                                i => i.pkUserPostImage === image.pkUserPostImage
+                              );
+                              postImagesCopy[index].deleted = true;
+
+                              setFormState({
+                                ...formState,
+                                userPostImages: postImagesCopy,
+                                hasUnsavedChanges: true
+                              });
+                            } else if (action === 'EDIT') {
+                              setFormState({
+                                ...formState,
+                                imageModal: {
+                                  ...formState.imageModal,
+                                  isOpen: true,
+                                  selectedImage: image
+                                },
+                                hasUnsavedChanges: true
+                              });
+                            }
+                          }}
+                          onOrderChange={updatedImages =>
+                            setFormState({
+                              ...formState,
+                              userPostImages: [
+                                ...formState.userPostImages.filter(
+                                  i => i.deleted
+                                ),
+                                ...updatedImages.map((i, index) => ({
+                                  ...i,
+                                  index
+                                }))
+                              ],
+                              hasUnsavedChanges: true
+                            })
+                          }
+                          postImages={formState.userPostImages.filter(
+                            i => !i.deleted
+                          )}
+                        />
+                      )}
+                    </Stack>
+                  </Stack>
                   {formState.fkUserPostType === USER_POST_TYPE.REVIEW.value && (
                     <CreatePostReviewAdditions
                       onPostReviewStateChange={newReviewState =>
@@ -474,7 +672,7 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
                         (!formState.draft && formState.isLoading)
                       }
                       loading={formState.draft && formState.isLoading}
-                      onClick={saveDraft}
+                      onClick={() => savePostPreflight(true)}
                       radius="xl"
                       type="button"
                       value="draft"
@@ -510,6 +708,53 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
             </Stack>
           )}
         </Group>
+        <CreatePostImageModal
+          isOpen={formState.imageModal.isOpen}
+          onAdd={imageState => {
+            const existingImageIndex = formState.userPostImages.findIndex(
+              i => i.pkUserPostImage === imageState.pkUserPostImage
+            );
+            if (existingImageIndex !== -1) {
+              const imagesCopy = [...formState.userPostImages];
+              imagesCopy[existingImageIndex] = {
+                ...imagesCopy[existingImageIndex],
+                ...imageState
+              };
+              setFormState({
+                ...formState,
+                userPostImages: imagesCopy,
+                imageModal: {
+                  ...formState.imageModal,
+                  isOpen: false
+                },
+                hasUnsavedChanges: true
+              });
+            } else {
+              setFormState({
+                ...formState,
+                userPostImages: [
+                  ...formState.userPostImages,
+                  { ...imageState, index: formState.userPostImages.length }
+                ],
+                imageModal: {
+                  ...formState.imageModal,
+                  isOpen: false
+                },
+                hasUnsavedChanges: true
+              });
+            }
+          }}
+          onClose={() =>
+            setFormState({
+              ...formState,
+              imageModal: {
+                ...formState.imageModal,
+                isOpen: false
+              }
+            })
+          }
+          postImage={formState.imageModal.selectedImage}
+        />
         <DraftSelectModal
           isOpen={formState.isDraftSelectOpen}
           onClose={() =>

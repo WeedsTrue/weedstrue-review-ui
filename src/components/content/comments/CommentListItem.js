@@ -84,7 +84,9 @@ const CommentListItem = ({
             : 'none'
         }}
       >
-        {!profileSummaryView && <Avatar radius="xl" size={45} />}
+        {!profileSummaryView && (
+          <Avatar radius="xl" size={45} src={comment.user.avatar} />
+        )}
 
         <Group sx={{ gap: 3 }}>
           <Text sx={{ fontSize: 14 }} weight={500}>

@@ -17,6 +17,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Leaf, Message, Point, Share } from 'tabler-icons-react';
 import DeletePostModal from './DeletePostModal';
 import PostMenu from './PostMenu';
+import UserPostImageCarousel from './UserPostImageCarousel';
 import { USER_POST_TYPE, USER_POST_TYPE_LIST } from '../../../config/constants';
 import { getUserPostLink } from '../../../helpers/format';
 import { reactToItem } from '../../../helpers/reactionHelper';
@@ -186,19 +187,28 @@ const PostListItem = ({ userPost }) => {
                 userPost.userRating && (
                   <Rating readOnly value={userPost.userRating} />
                 )}
-              <Text
-                sx={{
-                  fontSize: 14,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  WebkitLineClamp: 3,
-                  WebkitBoxOrient: 'vertical',
-                  display: '-webkit-box',
-                  whiteSpace: 'pre-wrap'
-                }}
-              >
-                {userPost.content}
-              </Text>
+              <Stack sx={{ gap: 10 }}>
+                {userPost.userPostImages.length > 0 && (
+                  <UserPostImageCarousel
+                    height={500}
+                    imageDisabled
+                    userPostImages={userPost.userPostImages}
+                  />
+                )}
+                <Text
+                  sx={{
+                    fontSize: 14,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    WebkitLineClamp: 3,
+                    WebkitBoxOrient: 'vertical',
+                    display: '-webkit-box',
+                    whiteSpace: 'pre-wrap'
+                  }}
+                >
+                  {userPost.content}
+                </Text>
+              </Stack>
             </Stack>
             <Group>
               <Group sx={{ gap: 5 }}>

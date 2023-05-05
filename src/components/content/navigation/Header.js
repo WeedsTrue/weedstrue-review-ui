@@ -94,7 +94,12 @@ const Header = () => {
                   variant="outline"
                 >
                   <Group sx={{ gap: 10 }}>
-                    <Avatar color="blue" radius={100} size={29} src={null}>
+                    <Avatar
+                      color="blue"
+                      radius={100}
+                      size={29}
+                      src={state.userData.avatar}
+                    >
                       <Text>{state.userData.username[0].toUpperCase()}</Text>
                     </Avatar>
                     <Text>My Account</Text>
