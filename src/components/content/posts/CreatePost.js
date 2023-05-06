@@ -17,6 +17,7 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import CreatePostImageList from './CreatePostImageList';
 import CreatePostImageModal from './CreatePostImageModal';
 import CreatePostReviewAdditions from './CreatePostReviewAdditions';
+import DeletePostModal from './DeletePostModal';
 import DraftSelectModal from './DraftSelectModal';
 import {
   PRODUCT_ATTRIBUTE_TYPE,
@@ -40,6 +41,8 @@ import ProductSidebarInfo from '../products/ProductSidebarInfo';
 const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
   const { postUuid } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
+  const [showDeletePostModal, setShowDeletePostModal] = useState(false);
+
   const [forceSaveDraft, setForceSaveDraft] = useState(false);
   const hasSearched = useRef(false);
   const navigate = useNavigate();
@@ -303,8 +306,9 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
         }
         currentResults.images.push({
           ...image,
-          src: image.externalUrl
+          src: image.externalUrl ?? image.src
         });
+        console.log(currentResults, image);
       } else if (!image.previewImage) {
         currentResults.images.push({
           ...image
@@ -667,7 +671,7 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
                       color="red"
                       disabled={!formState.delete && formState.isLoading}
                       loading={formState.delete && formState.isLoading}
-                      onClick={() => {}}
+                      onClick={() => setShowDeletePostModal(true)}
                       radius="xl"
                       type="button"
                       value="draft"
@@ -821,6 +825,12 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
           }}
           selectUserPost={formState.userPost}
           userPosts={userDrafts}
+        />
+        <DeletePostModal
+          onClose={() => setShowDeletePostModal(false)}
+          onDelete={() => navigate('/')}
+          opened={showDeletePostModal}
+          userPost={formState.userPost}
         />
       </Stack>
     )
