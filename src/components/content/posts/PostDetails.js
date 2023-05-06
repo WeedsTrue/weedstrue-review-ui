@@ -1,5 +1,4 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { Carousel } from '@mantine/carousel';
 import {
   ActionIcon,
   Alert,
@@ -7,7 +6,6 @@ import {
   Button,
   Card,
   Group,
-  Image,
   Rating,
   Stack,
   Text,
@@ -16,14 +14,7 @@ import {
 import dayjs from 'dayjs';
 import PropTypes from 'prop-types';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import {
-  ArrowLeft,
-  ArrowRight,
-  Leaf,
-  Message,
-  Point,
-  Share
-} from 'tabler-icons-react';
+import { Leaf, Message, Point, Share } from 'tabler-icons-react';
 import DeletePostModal from './DeletePostModal';
 import PostMenu from './PostMenu';
 import UserPostImageCarousel from './UserPostImageCarousel';

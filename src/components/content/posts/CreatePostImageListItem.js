@@ -60,6 +60,10 @@ const CreatePostImageListItem = ({
   });
   drag(drop(ref));
 
+  const imageUrl = image.isLinkExternal
+    ? image.externalUrl ?? image.src
+    : image.previewImage ?? image.src;
+
   return (
     <>
       <div
@@ -77,10 +81,8 @@ const CreatePostImageListItem = ({
           <Image
             fit="contain"
             height={50}
-            onClick={() =>
-              window.open(image.previewImage ?? image.src, '_blank').focus()
-            }
-            src={image.previewImage ?? image.src}
+            onClick={() => window.open(imageUrl, '_blank').focus()}
+            src={imageUrl}
             sx={{ cursor: 'pointer' }}
             width={50}
           />

@@ -292,8 +292,18 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
       const image = images.splice(0, 1)[0];
       let isUploading = false;
       if (image.deleted) {
-        currentResults.deletedImages.push({
-          ...image
+        if (image.hasOldImageUploaded) {
+          currentResults.deletedImages.push({
+            ...image
+          });
+        }
+      } else if (image.isLinkExternal) {
+        if (image.hasOldImageUploaded) {
+          currentResults.deletedImages.push({ ...image });
+        }
+        currentResults.images.push({
+          ...image,
+          src: image.externalUrl
         });
       } else if (!image.previewImage) {
         currentResults.images.push({
