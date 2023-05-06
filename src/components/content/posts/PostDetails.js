@@ -17,6 +17,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Leaf, Message, Point, Share } from 'tabler-icons-react';
 import DeletePostModal from './DeletePostModal';
 import PostMenu from './PostMenu';
+import UserPostImageCarousel from './UserPostImageCarousel';
 import { USER_POST_TYPE, USER_POST_TYPE_LIST } from '../../../config/constants';
 import { reactToItem } from '../../../helpers/reactionHelper';
 import { Context as ReviewsContext } from '../../../providers/ReviewsProvider';
@@ -239,14 +240,21 @@ const PostDetails = ({ postItem }) => {
                           </Text>
                         </Alert>
                       ) : (
-                        <Text
-                          sx={{
-                            fontSize: 16,
-                            whiteSpace: 'pre-wrap'
-                          }}
-                        >
-                          {userPost.content}
-                        </Text>
+                        <>
+                          {userPost.userPostImages.length > 0 && (
+                            <UserPostImageCarousel
+                              userPostImages={userPost.userPostImages}
+                            />
+                          )}
+                          <Text
+                            sx={{
+                              fontSize: 16,
+                              whiteSpace: 'pre-wrap'
+                            }}
+                          >
+                            {userPost.content}
+                          </Text>
+                        </>
                       )}
                     </Stack>
 

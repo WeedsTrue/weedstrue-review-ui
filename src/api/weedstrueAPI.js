@@ -1,6 +1,7 @@
 import { Auth } from '@aws-amplify/auth';
 import axios from 'axios';
 import { PRODUCTION } from '../config/constants';
+import { logger } from '../helpers/logger';
 
 const weedstrueAPI = axios.create({
   baseURL: PRODUCTION ? '' : 'https://localhost:7264'
@@ -20,7 +21,7 @@ weedstrueAPI.interceptors.request.use(
     return config;
   },
   error => {
-    console.log(error);
+    logger(error);
 
     Promise.reject(error);
   }

@@ -472,6 +472,7 @@ const createUserPost =
       postItemType,
       effectTypes,
       attributes,
+      userPostImages,
       rating
     },
     onSuccessCallback,
@@ -491,6 +492,7 @@ const createUserPost =
         postItemType,
         effectTypes,
         attributes,
+        userPostImages,
         rating
       });
 
@@ -528,6 +530,7 @@ const updateUserPost =
       postItemType,
       effectTypes,
       attributes,
+      userPostImages,
       rating
     },
     onSuccessCallback,
@@ -547,6 +550,7 @@ const updateUserPost =
         postItemType,
         effectTypes,
         attributes,
+        userPostImages,
         rating
       });
 

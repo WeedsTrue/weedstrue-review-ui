@@ -1,5 +1,4 @@
 import React from 'react';
-import Auth from '@aws-amplify/auth';
 import {
   BrandInstagram,
   BrandReddit,
@@ -16,13 +15,20 @@ const AWS_COGNITO_SETTINGS = {
   Auth: {
     identityPoolId: 'us-east-1:074c2f3e-8539-49e4-9c3b-fec7d63d7bc4',
     region: 'us-east-1',
+    identityPoolRegion: 'us-east-1',
     userPoolId: 'us-east-1_7qZzoWH6v',
     userPoolWebClientId: '3sjhbgb9k4m0b54j3k7vqivq9j',
     mandatorySignIn: true
+  },
+  Storage: {
+    AWSS3: {
+      bucket: 'weedstruebucket',
+      region: 'us-east-1'
+    }
   }
 };
 
-Auth.configure(AWS_COGNITO_SETTINGS);
+const S3_PUBLIC_URL = 'https://weedstruebucket.s3.amazonaws.com/public/';
 
 const USER_POST_TYPE = {
   REVIEW: {
@@ -220,6 +226,7 @@ const USER_SOCIAL_LINK_TYPES = [
 export {
   PRODUCTION,
   AWS_COGNITO_SETTINGS,
+  S3_PUBLIC_URL,
   PRODUCT_TYPES,
   USER_POST_TYPE,
   USER_POST_TYPE_LIST,

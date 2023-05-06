@@ -1,6 +1,11 @@
 import { Auth } from '@aws-amplify/auth';
+import { Storage } from '@aws-amplify/storage';
 import createProvider from './createProvider';
 import weedstrueAPI from '../api/weedstrueAPI';
+import { AWS_COGNITO_SETTINGS } from '../config/constants';
+
+Auth.configure(AWS_COGNITO_SETTINGS);
+Storage.configure(AWS_COGNITO_SETTINGS);
 
 const initialState = {
   username: '',

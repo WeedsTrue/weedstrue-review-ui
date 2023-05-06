@@ -1,13 +1,25 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { Button, Group, Stack, Text, Textarea, Title } from '@mantine/core';
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import {
+  Avatar,
+  Button,
+  Group,
+  Stack,
+  Text,
+  Textarea,
+  Title
+} from '@mantine/core';
 import { Plus } from 'tabler-icons-react';
 import ProfileSocialLinkModal from './ProfileSocialLinkModal';
+import {
+  deleteFileFromStorage,
+  uploadFileToStorage
+} from '../../../helpers/awsHelper';
 import { triggerNotification } from '../../../helpers/notificationHelper';
 import { Context as AuthContext } from '../../../providers/AuthProvider';
-import FileDropzone from '../../common/FileDropZone';
 import ProfileSocialLink from '../profile/ProfileSocialLink';
 
 const ProfileSettings = () => {
+  const avatarInputRef = useRef(false);
   const { state, updateUserProfile } = useContext(AuthContext);
   const [socialLinkModalState, setSocialLinkModalState] = useState({
     isOpen: false,
@@ -15,9 +27,11 @@ const ProfileSettings = () => {
     showDelete: false
   });
   const [formState, setFormState] = useState({
-    avatar: state.userData?.avatar,
-    bio: state.userData?.bio,
-    userSocialLinks: [],
+    avatar: state.userData?.avatar ?? '',
+    avatarFile: null,
+    avatarPreview: null,
+    bio: state.userData?.bio ?? '',
+    userSocialLinks: state.userData?.userSocialLinks ?? [],
     hasChanges: false,
     isLoading: false
   });
@@ -25,13 +39,46 @@ const ProfileSettings = () => {
 
   useEffect(() => {
     setFormState({
-      avatar: state.userData?.avatar,
+      avatar: state.userData?.avatar ?? '',
+      avatarFile: null,
+      avatarPreview: null,
       bio: state.userData?.bio ?? '',
-      userSocialLinks: state.userData?.userSocialLinks,
+      userSocialLinks: state.userData?.userSocialLinks ?? [],
       hasChanges: false,
       isLoading: false
     });
   }, []);
+
+  const updateProfile = (profileFormState, onSuccessCallback) => {
+    updateUserProfile(
+      {
+        ...profileFormState,
+        userSocialLinks: profileFormState.userSocialLinks.map(s => ({
+          ...s,
+          pkUserSocialLink:
+            typeof s.pkUserSocialLink === 'string' ? null : s.pkUserSocialLink
+        }))
+      },
+      () => {
+        if (onSuccessCallback) {
+          onSuccessCallback();
+        }
+        setFormState({
+          ...profileFormState,
+          isLoading: false,
+          hasChanges: false
+        });
+        triggerNotification('Profile Updated!', 'Success', 'green');
+      },
+      message => {
+        setFormState({
+          ...profileFormState,
+          isLoading: false
+        });
+        triggerNotification(message);
+      }
+    );
+  };
 
   return (
     <Stack sx={{ gap: 40 }}>
@@ -47,9 +94,11 @@ const ProfileSettings = () => {
                 disabled={formState.isLoading}
                 onClick={() => {
                   setFormState({
-                    avatar: state.userData?.avatar,
+                    avatar: state.userData?.avatar ?? '',
+                    avatarFile: null,
+                    avatarPreview: null,
                     bio: state.userData?.bio ?? '',
-                    userSocialLinks: state.userData?.userSocialLinks,
+                    userSocialLinks: state.userData?.userSocialLinks ?? [],
                     hasChanges: false,
                     isLoading: false
                   });
@@ -65,37 +114,26 @@ const ProfileSettings = () => {
                     isLoading: true
                   });
 
-                  updateUserProfile(
-                    {
-                      ...formState,
-                      userSocialLinks: formState.userSocialLinks.map(s => ({
-                        ...s,
-                        pkUserSocialLink:
-                          typeof s.pkUserSocialLink === 'string'
-                            ? null
-                            : s.pkUserSocialLink
-                      }))
-                    },
-                    () => {
-                      setFormState({
-                        ...formState,
-                        isLoading: false,
-                        hasChanges: false
-                      });
-                      triggerNotification(
-                        'Profile Updated!',
-                        'Success',
-                        'green'
-                      );
-                    },
-                    message => {
-                      setFormState({
-                        ...formState,
-                        isLoading: false
-                      });
-                      triggerNotification(message);
-                    }
-                  );
+                  if (formState.avatarFile) {
+                    uploadFileToStorage(
+                      `user-${
+                        state.userData.pkUser
+                      }-avatar-${new Date().getTime()}`,
+                      formState.avatarFile,
+                      url => {
+                        updateProfile({ ...formState, avatar: url }, () => {
+                          if (formState.avatar) {
+                            deleteFileFromStorage(formState.avatar);
+                          }
+                        });
+                      },
+                      () => {
+                        updateProfile(formState);
+                      }
+                    );
+                  } else {
+                    updateProfile(formState);
+                  }
                 }}
               >
                 Save Changes
@@ -115,13 +153,41 @@ const ProfileSettings = () => {
         <Group>
           <Stack sx={{ gap: 5, flex: 1, maxWidth: 200 }}>
             <Text weight={500}>Profile Image</Text>
-            <FileDropzone height={100} />
+            <Group noWrap sx={{ flex: 1, alignItems: 'end' }}>
+              <Avatar
+                size={75}
+                src={formState.avatarPreview ?? formState.avatar}
+              />
+              <Button
+                compact
+                disabled={formState.isLoading}
+                onClick={() => avatarInputRef.current.click()}
+                size="sm"
+              >
+                Upload image
+              </Button>
+              <input
+                accept={['image/png', 'image/jpeg']}
+                hidden
+                onChangeCapture={e => {
+                  setFormState({
+                    ...formState,
+                    avatarPreview: URL.createObjectURL(e.target.files[0]),
+                    avatarFile: e.target.files[0],
+                    hasChanges: true
+                  });
+                }}
+                ref={avatarInputRef}
+                type="file"
+              />
+            </Group>
           </Stack>
         </Group>
 
         <Group sx={{ justifyContent: 'space-between' }}>
           <Stack style={{ gap: 3, flex: 1 }}>
             <Textarea
+              disabled={formState.isLoading}
               label="Bio"
               minRows={4}
               onChange={e =>
@@ -151,6 +217,7 @@ const ProfileSettings = () => {
             {formState.userSocialLinks.length < 3 && (
               <Group>
                 <Button
+                  disabled={formState.isLoading}
                   leftIcon={<Plus />}
                   onClick={() =>
                     setSocialLinkModalState({

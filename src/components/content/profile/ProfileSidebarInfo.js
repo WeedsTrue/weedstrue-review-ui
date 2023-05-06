@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState } from 'react';
 import {
   Avatar,
   Button,
@@ -39,7 +39,13 @@ const ProfileSidebarInfo = ({ isCurrentUsersProfile, user, isLoading }) => {
                 style={{ padding: 0 }}
                 sx={{ position: 'absolute', top: -90 }}
               >
-                <Avatar color="gray" size={100} sx={{}} variant="light" />
+                <Avatar
+                  color="gray"
+                  size={100}
+                  src={user.avatar}
+                  sx={{}}
+                  variant="light"
+                />
               </Card>
               {!isCurrentUsersProfile && (
                 <Button

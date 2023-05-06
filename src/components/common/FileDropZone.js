@@ -1,18 +1,15 @@
 import React from 'react';
-import { Group, Stack, Text, useMantineTheme } from '@mantine/core';
+import { Group, Stack, Text } from '@mantine/core';
 import { Dropzone } from '@mantine/dropzone';
 import PropTypes from 'prop-types';
-import { Photo, Upload, X } from 'tabler-icons-react';
 
-const FileDropzone = ({ height, ...rest }) => {
-  const theme = useMantineTheme();
-
+const FileDropzone = ({ height, onDrop, onReject, ...rest }) => {
   return (
     <Dropzone
       accept={['image/png', 'image/jpeg']}
       maxSize={3 * 1024 ** 2}
-      onDrop={files => console.log('accepted files', files)}
-      onReject={files => console.log('rejected files', files)}
+      onDrop={onDrop}
+      onReject={onReject}
       {...rest}
     >
       <Group
@@ -20,30 +17,8 @@ const FileDropzone = ({ height, ...rest }) => {
         spacing="xl"
         style={{ minHeight: height, pointerEvents: 'none' }}
       >
-        {/* <Dropzone.Accept>
-          <Upload
-            color={
-              theme.colors[theme.primaryColor][
-                theme.colorScheme === 'dark' ? 4 : 6
-              ]
-            }
-            size="3.2rem"
-            stroke={1.5}
-          />
-        </Dropzone.Accept>
-        <Dropzone.Reject>
-          <X
-            color={theme.colors.red[theme.colorScheme === 'dark' ? 4 : 6]}
-            size="3.2rem"
-            stroke={1.5}
-          />
-        </Dropzone.Reject>
-        <Dropzone.Idle>
-          <Photo size="3.2rem" stroke={1.5} />
-        </Dropzone.Idle> */}
-
         <Stack>
-          <Text inline>Drag images here or click to select files</Text>
+          <Text inline>Drag your image here or click to select</Text>
         </Stack>
       </Group>
     </Dropzone>
@@ -51,7 +26,9 @@ const FileDropzone = ({ height, ...rest }) => {
 };
 
 FileDropzone.propTypes = {
-  height: PropTypes.number
+  height: PropTypes.number,
+  onDrop: PropTypes.func,
+  onReject: PropTypes.func
 };
 
 export default FileDropzone;
