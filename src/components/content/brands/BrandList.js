@@ -2,6 +2,7 @@ import React from 'react';
 import { Grid, Group, Stack, Text, Title } from '@mantine/core';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
+import { mq } from '../../../config/theme';
 
 const BrandList = ({ brands, isLoading }) => {
   const sortedBrands = Object.values(
@@ -22,7 +23,7 @@ const BrandList = ({ brands, isLoading }) => {
   );
 
   return (
-    <Stack sx={{ gap: 40 }}>
+    <Stack sx={mq({ gap: [20, 20, 40] })}>
       <Title sx={{ margin: 'auto' }}>Brands</Title>
 
       <Group sx={{ justifyContent: 'center' }}>
@@ -41,7 +42,13 @@ const BrandList = ({ brands, isLoading }) => {
 
       <Grid gutter="xl" justify="center" sx={{ margin: 'auto', maxWidth: 765 }}>
         {sortedBrands.map(s => (
-          <Grid.Col key={s.title} span={4} sx={{ paddingLeft: 40 }}>
+          <Grid.Col
+            key={s.title}
+            md={4}
+            sm={6}
+            sx={mq({ paddingLeft: 40 })}
+            xl={12}
+          >
             <Stack sx={{ gap: 20 }}>
               <Text id={s.title} weight={700}>
                 {s.title}
