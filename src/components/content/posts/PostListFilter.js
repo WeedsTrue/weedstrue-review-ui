@@ -71,7 +71,7 @@ const PostListFilter = ({ onFilterChange, filterState }) => {
         padding: ['10px !important', '15px !important', '20px !important']
       })}
     >
-      <Stack sx={{ gap: 10 }}>
+      <Stack sx={mq({ gap: 10 })}>
         <Group noWrap sx={{ justifyContent: 'space-between', gap: 5 }}>
           <Group
             noWrap

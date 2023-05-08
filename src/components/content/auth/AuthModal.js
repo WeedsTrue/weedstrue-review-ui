@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Stack } from '@mantine/core';
+import { ActionIcon, Group, Stack } from '@mantine/core';
 import PropTypes from 'prop-types';
+import { X } from 'tabler-icons-react';
 import ConfirmAccount from './ConfirmAccount';
 import ConfirmAccountResend from './ConfirmAccountResend';
 import ForgotPassword from './ForgotPassword';
@@ -31,6 +32,27 @@ const AuthModal = ({ defaultView }) => {
       opened={state.showAuthModal}
       size={400}
     >
+      <Stack
+        sx={mq({
+          gap: 0,
+          display: ['flex', 'flex', 'none']
+        })}
+      >
+        <Group
+          sx={{
+            minWidth: 100,
+            gap: 10,
+            padding: '12px 16px',
+            placeItems: 'end',
+            justifyContent: 'space-between'
+          }}
+        >
+          <Stack style={{ flex: 1 }}></Stack>
+          <ActionIcon onClick={() => toggleAuthModal(false)}>
+            <X />
+          </ActionIcon>
+        </Group>
+      </Stack>
       <Stack
         sx={{
           maxWidth: 450,

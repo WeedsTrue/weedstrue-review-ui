@@ -2,6 +2,7 @@ import React from 'react';
 import { Button, Group, Stack, TextInput } from '@mantine/core';
 import PropTypes from 'prop-types';
 import ResponsiveModal from './ResponsiveModal';
+import { mq } from '../../config/theme';
 import { triggerNotification } from '../../helpers/notificationHelper';
 
 const ShareLinkModal = ({ title, pathname, onClose, opened }) => {
@@ -20,13 +21,15 @@ const ShareLinkModal = ({ title, pathname, onClose, opened }) => {
       title={title}
     >
       <Stack sx={{ padding: 20, flex: 1 }}>
-        <Group sx={{ gap: 5 }}>
+        <Group sx={mq({ gap: [10, 5] })}>
           <TextInput
             onChange={() => {}}
             sx={{ flex: 1 }}
             value={`${window.location.origin}${pathname}`}
           />
-          <Button onClick={onCopy}>Copy</Button>
+          <Button onClick={onCopy} sx={mq({ width: ['100%', 'unset'] })}>
+            Copy
+          </Button>
         </Group>
       </Stack>
     </ResponsiveModal>
