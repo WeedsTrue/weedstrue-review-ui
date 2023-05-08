@@ -105,7 +105,7 @@ const PostListFilter = ({ onFilterChange, filterState }) => {
             />
           </Stack>
 
-          <Stack sx={mq({ display: ['none', 'none', 'flex'] })}>
+          <Stack sx={mq({ display: ['none', 'none', 'none', 'flex'] })}>
             <Select
               clearable
               data={POST_TYPES}
@@ -115,7 +115,7 @@ const PostListFilter = ({ onFilterChange, filterState }) => {
             />
           </Stack>
 
-          <Stack sx={mq({ display: ['flex', 'flex', 'none'] })}>
+          <Stack sx={mq({ display: ['flex', 'flex', 'flex', 'none'] })}>
             <ActionIcon
               color="dark"
               onClick={() => setShowMobileFilter(!showMobileFilter)}
@@ -127,7 +127,7 @@ const PostListFilter = ({ onFilterChange, filterState }) => {
         {showMobileFilter && (
           <Stack
             sx={mq({
-              display: ['flex', 'flex', 'none'],
+              display: ['flex', 'flex', 'flex', 'none'],
               maxWidth: ['unset', 300]
             })}
           >
