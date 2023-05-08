@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import {
   Header as MantineHeader,
   Avatar,
@@ -6,7 +6,12 @@ import {
   Group,
   Menu,
   Button,
-  Stack
+  Stack,
+  Drawer,
+  Burger,
+  Divider,
+  NavLink,
+  UnstyledButton
 } from '@mantine/core';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { ChevronDown, Leaf, Logout, User } from 'tabler-icons-react';
@@ -18,6 +23,7 @@ const Header = () => {
   const navigate = useNavigate();
   const { state, logout, toggleAuthModal } = useContext(AuthContext);
   const { pathname } = useLocation();
+  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
 
   return (
     <MantineHeader
@@ -48,16 +54,19 @@ const Header = () => {
                 }}
               >
                 <Leaf color="dodgerblue" size={40} />
-                <Text
-                  sx={mq({ fontSize: 20, display: ['none', 'block'] })}
-                  weight={700}
-                >
+                <Text sx={mq({ fontSize: 20 })} weight={700}>
                   WeedsTrue
                 </Text>
               </Group>
             </Link>
           </Group>
-          <Group sx={{ flex: 3, gap: 50 }}>
+          <Group
+            sx={mq({
+              flex: 3,
+              gap: 50,
+              display: ['none', 'none', 'none', 'flex']
+            })}
+          >
             {links.public.map(link => (
               <Stack key={link.to} sx={{ width: 125 }}>
                 <Text
@@ -84,7 +93,9 @@ const Header = () => {
             ))}
           </Group>
         </Group>
-        <Group sx={{ marginRight: 5 }}>
+        <Group
+          sx={mq({ marginRight: 5, display: ['none', 'none', 'none', 'flex'] })}
+        >
           {state.isAuthenticated ? (
             <Menu shadow="md" width={200}>
               <Menu.Target>
@@ -140,6 +151,120 @@ const Header = () => {
               Log In
             </Button>
           )}
+        </Group>
+        <Group
+          sx={mq({ marginRight: 5, display: ['flex', 'flex', 'flex', 'none'] })}
+        >
+          <Drawer
+            onClose={() => setMobileDrawerOpen(false)}
+            opened={mobileDrawerOpen}
+            position="right"
+            size={'100%'}
+            styles={{
+              content: mq({
+                maxWidth: ['100%', '320px !important']
+              }),
+              body: {
+                padding: 0,
+                height: '100%'
+              }
+            }}
+            withCloseButton={false}
+          >
+            <Stack sx={{ gap: 0, height: '100%' }}>
+              {state.isAuthenticated ? (
+                <>
+                  <Stack sx={{ padding: 20 }}>
+                    <UnstyledButton
+                      component={Link}
+                      onClick={() => setMobileDrawerOpen(false)}
+                      to={`profile/${state.userData.username}`}
+                    >
+                      <Group>
+                        <Avatar color="blue" size={40}>
+                          BH
+                        </Avatar>
+                        <div>
+                          <Text>Bob Handsome</Text>
+                          <Text color="dimmed" size="xs">
+                            bob@handsome.inc
+                          </Text>
+                        </div>
+                      </Group>
+                    </UnstyledButton>
+                  </Stack>
+                  <Divider />
+                  <Stack sx={{ padding: 20, gap: 5 }}>
+                    <NavLink
+                      active={pathname.startsWith(
+                        `/profile/${state.userData.username}`
+                      )}
+                      component={Link}
+                      icon={<User />}
+                      label={'My Profile'}
+                      onClick={() => setMobileDrawerOpen(false)}
+                      sx={{ color: 'black' }}
+                      to={`profile/${state.userData.username}`}
+                    />
+                  </Stack>
+                </>
+              ) : (
+                <Stack sx={{ padding: 20 }}>
+                  <Button
+                    onClick={() => {
+                      setMobileDrawerOpen(false);
+                      toggleAuthModal(true);
+                    }}
+                    sx={{ height: 40 }}
+                  >
+                    Log In
+                  </Button>
+                </Stack>
+              )}
+              <Divider />
+              <Stack sx={{ padding: 20, gap: 5 }}>
+                {links.public.map(link => (
+                  <NavLink
+                    active={link.isSelected(pathname)}
+                    component={Link}
+                    icon={link.icon}
+                    key={link.to}
+                    label={link.label}
+                    onClick={() => setMobileDrawerOpen(false)}
+                    sx={{ color: 'black' }}
+                    to={link.to}
+                  />
+                ))}
+              </Stack>
+              <Divider />
+
+              {state.isAuthenticated && (
+                <>
+                  <Stack sx={{ gap: 0, flex: 1, justifyContent: 'end' }}>
+                    <Divider />
+
+                    <Stack sx={{ padding: 20 }}>
+                      <Button
+                        onClick={() => {
+                          logout();
+                        }}
+                        variant="outline"
+                      >
+                        Logout
+                      </Button>
+                    </Stack>
+                  </Stack>
+                </>
+              )}
+            </Stack>
+          </Drawer>
+
+          <Group position="center">
+            <Burger
+              onClick={() => setMobileDrawerOpen(true)}
+              opened={mobileDrawerOpen}
+            />
+          </Group>
         </Group>
       </Group>
     </MantineHeader>

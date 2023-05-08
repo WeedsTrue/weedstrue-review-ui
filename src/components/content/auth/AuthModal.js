@@ -7,6 +7,7 @@ import ForgotPassword from './ForgotPassword';
 import ForgotPasswordConfirm from './ForgotPasswordConfirm';
 import Login from './Login';
 import Register from './Register';
+import { mq } from '../../../config/theme';
 import { Context as AuthContext } from '../../../providers/AuthProvider';
 import ResponsiveModal from '../../common/ResponsiveModal';
 
@@ -30,7 +31,7 @@ const AuthModal = ({ defaultView }) => {
       opened={state.showAuthModal}
       size={400}
     >
-      <Stack sx={{ padding: 60 }}>
+      <Stack sx={mq({ padding: [20, 20, 60] })}>
         {modalState.view === 'login' ? (
           <Login
             onModalViewChange={view => setModalState({ ...modalState, view })}

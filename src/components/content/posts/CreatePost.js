@@ -308,7 +308,6 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
           ...image,
           src: image.externalUrl ?? image.src
         });
-        console.log(currentResults, image);
       } else if (!image.previewImage) {
         currentResults.images.push({
           ...image
