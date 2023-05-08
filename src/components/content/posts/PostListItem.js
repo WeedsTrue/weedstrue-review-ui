@@ -19,6 +19,7 @@ import DeletePostModal from './DeletePostModal';
 import PostMenu from './PostMenu';
 import UserPostImageCarousel from './UserPostImageCarousel';
 import { USER_POST_TYPE, USER_POST_TYPE_LIST } from '../../../config/constants';
+import { mq } from '../../../config/theme';
 import { getUserPostLink } from '../../../helpers/format';
 import { reactToItem } from '../../../helpers/reactionHelper';
 import { Context as ReviewsContext } from '../../../providers/ReviewsProvider';
@@ -68,9 +69,23 @@ const PostListItem = ({ userPost }) => {
 
   return userPost ? (
     <>
-      <Card component={Link} sx={{ overflow: 'visible' }} to={postLink}>
+      <Card
+        component={Link}
+        sx={mq({
+          overflow: 'visible',
+          padding: ['10px !important', '15px !important', '20px !important']
+        })}
+        to={postLink}
+      >
         <Group sx={{ alignItems: 'start' }}>
-          <Stack sx={{ gap: 0, placeItems: 'center', marginLeft: 5 }}>
+          <Stack
+            sx={mq({
+              gap: 0,
+              placeItems: 'center',
+              marginLeft: 5,
+              display: ['none', 'none', 'flex']
+            })}
+          >
             <ActionIcon
               color={isUpvoted ? 'blue' : 'dark'}
               onClick={e => {
@@ -111,7 +126,7 @@ const PostListItem = ({ userPost }) => {
           >
             <Stack
               sx={{
-                gap: 5,
+                gap: 3,
                 overflow: 'hidden',
                 marginLeft: 5
               }}
@@ -147,14 +162,15 @@ const PostListItem = ({ userPost }) => {
                     flexWrap: 'nowrap',
                     overflow: 'hidden',
                     justifyContent: 'space-between',
-                    alignItems: 'start'
+                    alignItems: 'center'
                   }}
                 >
                   <Title
                     order={4}
                     sx={{
                       overflow: 'hidden',
-                      textOverflow: 'ellipsis'
+                      textOverflow: 'ellipsis',
+                      lineHeight: '20px'
                     }}
                   >
                     {userPost.title}
@@ -162,55 +178,125 @@ const PostListItem = ({ userPost }) => {
                   <Badge
                     color={postType.color}
                     size="lg"
-                    sx={{ minWidth: 100 }}
+                    sx={mq({
+                      display: ['none', 'none', 'flex'],
+                      minWidth: 100
+                    })}
                     variant="filled"
                   >
                     {postType.label}
                   </Badge>
                 </Group>
               </Stack>
-
-              <Group sx={{ gap: 5 }}>
-                <Text color="dodgerblue" size={14}>
-                  {userPost.postItemName}
-                </Text>
-                {userPost.postItemSecondaryName && (
-                  <>
-                    <Point size={5} />
-                    <Text color="dodgerblue" size={14}>
-                      {userPost.postItemUuid}
-                    </Text>
-                  </>
-                )}
-              </Group>
-              {userPost.fkUserPostType === USER_POST_TYPE.REVIEW.value &&
-                userPost.userRating && (
-                  <Rating readOnly value={userPost.userRating} />
-                )}
-              <Stack sx={{ gap: 10 }}>
-                {userPost.userPostImages.length > 0 && (
-                  <UserPostImageCarousel
-                    height={500}
-                    imageDisabled
-                    userPostImages={userPost.userPostImages}
-                  />
-                )}
-                <Text
-                  sx={{
-                    fontSize: 14,
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    WebkitLineClamp: 3,
-                    WebkitBoxOrient: 'vertical',
-                    display: '-webkit-box',
-                    whiteSpace: 'pre-wrap'
-                  }}
+              <Stack sx={{ gap: 5 }}>
+                <Group sx={{ gap: 5 }}>
+                  <Text color="dodgerblue" size={14}>
+                    {userPost.postItemName}
+                  </Text>
+                  {userPost.postItemSecondaryName && (
+                    <>
+                      <Point size={5} />
+                      <Text color="dodgerblue" size={14}>
+                        {userPost.postItemUuid}
+                      </Text>
+                    </>
+                  )}
+                </Group>
+                <Group
+                  sx={mq({
+                    display: ['flex', 'flex', 'none']
+                  })}
                 >
-                  {userPost.content}
-                </Text>
+                  <Badge
+                    color={postType.color}
+                    size="lg"
+                    sx={mq({
+                      display: ['flex', 'flex', 'none']
+                    })}
+                    variant="filled"
+                  >
+                    {postType.label}
+                  </Badge>
+                </Group>
+                {userPost.fkUserPostType === USER_POST_TYPE.REVIEW.value &&
+                  userPost.userRating && (
+                    <Rating
+                      readOnly
+                      sx={mq({ marginTop: [3, 3, 0] })}
+                      value={userPost.userRating}
+                    />
+                  )}
+                <Stack sx={{ gap: 10 }}>
+                  {userPost.userPostImages.length > 0 && (
+                    <Stack sx={{ paddingTop: 5 }}>
+                      <UserPostImageCarousel
+                        height={500}
+                        imageDisabled
+                        userPostImages={userPost.userPostImages}
+                      />
+                    </Stack>
+                  )}
+                  <Text
+                    sx={{
+                      fontSize: 14,
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      WebkitLineClamp: 3,
+                      WebkitBoxOrient: 'vertical',
+                      display: '-webkit-box',
+                      whiteSpace: 'pre-wrap'
+                    }}
+                  >
+                    {userPost.content}
+                  </Text>
+                </Stack>
               </Stack>
             </Stack>
             <Group>
+              <Group
+                sx={mq({
+                  gap: 0,
+                  placeItems: 'center',
+                  marginLeft: 5,
+                  display: ['flex', 'flex', 'none']
+                })}
+              >
+                <ActionIcon
+                  color={isUpvoted ? 'blue' : 'dark'}
+                  onClick={e => {
+                    e.preventDefault();
+                    createReaction(true);
+                  }}
+                  variant="transparent"
+                >
+                  <Leaf />
+                </ActionIcon>
+                <Text weight={500}>
+                  {userPost.positiveReactionCount -
+                    userPost.negativeReactionCount +
+                    (!userPost?.userReaction && reactionState.deleted
+                      ? 0
+                      : reactionState.value)}
+                </Text>
+                <ActionIcon
+                  color={isDownVoted ? 'blue' : 'dark'}
+                  onClick={e => {
+                    e.preventDefault();
+                    createReaction(false);
+                  }}
+                  variant="transparent"
+                >
+                  <Leaf
+                    style={{
+                      transform: 'rotate(180deg)',
+                      MozTransform: 'rotate(180deg)',
+                      WebkitTransform: 'rotate(180deg)',
+                      msTransform: 'rotate(180deg)'
+                    }}
+                  />
+                </ActionIcon>
+              </Group>
+
               <Group sx={{ gap: 5 }}>
                 <Button
                   color="dark"
@@ -223,7 +309,7 @@ const PostListItem = ({ userPost }) => {
                   {userPost.commentCount === 1 ? 'Comment' : 'Comments'}
                 </Button>
               </Group>
-              <Group>
+              <Group sx={mq({ display: ['none', 'flex'] })}>
                 <Button
                   color="dark"
                   leftIcon={<Share />}
@@ -247,6 +333,9 @@ const PostListItem = ({ userPost }) => {
                         break;
                       case 'REPORT':
                         setShowReportModal(true);
+                        break;
+                      case 'SHARE':
+                        setShowSharePostModal(true);
                         break;
                       default:
                         break;

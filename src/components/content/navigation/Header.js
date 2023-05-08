@@ -11,10 +11,11 @@ import {
   Burger,
   Divider,
   NavLink,
-  UnstyledButton
+  UnstyledButton,
+  ActionIcon
 } from '@mantine/core';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { ChevronDown, Leaf, Logout, User } from 'tabler-icons-react';
+import { ChevronDown, Leaf, Logout, User, X } from 'tabler-icons-react';
 import { links } from './links';
 import { mq } from '../../../config/theme';
 import { Context as AuthContext } from '../../../providers/AuthProvider';
@@ -24,7 +25,6 @@ const Header = () => {
   const { state, logout, toggleAuthModal } = useContext(AuthContext);
   const { pathname } = useLocation();
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
-
   return (
     <MantineHeader
       fixed
@@ -172,29 +172,59 @@ const Header = () => {
             withCloseButton={false}
           >
             <Stack sx={{ gap: 0, height: '100%' }}>
+              <Group sx={{ padding: 10, justifyContent: 'space-between' }}>
+                <Group>
+                  <Link
+                    onClick={() => setMobileDrawerOpen(false)}
+                    style={{
+                      textDecoration: 'none',
+                      color: 'black'
+                    }}
+                    to="/lanes"
+                  >
+                    <Group
+                      sx={{
+                        gap: 1,
+                        flexWrap: 'nowrap'
+                      }}
+                    >
+                      <Leaf color="dodgerblue" size={40} />
+                      <Text sx={mq({ fontSize: 20 })} weight={700}>
+                        WeedsTrue
+                      </Text>
+                    </Group>
+                  </Link>
+                </Group>
+                <ActionIcon onClick={() => setMobileDrawerOpen(false)}>
+                  <X />
+                </ActionIcon>
+              </Group>
+              <Divider />
               {state.isAuthenticated ? (
                 <>
-                  <Stack sx={{ padding: 20 }}>
+                  <Stack sx={{ padding: 10, paddingBottom: 13 }}>
                     <UnstyledButton
                       component={Link}
                       onClick={() => setMobileDrawerOpen(false)}
                       to={`profile/${state.userData.username}`}
                     >
                       <Group>
-                        <Avatar color="blue" size={40}>
-                          BH
-                        </Avatar>
+                        <Avatar
+                          color="blue"
+                          size={40}
+                          src={state.userData.avatar}
+                        />
                         <div>
-                          <Text>Bob Handsome</Text>
+                          <Text>{state.userData.username}</Text>
                           <Text color="dimmed" size="xs">
-                            bob@handsome.inc
+                            {state.userData.email}
                           </Text>
                         </div>
                       </Group>
                     </UnstyledButton>
                   </Stack>
                   <Divider />
-                  <Stack sx={{ padding: 20, gap: 5 }}>
+                  <Stack sx={{ padding: 10, gap: 5 }}>
                     <NavLink
                       active={pathname.startsWith(
                         `/profile/${state.userData.username}`
@@ -209,7 +239,7 @@ const Header = () => {
                   </Stack>
                 </>
               ) : (
-                <Stack sx={{ padding: 20 }}>
+                <Stack sx={{ padding: 10 }}>
                   <Button
                     onClick={() => {
                       setMobileDrawerOpen(false);
@@ -222,7 +252,7 @@ const Header = () => {
                 </Stack>
               )}
               <Divider />
-              <Stack sx={{ padding: 20, gap: 5 }}>
+              <Stack sx={{ padding: 10, gap: 5 }}>
                 {links.public.map(link => (
                   <NavLink
                     active={link.isSelected(pathname)}

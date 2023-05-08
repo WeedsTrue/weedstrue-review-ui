@@ -31,34 +31,46 @@ const AuthModal = ({ defaultView }) => {
       opened={state.showAuthModal}
       size={400}
     >
-      <Stack sx={mq({ padding: [20, 20, 60] })}>
-        {modalState.view === 'login' ? (
-          <Login
-            onModalViewChange={view => setModalState({ ...modalState, view })}
-          />
-        ) : modalState.view === 'register' ? (
-          <Register
-            onModalViewChange={view => setModalState({ ...modalState, view })}
-          />
-        ) : modalState.view === 'forgot-password' ? (
-          <ForgotPassword
-            onModalViewChange={view => setModalState({ ...modalState, view })}
-          />
-        ) : modalState.view === 'forgot-password-confirm' ? (
-          <ForgotPasswordConfirm
-            onModalViewChange={view => setModalState({ ...modalState, view })}
-          />
-        ) : modalState.view === 'confirm-code' ? (
-          <ConfirmAccount
-            onModalViewChange={view => setModalState({ ...modalState, view })}
-          />
-        ) : modalState.view === 'confirm-resend' ? (
-          <ConfirmAccountResend
-            onModalViewChange={view => setModalState({ ...modalState, view })}
-          />
-        ) : (
-          <></>
-        )}
+      <Stack
+        sx={{
+          maxWidth: 450,
+          alignSelf: 'center',
+          width: '100%'
+        }}
+      >
+        <Stack
+          sx={mq({
+            padding: [20, 20, 60]
+          })}
+        >
+          {modalState.view === 'login' ? (
+            <Login
+              onModalViewChange={view => setModalState({ ...modalState, view })}
+            />
+          ) : modalState.view === 'register' ? (
+            <Register
+              onModalViewChange={view => setModalState({ ...modalState, view })}
+            />
+          ) : modalState.view === 'forgot-password' ? (
+            <ForgotPassword
+              onModalViewChange={view => setModalState({ ...modalState, view })}
+            />
+          ) : modalState.view === 'forgot-password-confirm' ? (
+            <ForgotPasswordConfirm
+              onModalViewChange={view => setModalState({ ...modalState, view })}
+            />
+          ) : modalState.view === 'confirm-code' ? (
+            <ConfirmAccount
+              onModalViewChange={view => setModalState({ ...modalState, view })}
+            />
+          ) : modalState.view === 'confirm-resend' ? (
+            <ConfirmAccountResend
+              onModalViewChange={view => setModalState({ ...modalState, view })}
+            />
+          ) : (
+            <></>
+          )}
+        </Stack>
       </Stack>
     </ResponsiveModal>
   );

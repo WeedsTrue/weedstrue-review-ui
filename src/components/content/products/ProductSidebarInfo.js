@@ -13,19 +13,29 @@ import PropTypes from 'prop-types';
 import { ChevronRight } from 'tabler-icons-react';
 import ProductListItem from './ProductListItem';
 import { LINK_SOURCE_TYPE } from '../../../config/constants';
+import { mq } from '../../../config/theme';
 
 const ProductSidebarInfo = ({ product, showReport, isLoading }) => {
   return (
     <>
       <ProductListItem product={product} showReport={showReport} />
+      <Divider sx={mq({ display: ['flex', 'flex', 'none'] })} />
       {product && (
         <>
           <Card style={{ padding: 0 }}>
-            <Group sx={{ padding: '10px 20px' }}>
-              <Title order={4}>Links</Title>
+            <Group sx={mq({ padding: ['10px 15px', 15, 20] })}>
+              <Title order={4} sx={{ lineHeight: '20px' }}>
+                Links
+              </Title>
             </Group>
-            <Divider />
-            <Stack sx={{ padding: 20, gap: 10 }}>
+            <Divider sx={mq({ display: ['none', 'none', 'flex'] })} />
+            <Stack
+              sx={mq({
+                padding: ['10px 15px', 15, 20],
+                gap: 10,
+                paddingTop: [0, 0, 20]
+              })}
+            >
               {product.links.map(link => (
                 <NavLink
                   component="a"
@@ -55,13 +65,22 @@ const ProductSidebarInfo = ({ product, showReport, isLoading }) => {
               />
             </Stack>
           </Card>
+          <Divider sx={mq({ display: ['flex', 'flex', 'none'] })} />
           {product.attributes.length > 0 && (
             <Card style={{ padding: 0 }}>
-              <Group sx={{ padding: '10px 20px' }}>
-                <Title order={4}>Properties</Title>
+              <Group sx={mq({ padding: ['10px 15px', 15, 20] })}>
+                <Title order={4} sx={{ lineHeight: '20px' }}>
+                  Properties
+                </Title>
               </Group>
-              <Divider />
-              <Stack sx={{ padding: 20, gap: 10 }}>
+              <Divider sx={mq({ display: ['none', 'none', 'flex'] })} />
+              <Stack
+                sx={mq({
+                  padding: ['10px 15px', 15, 20],
+                  gap: 10,
+                  paddingTop: [0, 0, 20]
+                })}
+              >
                 <Table highlightOnHover striped withBorder withColumnBorders>
                   <tbody>
                     {product.attributes.map(attribute => (

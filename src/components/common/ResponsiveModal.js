@@ -41,7 +41,7 @@ const ResponsiveModal = ({
           flex: 1
         }}
       >
-        <Stack sx={{ maxWidth: 550, alignSelf: 'center', width: '100%' }}>
+        {!noHeader && (
           <Stack
             sx={{
               gap: 0,
@@ -68,8 +68,9 @@ const ResponsiveModal = ({
               </>
             )}
           </Stack>
-          {children}
-        </Stack>
+        )}
+
+        {children}
       </Stack>
     </Modal>
   );
