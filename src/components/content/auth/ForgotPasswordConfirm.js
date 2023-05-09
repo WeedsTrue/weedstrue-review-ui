@@ -2,6 +2,7 @@ import React, { useContext, useState } from 'react';
 import { Alert, Button, Stack, Text, TextInput, Title } from '@mantine/core';
 import PropTypes from 'prop-types';
 import { AlertCircle } from 'tabler-icons-react';
+import { triggerNotification } from '../../../helpers/notificationHelper';
 import { Context as AuthContext } from '../../../providers/AuthProvider';
 import FormSection from '../../common/FormSection';
 
@@ -54,7 +55,10 @@ const ForgotPasswordConfirm = ({ onModalViewChange }) => {
               code: formState.code,
               newPassword: formState.password
             },
-            () => {},
+            () => {
+              triggerNotification('Password Reset!', 'Success', 'green');
+              onModalViewChange('login');
+            },
             message =>
               setFormState({ ...formState, isLoading: false, error: message })
           );
