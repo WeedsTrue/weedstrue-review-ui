@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import AccountSettings from './AccountSettings';
 import PrivacySettings from './PrivacySettings';
 import ProfileSettings from './ProfileSettings';
+import { mq } from '../../../config/theme';
 import CustomTab from '../../common/CustomTab';
 
 const SETTINGS_TABS = [
@@ -36,8 +37,8 @@ const UserSettingsView = () => {
           }}
         >
           <Stack style={{ flex: 1, maxWidth: 1100 }}>
-            <Stack sx={{ gap: 40 }}>
-              <Stack sx={{ gap: 20 }}>
+            <Stack sx={mq({ gap: 20 })}>
+              <Stack sx={mq({ gap: [10, 10, 20] })}>
                 <Title order={4}>User settings</Title>
                 <Stack sx={{ gap: 0 }}>
                   <Group sx={{ gap: 10 }}>

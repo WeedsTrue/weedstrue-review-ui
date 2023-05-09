@@ -15,7 +15,7 @@ const ProfileCommentsList = ({ pkUser }) => {
   }, [pkUser]);
 
   return (
-    <Stack sx={{ flex: 1, gap: 15 }}>
+    <Stack sx={{ flex: 1, gap: 15, alignSelf: 'stretch' }}>
       {isLoading ? (
         <>
           <ProfileCommentListItem />
