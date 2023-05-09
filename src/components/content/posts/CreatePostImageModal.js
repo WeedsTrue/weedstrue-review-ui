@@ -11,6 +11,7 @@ import {
   Textarea
 } from '@mantine/core';
 import PropTypes from 'prop-types';
+import { mq } from '../../../config/theme';
 import FileDropzone from '../../common/FileDropZone';
 import ResponsiveModal from '../../common/ResponsiveModal';
 
@@ -72,11 +73,17 @@ const CreatePostImageModal = ({ postImage, onClose, isOpen, onAdd }) => {
         </Group>
       }
     >
-      <Stack sx={{ gap: 10, padding: 20 }}>
+      <Stack
+        sx={mq({
+          gap: 10,
+          padding: [10, 10, 20],
+          flex: 1,
+          alignSelf: 'stretch'
+        })}
+      >
         <Group
           sx={{
             justifyContent: 'space-between',
-            flex: 1,
             alignSelf: 'stretch'
           }}
         >
@@ -170,7 +177,7 @@ const CreatePostImageModal = ({ postImage, onClose, isOpen, onAdd }) => {
         />
       </Stack>
       <Divider />
-      <Group sx={{ padding: '12px 16px', justifyContent: 'end' }}>
+      <Group sx={mq({ padding: [10, 10, '12px 16px'], justifyContent: 'end' })}>
         <Button
           color="dark"
           onClick={onClose}

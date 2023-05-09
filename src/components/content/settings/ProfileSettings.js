@@ -10,6 +10,7 @@ import {
 } from '@mantine/core';
 import { Plus } from 'tabler-icons-react';
 import ProfileSocialLinkModal from './ProfileSocialLinkModal';
+import { mq } from '../../../config/theme';
 import {
   deleteFileFromStorage,
   uploadFileToStorage
@@ -80,62 +81,59 @@ const ProfileSettings = () => {
     );
   };
 
+  const onSaveChanges = () => {
+    setFormState({
+      ...formState,
+      isLoading: true
+    });
+
+    if (formState.avatarFile) {
+      uploadFileToStorage(
+        `user-${state.userData.pkUser}-avatar-${new Date().getTime()}`,
+        formState.avatarFile,
+        url => {
+          updateProfile({ ...formState, avatar: url }, () => {
+            if (formState.avatar) {
+              deleteFileFromStorage(formState.avatar);
+            }
+          });
+        },
+        () => {
+          updateProfile(formState);
+        }
+      );
+    } else {
+      updateProfile(formState);
+    }
+  };
+
+  const onCancel = () => {
+    setFormState({
+      avatar: state.userData?.avatar ?? '',
+      avatarFile: null,
+      avatarPreview: null,
+      bio: state.userData?.bio ?? '',
+      userSocialLinks: state.userData?.userSocialLinks ?? [],
+      hasChanges: false,
+      isLoading: false
+    });
+  };
+
   return (
-    <Stack sx={{ gap: 40 }}>
+    <Stack sx={{ gap: 20, flex: 1 }}>
       <Stack sx={{ gap: 20, flex: 1, maxWidth: 768 }}>
         <Group sx={{ justifyContent: 'space-between' }}>
-          <Title order={4} sx={{ minHeight: 36 }}>
-            Profile Settings
-          </Title>
+          <Title order={4}>Profile Settings</Title>
           {formState.hasChanges && (
-            <Group>
+            <Group sx={mq({ display: ['none', 'flex'] })}>
               <Button
                 color="dark"
                 disabled={formState.isLoading}
-                onClick={() => {
-                  setFormState({
-                    avatar: state.userData?.avatar ?? '',
-                    avatarFile: null,
-                    avatarPreview: null,
-                    bio: state.userData?.bio ?? '',
-                    userSocialLinks: state.userData?.userSocialLinks ?? [],
-                    hasChanges: false,
-                    isLoading: false
-                  });
-                }}
+                onClick={onCancel}
               >
                 Cancel
               </Button>
-              <Button
-                loading={formState.isLoading}
-                onClick={() => {
-                  setFormState({
-                    ...formState,
-                    isLoading: true
-                  });
-
-                  if (formState.avatarFile) {
-                    uploadFileToStorage(
-                      `user-${
-                        state.userData.pkUser
-                      }-avatar-${new Date().getTime()}`,
-                      formState.avatarFile,
-                      url => {
-                        updateProfile({ ...formState, avatar: url }, () => {
-                          if (formState.avatar) {
-                            deleteFileFromStorage(formState.avatar);
-                          }
-                        });
-                      },
-                      () => {
-                        updateProfile(formState);
-                      }
-                    );
-                  } else {
-                    updateProfile(formState);
-                  }
-                }}
-              >
+              <Button loading={formState.isLoading} onClick={onSaveChanges}>
                 Save Changes
               </Button>
             </Group>
@@ -257,6 +255,26 @@ const ProfileSettings = () => {
             </Stack>
           </Stack>
         </Group>
+
+        {formState.hasChanges && (
+          <Group sx={mq({ display: ['flex', 'none'], flex: 1 })}>
+            <Button
+              color="dark"
+              disabled={formState.isLoading}
+              onClick={onCancel}
+              style={{ flex: 1 }}
+            >
+              Cancel
+            </Button>
+            <Button
+              loading={formState.isLoading}
+              onClick={onSaveChanges}
+              style={{ flex: 1 }}
+            >
+              Save Changes
+            </Button>
+          </Group>
+        )}
       </Stack>
       <ProfileSocialLinkModal
         onAdd={socialLink => {

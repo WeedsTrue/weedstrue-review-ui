@@ -5,13 +5,13 @@ import PropTypes from 'prop-types';
 import { NumericFormat } from 'react-number-format';
 import { PRODUCT_ATTRIBUTE_TYPE } from '../../../config/constants';
 
-const ProductAttribute = ({ attribute }) => {
+const ProductAttribute = ({ attribute, ...rest }) => {
   const attributeType = PRODUCT_ATTRIBUTE_TYPE.find(
     t => t.value === attribute.fkProductAttributeType
   );
 
   return (
-    <Stack>
+    <Stack {...rest}>
       <Text size={14} weight={500}>
         {attributeType.displayLabel}{' '}
         {attributeType.displayType === 'percentage' ? (

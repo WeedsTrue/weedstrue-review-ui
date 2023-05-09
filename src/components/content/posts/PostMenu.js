@@ -3,6 +3,7 @@ import { Button, Menu } from '@mantine/core';
 import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
 import { Dots } from 'tabler-icons-react';
+import { mq } from '../../../config/theme';
 import { Context as AuthContext } from '../../../providers/AuthProvider';
 
 const PostMenu = ({ userPost, onAction }) => {
@@ -24,6 +25,15 @@ const PostMenu = ({ userPost, onAction }) => {
       </Menu.Target>
 
       <Menu.Dropdown>
+        <Menu.Item
+          onClick={e => {
+            e.preventDefault();
+            onAction('SHARE');
+          }}
+          sx={mq({ display: ['flex', 'none'] })}
+        >
+          Share
+        </Menu.Item>
         {state.userData?.pkUser === userPost?.user.pkUser ? (
           <>
             <Menu.Item

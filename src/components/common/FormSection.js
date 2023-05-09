@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button, Divider, Group, Stack } from '@mantine/core';
 import PropTypes from 'prop-types';
+import { mq } from '../../config/theme';
 
 const FormSection = ({
   onSubmit,
@@ -19,7 +20,7 @@ const FormSection = ({
         onSubmit(e);
       }}
       {...rest}
-      sx={{ gap: 20, ...rest.sx }}
+      sx={mq({ gap: 20, ...rest.sx })}
     >
       {children}
       {!hideButtons && (

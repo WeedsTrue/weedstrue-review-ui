@@ -14,6 +14,7 @@ import { Leaf, Message, Point, Share } from 'tabler-icons-react';
 import CommentMenu from './CommentMenu';
 import CreateComment from './CreateComment';
 import DeleteCommentModal from './DeleteCommentModal';
+import { mq } from '../../../config/theme';
 import { reactToItem } from '../../../helpers/reactionHelper';
 import { Context as ReviewsContext } from '../../../providers/ReviewsProvider';
 import ShareLinkModal from '../../common/ShareLinkModal';
@@ -190,7 +191,7 @@ const CommentListItem = ({
                   leftIcon={<Share size={22} />}
                   onClick={() => setShowSharePostModal(true)}
                   size="xs"
-                  sx={{ padding: 5 }}
+                  sx={mq({ padding: 5, display: ['none', 'none', 'flex'] })}
                   variant="subtle"
                 >
                   Share
@@ -205,6 +206,9 @@ const CommentListItem = ({
                           break;
                         case 'REPORT':
                           setShowReportModal(true);
+                          break;
+                        case 'SHARE':
+                          setShowSharePostModal(true);
                           break;
                         default:
                           break;

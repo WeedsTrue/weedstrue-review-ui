@@ -3,6 +3,7 @@ import { Carousel } from '@mantine/carousel';
 import { Image, Stack, Text } from '@mantine/core';
 import PropTypes from 'prop-types';
 import { ArrowLeft, ArrowRight } from 'tabler-icons-react';
+import { mq } from '../../../config/theme';
 
 const UserPostImageCarousel = ({ userPostImages, height, imageDisabled }) => {
   return (
@@ -34,12 +35,19 @@ const UserPostImageCarousel = ({ userPostImages, height, imageDisabled }) => {
             >
               <Image
                 fit="contain"
-                height={height ?? 600}
                 onClick={() =>
                   !imageDisabled && window.open(i.src, '_blank').focus()
                 }
                 src={i.src}
-                sx={{ cursor: 'pointer' }}
+                styles={{
+                  image: mq({
+                    height: ['unset', `${height ?? 600}px !important`],
+                    maxHeight: `${height ?? 600}px !important`
+                  })
+                }}
+                sx={{
+                  cursor: 'pointer'
+                }}
                 width={'100%'}
               />
             </Stack>

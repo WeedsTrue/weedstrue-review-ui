@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import {
   Avatar,
   Button,
@@ -11,15 +11,13 @@ import {
 } from '@mantine/core';
 import dayjs from 'dayjs';
 import PropTypes from 'prop-types';
-import { useNavigate } from 'react-router-dom';
 import { Calendar, Star } from 'tabler-icons-react';
+import ProfileSidebarInfoProfileActionButton from './ProfileSidebarInfoProfileActionButton';
 import ProfileSocialLink from './ProfileSocialLink';
-import { Context as ReviewsContext } from '../../../providers/ReviewsProvider';
+import { mq } from '../../../config/theme';
 import ReportContentModal from '../reports/ReportContentModal';
 
 const ProfileSidebarInfo = ({ isCurrentUsersProfile, user, isLoading }) => {
-  const { followUser, unfollowUser } = useContext(ReviewsContext);
-  const navigate = useNavigate();
   const [followState, setFollowState] = useState({
     isLoading: false,
     isFollowing: false,
@@ -32,7 +30,7 @@ const ProfileSidebarInfo = ({ isCurrentUsersProfile, user, isLoading }) => {
       <>
         <Card style={{ padding: 0 }}>
           <Stack sx={{ minHeight: 100, backgroundColor: 'dodgerblue' }} />
-          <Stack sx={{ padding: '10px 15px', gap: 0 }}>
+          <Stack sx={{ padding: '10px 15px', gap: 10 }}>
             <Stack sx={{ gap: 5, position: 'relative', paddingTop: 10 }}>
               <Card
                 shadow="xs"
@@ -57,10 +55,30 @@ const ProfileSidebarInfo = ({ isCurrentUsersProfile, user, isLoading }) => {
                   Report
                 </Button>
               )}
-              <Group>
+              <Group sx={{ justifyContent: 'space-between' }}>
                 <Title order={2}>{user.username}</Title>
+
+                <Stack
+                  sx={mq({
+                    width: 175,
+                    display: ['none', 'flex', 'none']
+                  })}
+                >
+                  <ProfileSidebarInfoProfileActionButton
+                    followState={followState}
+                    isCurrentUsersProfile={isCurrentUsersProfile}
+                    setFollowState={setFollowState}
+                    user={user}
+                  />
+                </Stack>
               </Group>
-              <Group>
+              <Group
+                sx={mq({
+                  flexDirection: ['column', 'column', 'row'],
+                  gap: 10,
+                  alignItems: 'start'
+                })}
+              >
                 <Stack sx={{ flex: 1, gap: 0 }}>
                   <Text weight={500}>Karma</Text>
                   <Group sx={{ gap: 5 }}>
@@ -79,79 +97,26 @@ const ProfileSidebarInfo = ({ isCurrentUsersProfile, user, isLoading }) => {
             </Stack>
 
             {user.bio && (
-              <Stack sx={{ marginTop: 10 }}>
+              <Stack>
                 <Text>{user.bio}</Text>
               </Stack>
             )}
 
-            <Stack sx={{ alignItems: 'center' }}>
-              {isCurrentUsersProfile ? (
-                <Button
-                  onClick={() => navigate('/settings')}
-                  radius="xl"
-                  sx={{ margin: '20px 0px', width: '100%', maxWidth: 250 }}
-                >
-                  Settings
-                </Button>
-              ) : (user.userFollower && !followState.hasChanged) ||
-                followState.isFollowing ? (
-                <Button
-                  disabled={followState.isLoading}
-                  onClick={() => {
-                    setFollowState({
-                      ...followState,
-                      isLoading: true
-                    });
-                    unfollowUser(
-                      user.pkUser,
-                      () =>
-                        setFollowState({
-                          isLoading: false,
-                          isFollowing: false,
-                          hasChanged: true
-                        }),
-                      () =>
-                        setFollowState({
-                          ...followState,
-                          isLoading: false
-                        })
-                    );
-                  }}
-                  radius="xl"
-                  sx={{ margin: '20px 0px', width: '100%', maxWidth: 250 }}
-                >
-                  Unfollow
-                </Button>
-              ) : (
-                <Button
-                  disabled={followState.isLoading}
-                  onClick={() => {
-                    setFollowState({
-                      ...followState,
-                      isLoading: true
-                    });
-                    followUser(
-                      user.pkUser,
-                      () =>
-                        setFollowState({
-                          isLoading: false,
-                          isFollowing: true,
-                          hasChanged: true
-                        }),
-                      () =>
-                        setFollowState({
-                          ...followState,
-                          isLoading: false
-                        })
-                    );
-                  }}
-                  radius="xl"
-                  sx={{ margin: '20px 0px', width: '100%', maxWidth: 250 }}
-                  variant="outline"
-                >
-                  Follow
-                </Button>
-              )}
+            <Stack
+              sx={mq({
+                margin: 10,
+                flex: 1,
+                display: ['flex', 'none', 'flex'],
+                alignItems: 'center',
+                alignSelf: 'stretch'
+              })}
+            >
+              <ProfileSidebarInfoProfileActionButton
+                followState={followState}
+                isCurrentUsersProfile={isCurrentUsersProfile}
+                setFollowState={setFollowState}
+                user={user}
+              />
             </Stack>
           </Stack>
         </Card>

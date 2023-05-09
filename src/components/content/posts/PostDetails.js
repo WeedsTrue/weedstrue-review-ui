@@ -5,6 +5,7 @@ import {
   Badge,
   Button,
   Card,
+  Divider,
   Group,
   Rating,
   Stack,
@@ -14,11 +15,19 @@ import {
 import dayjs from 'dayjs';
 import PropTypes from 'prop-types';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { Leaf, Message, Point, Share } from 'tabler-icons-react';
+import {
+  ChevronDown,
+  ChevronUp,
+  Leaf,
+  Message,
+  Point,
+  Share
+} from 'tabler-icons-react';
 import DeletePostModal from './DeletePostModal';
 import PostMenu from './PostMenu';
 import UserPostImageCarousel from './UserPostImageCarousel';
 import { USER_POST_TYPE, USER_POST_TYPE_LIST } from '../../../config/constants';
+import { mq } from '../../../config/theme';
 import { reactToItem } from '../../../helpers/reactionHelper';
 import { Context as ReviewsContext } from '../../../providers/ReviewsProvider';
 import ShareLinkModal from '../../common/ShareLinkModal';
@@ -37,6 +46,8 @@ const PostDetails = ({ postItem }) => {
   const hasFetched = useRef(false);
   const { state, fetchUserPost, createUserPostReaction } =
     useContext(ReviewsContext);
+  const [showMobilePostSidebarInfo, setShowMobilePostSidebarInfo] =
+    useState(false);
   const [showSharePostModal, setShowSharePostModal] = useState(false);
   const [showDeletePostModal, setShowDeletePostModal] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
@@ -81,20 +92,94 @@ const PostDetails = ({ postItem }) => {
 
   return (
     <Group
-      sx={{
-        padding: 20,
-        gap: 20,
+      sx={mq({
+        padding: [0, 0, 20],
+        gap: [0, 0, 20],
         placeItems: 'start',
-        justifyContent: 'center'
-      }}
+        justifyContent: 'center',
+        alignItems: 'stretch',
+        flexDirection: ['column', 'column', 'row-reverse']
+      })}
     >
       {hasFetched.current && !state.userPost.loading && userPost && (
         <>
-          <Stack sx={{ gap: 40, flex: 1, maxWidth: 768 }}>
-            <Card shadow="xl" sx={{}}>
+          <Stack
+            sx={mq({ display: ['flex', 'flex', 'none'], gap: 0, flex: 1 })}
+          >
+            <Card
+              sx={mq({
+                padding: [
+                  '10px !important',
+                  '10px !important',
+                  '20px !important'
+                ]
+              })}
+            >
+              <Group sx={{ justifyContent: 'space-between' }}>
+                <Text weight={500}>
+                  {userPost.postItemType === 'product'
+                    ? 'Product Information'
+                    : 'Brand Information'}
+                </Text>
+                <ActionIcon
+                  color="dark"
+                  onClick={() =>
+                    setShowMobilePostSidebarInfo(!showMobilePostSidebarInfo)
+                  }
+                >
+                  {showMobilePostSidebarInfo ? <ChevronUp /> : <ChevronDown />}
+                </ActionIcon>
+              </Group>
+            </Card>
+            <Divider />
+          </Stack>
+          <Stack
+            sx={mq({
+              display: showMobilePostSidebarInfo
+                ? 'flex'
+                : ['none', 'none', 'flex'],
+              flex: 1,
+              maxWidth: ['unset', 'unset', 332],
+              gap: [0, 0, 20]
+            })}
+          >
+            {userPost.postItemType === 'product' ? (
+              <ProductSidebarInfo product={postItem} />
+            ) : (
+              userPost.postItemType === 'brand' && (
+                <BrandSidebarInfo brand={postItem} />
+              )
+            )}
+            <Divider sx={mq({ display: ['flex', 'flex', 'none'] })} />
+          </Stack>
+
+          <Stack
+            sx={mq({
+              gap: [0, 0, 40],
+              flex: 1,
+              maxWidth: ['unset', 'unset', 768]
+            })}
+          >
+            <Card
+              shadow="xl"
+              sx={mq({
+                padding: [
+                  '10px !important',
+                  '10px !important',
+                  '20px !important'
+                ]
+              })}
+            >
               <Stack sx={{ gap: 20, flex: 1 }}>
                 <Group sx={{ placeItems: 'start', flex: 1 }}>
-                  <Stack sx={{ gap: 0, placeItems: 'center', marginLeft: 5 }}>
+                  <Stack
+                    sx={mq({
+                      gap: 0,
+                      placeItems: 'center',
+                      marginLeft: 5,
+                      display: ['none', 'none', 'none', 'flex']
+                    })}
+                  >
                     <ActionIcon
                       color={isUpvoted ? 'blue' : 'dark'}
                       disabled={userPost.hidden}
@@ -127,13 +212,13 @@ const PostDetails = ({ postItem }) => {
                     </ActionIcon>
                   </Stack>
 
-                  <Stack style={{ gap: 20, flex: 1 }}>
+                  <Stack sx={mq({ gap: 10, flex: 1 })}>
                     <Stack
-                      sx={{
-                        gap: 10,
+                      sx={mq({
+                        gap: 5,
                         overflow: 'hidden',
                         marginLeft: 5
-                      }}
+                      })}
                     >
                       <Stack sx={{ gap: 0 }}>
                         <Text
@@ -141,7 +226,6 @@ const PostDetails = ({ postItem }) => {
                           size={13}
                           sx={{ flexWrap: 'nowrap', display: 'inline' }}
                         >
-                          Posted by{' '}
                           <Group sx={{ gap: 3, display: 'inline-flex' }}>
                             <Text
                               component={Link}
@@ -150,7 +234,7 @@ const PostDetails = ({ postItem }) => {
                               }}
                               to={`/profile/${userPost.user.username}`}
                             >
-                              {userPost.user.username}
+                              Posted by {userPost.user.username}
                             </Text>
                             <Point size={10} />
                             <Text color="grey" sx={{ fontSize: 12 }}>
@@ -188,7 +272,10 @@ const PostDetails = ({ postItem }) => {
                             <Badge
                               color={postType.color}
                               size="lg"
-                              sx={{ minWidth: 100 }}
+                              sx={mq({
+                                display: ['none', 'none', 'flex'],
+                                minWidth: 100
+                              })}
                               variant="filled"
                             >
                               {postType.label}
@@ -196,7 +283,22 @@ const PostDetails = ({ postItem }) => {
                           </Group>
                         )}
                       </Stack>
-
+                      <Group
+                        sx={mq({
+                          display: ['flex', 'flex', 'none']
+                        })}
+                      >
+                        <Badge
+                          color={postType.color}
+                          size="lg"
+                          sx={mq({
+                            display: ['flex', 'flex', 'none']
+                          })}
+                          variant="filled"
+                        >
+                          {postType.label}
+                        </Badge>
+                      </Group>
                       {!userPost.hidden &&
                         userPost.fkUserPostType ===
                           USER_POST_TYPE.REVIEW.value &&
@@ -204,15 +306,22 @@ const PostDetails = ({ postItem }) => {
                           <>
                             <Rating readOnly value={userPost.userRating} />
                             {userPost.attributes.length > 0 && (
-                              <Group sx={{ gap: 10 }}>
+                              <Group sx={{ gap: 0 }}>
                                 {userPost.attributes.map((a, index) => (
                                   <React.Fragment
                                     key={a.fkProductAttributeType}
                                   >
-                                    <ProductAttribute attribute={a} />
+                                    <ProductAttribute
+                                      attribute={a}
+                                      sx={mq({ marginRight: [5, 5, 10] })}
+                                    />
                                     {index !==
                                       userPost.attributes.length - 1 && (
-                                      <Point size={10} />
+                                      <Stack
+                                        sx={mq({ marginRight: [5, 5, 10] })}
+                                      >
+                                        <Point size={10} />
+                                      </Stack>
                                     )}
                                   </React.Fragment>
                                 ))}
@@ -242,9 +351,11 @@ const PostDetails = ({ postItem }) => {
                       ) : (
                         <>
                           {userPost.userPostImages.length > 0 && (
-                            <UserPostImageCarousel
-                              userPostImages={userPost.userPostImages}
-                            />
+                            <Stack sx={{ padding: '5px 0px' }}>
+                              <UserPostImageCarousel
+                                userPostImages={userPost.userPostImages}
+                              />
+                            </Stack>
                           )}
                           <Text
                             sx={{
@@ -259,6 +370,45 @@ const PostDetails = ({ postItem }) => {
                     </Stack>
 
                     <Group>
+                      <Group
+                        sx={mq({
+                          gap: 0,
+                          placeItems: 'center',
+                          marginLeft: 5,
+                          display: ['flex', 'flex', 'flex', 'none']
+                        })}
+                      >
+                        <ActionIcon
+                          color={isUpvoted ? 'blue' : 'dark'}
+                          disabled={userPost.hidden}
+                          onClick={() => createReaction(true)}
+                          variant="transparent"
+                        >
+                          <Leaf />
+                        </ActionIcon>
+                        <Text weight={500}>
+                          {userPost?.positiveReactionCount -
+                            userPost?.negativeReactionCount +
+                            (!userPost?.userReaction && reactionState.deleted
+                              ? 0
+                              : reactionState.value)}
+                        </Text>
+                        <ActionIcon
+                          color={isDownVoted ? 'blue' : 'dark'}
+                          disabled={userPost.hidden}
+                          onClick={() => createReaction(false)}
+                          variant="transparent"
+                        >
+                          <Leaf
+                            style={{
+                              transform: 'rotate(180deg)',
+                              MozTransform: 'rotate(180deg)',
+                              WebkitTransform: 'rotate(180deg)',
+                              msTransform: 'rotate(180deg)'
+                            }}
+                          />
+                        </ActionIcon>
+                      </Group>
                       <Group sx={{ gap: 5 }}>
                         <Message size={20} />
                         <Text sx={{ fontSize: 14 }} weight={500}>
@@ -270,7 +420,7 @@ const PostDetails = ({ postItem }) => {
                       </Group>
                       {!userPost.hidden && (
                         <>
-                          <Group>
+                          <Group sx={mq({ display: ['none', 'flex'] })}>
                             <Button
                               color="dark"
                               leftIcon={<Share size={20} />}
@@ -320,15 +470,6 @@ const PostDetails = ({ postItem }) => {
                 />
               </Stack>
             </Card>
-          </Stack>
-          <Stack style={{ flex: 1, maxWidth: 332 }}>
-            {userPost.postItemType === 'product' ? (
-              <ProductSidebarInfo product={postItem} />
-            ) : (
-              userPost.postItemType === 'brand' && (
-                <BrandSidebarInfo brand={postItem} />
-              )
-            )}
           </Stack>
         </>
       )}

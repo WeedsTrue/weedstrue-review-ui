@@ -14,6 +14,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Photo, Link as LinkIcon } from 'tabler-icons-react';
 import PostListFilter from './PostListFilter';
 import PostListItem from './PostListItem';
+import { mq } from '../../../config/theme';
 import { Context as ReviewsContext } from '../../../providers/ReviewsProvider';
 
 const PostList = ({
@@ -71,9 +72,13 @@ const PostList = ({
   };
 
   return (
-    <Stack sx={{ flex: 1, gap: 15 }}>
+    <Stack sx={mq({ flex: 1, gap: [5, 10, 15] })}>
       {!hidePostSubmit && (
-        <Card>
+        <Card
+          sx={mq({
+            padding: ['10px !important', '15px !important', '20px !important']
+          })}
+        >
           <Group
             sx={{
               gap: 5

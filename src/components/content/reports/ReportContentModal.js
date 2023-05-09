@@ -123,13 +123,13 @@ const ReportContentModal = ({ opened, onClose, pkContent, contentType }) => {
       }
     >
       {formState.success ? (
-        <Stack sx={{ gap: 10, padding: 20 }}>
+        <Stack sx={{ gap: 10, padding: 20, flex: 1 }}>
           <Text size={14} sx={{ textAlign: 'center' }} weight={500}>
             Thank you. Your Report has been received.
           </Text>
         </Stack>
       ) : formState.fkContentReportType ? (
-        <Stack sx={{ gap: 10, padding: 20 }}>
+        <Stack sx={{ gap: 10, padding: 20, flex: 1 }}>
           <Text size={14}>
             Thank you for looking out for your community by reporting content
             that breaks our guidelines. Let us know what's happening, and we'll
@@ -148,7 +148,7 @@ const ReportContentModal = ({ opened, onClose, pkContent, contentType }) => {
           />
         </Stack>
       ) : (
-        <Stack sx={{ gap: 0 }}>
+        <Stack sx={{ gap: 0, flex: 1 }}>
           <Stack sx={{ padding: 20 }}>
             <Text sx={{ textAlign: 'center' }} weight={500}>
               Please select a reason for reporting

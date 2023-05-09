@@ -1,8 +1,16 @@
-import React from 'react';
-import { Button, Card, Group, Select } from '@mantine/core';
+import React, { useState } from 'react';
+import { ActionIcon, Button, Card, Group, Select, Stack } from '@mantine/core';
 import PropTypes from 'prop-types';
-import { ChartArrowsVertical, Flame, Star, Sun } from 'tabler-icons-react';
+import {
+  ChartArrowsVertical,
+  ChevronDown,
+  ChevronUp,
+  Flame,
+  Star,
+  Sun
+} from 'tabler-icons-react';
 import { PRODUCT_TYPES } from '../../../config/constants';
+import { mq } from '../../../config/theme';
 
 const FILTER_BUTTONS = [
   {
@@ -32,35 +40,90 @@ const FILTER_BUTTONS = [
 ];
 
 const ProductListFilter = ({ onFilterChange, filterState }) => {
+  const [showMobileFilter, setShowMobileFilter] = useState(false);
+
   return (
-    <Card sx={{ overflow: 'visible' }}>
-      <Group sx={{ justifyContent: 'space-between' }}>
-        <Group sx={{ gap: 10 }}>
-          {FILTER_BUTTONS.map(b => {
-            const isSelected = filterState.sortBy === b.value;
-            return (
-              <Button
-                color={isSelected ? 'blue' : 'gray'}
-                key={b.value}
-                leftIcon={b.icon}
-                onClick={() => onFilterChange('sortBy', b.value)}
-                radius="xl"
-                styles={{ leftIcon: { marginRight: 10 } }}
-                variant={isSelected ? 'light' : 'subtle'}
-              >
-                {b.label}
-              </Button>
-            );
-          })}
+    <Card
+      sx={mq({
+        overflow: 'visible',
+        padding: ['10px !important', '15px !important', '20px !important']
+      })}
+    >
+      <Stack sx={{ gap: 10 }}>
+        <Group noWrap sx={{ justifyContent: 'space-between', gap: 5 }}>
+          <Group
+            noWrap
+            sx={mq({ gap: [0, 10], flex: 1, display: ['none', 'flex'] })}
+          >
+            {FILTER_BUTTONS.map(b => {
+              const isSelected = filterState.sortBy === b.value;
+              return (
+                <Button
+                  color={isSelected ? 'blue' : 'gray'}
+                  key={b.value}
+                  leftIcon={b.icon}
+                  onClick={() => onFilterChange('sortBy', b.value)}
+                  radius="xl"
+                  styles={{ leftIcon: { marginRight: 10 } }}
+                  variant={isSelected ? 'light' : 'subtle'}
+                >
+                  {b.label}
+                </Button>
+              );
+            })}
+          </Group>
+
+          <Stack sx={mq({ display: ['flex', 'none'] })}>
+            <Select
+              data={FILTER_BUTTONS.map(b => ({
+                label: b.label,
+                value: b.value
+              }))}
+              onChange={value => onFilterChange('sortBy', value)}
+              value={filterState?.sortBy}
+            />
+          </Stack>
+
+          <Stack sx={mq({ display: ['none', 'none', 'none', 'flex'] })}>
+            <Select
+              clearable
+              data={PRODUCT_TYPES.sort((a, b) =>
+                a.label.localeCompare(b.label)
+              )}
+              onChange={value => onFilterChange('fkProductType', value)}
+              placeholder="Filter by type..."
+              value={filterState?.fkProductType}
+            />
+          </Stack>
+
+          <Stack sx={mq({ display: ['flex', 'flex', 'flex', 'none'] })}>
+            <ActionIcon
+              color="dark"
+              onClick={() => setShowMobileFilter(!showMobileFilter)}
+            >
+              {showMobileFilter ? <ChevronUp /> : <ChevronDown />}
+            </ActionIcon>
+          </Stack>
         </Group>
-        <Select
-          clearable
-          data={PRODUCT_TYPES.sort((a, b) => a.label.localeCompare(b.label))}
-          onChange={value => onFilterChange('fkProductType', value)}
-          placeholder="Filter by type..."
-          value={filterState?.fkProductType}
-        />
-      </Group>
+        {showMobileFilter && (
+          <Stack
+            sx={mq({
+              display: ['flex', 'flex', 'flex', 'none'],
+              maxWidth: ['unset', 300]
+            })}
+          >
+            <Select
+              clearable
+              data={PRODUCT_TYPES.sort((a, b) =>
+                a.label.localeCompare(b.label)
+              )}
+              onChange={value => onFilterChange('fkProductType', value)}
+              placeholder="Filter by type..."
+              value={filterState?.fkProductType}
+            />
+          </Stack>
+        )}
+      </Stack>
     </Card>
   );
 };

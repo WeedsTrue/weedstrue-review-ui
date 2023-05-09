@@ -1,12 +1,27 @@
-import React from 'react';
-import { Card, Group, Rating, Skeleton, Stack, Title } from '@mantine/core';
+import React, { useState } from 'react';
+import {
+  ActionIcon,
+  Card,
+  Divider,
+  Group,
+  Rating,
+  Skeleton,
+  Stack,
+  Text,
+  Title
+} from '@mantine/core';
 import PropTypes from 'prop-types';
+import { ChevronDown, ChevronUp } from 'tabler-icons-react';
 import ProductSidebarInfo from './ProductSidebarInfo';
+import { mq } from '../../../config/theme';
 import PostList from '../posts/PostList';
 
 const ProductDetails = ({ product, isLoading }) => {
+  const [showMobilePostSidebarInfo, setShowMobilePostSidebarInfo] =
+    useState(false);
+
   return !isLoading && product ? (
-    <Stack sx={{ gap: 20 }}>
+    <Stack sx={mq({ gap: [5, 10, 20] })}>
       <Card>
         <Stack sx={{ flex: 1, padding: 20, alignItems: 'center', gap: 10 }}>
           <Title sx={{ textAlign: 'center' }}>{product.name}</Title>
@@ -14,42 +29,158 @@ const ProductDetails = ({ product, isLoading }) => {
         </Stack>
       </Card>
       <Group
-        sx={{
-          gap: 20,
+        noWrap
+        sx={mq({
+          gap: [5, 10, 20],
           placeItems: 'start',
+          flexDirection: ['column', 'column', 'row-reverse'],
           justifyContent: 'center'
-        }}
+        })}
       >
-        <Stack style={{ flex: 1, maxWidth: 768 }}>
-          <PostList fkProduct={product.pkProduct} />
+        <Stack
+          sx={mq({
+            gap: 0,
+            flex: 1,
+            maxWidth: ['unset', 'unset', 332],
+            alignSelf: 'stretch'
+          })}
+        >
+          <Stack
+            sx={mq({
+              display: ['flex', 'flex', 'none'],
+              gap: 0,
+              flex: 1,
+              alignSelf: 'stretch'
+            })}
+          >
+            <Card
+              sx={mq({
+                padding: [
+                  '10px !important',
+                  '10px !important',
+                  '20px !important'
+                ]
+              })}
+            >
+              <Group noWrap sx={{ justifyContent: 'space-between' }}>
+                <Text weight={500}>Product Information</Text>
+                <ActionIcon
+                  color="dark"
+                  onClick={() =>
+                    setShowMobilePostSidebarInfo(!showMobilePostSidebarInfo)
+                  }
+                >
+                  {showMobilePostSidebarInfo ? <ChevronUp /> : <ChevronDown />}
+                </ActionIcon>
+              </Group>
+            </Card>
+            <Divider />
+          </Stack>
+
+          <Stack
+            sx={mq({
+              display: showMobilePostSidebarInfo
+                ? 'flex'
+                : ['none', 'none', 'flex'],
+              flex: 1,
+              maxWidth: ['unset', 'unset', 332],
+              gap: [0, 0, 20]
+            })}
+          >
+            <ProductSidebarInfo product={product} showReport />
+          </Stack>
         </Stack>
 
-        <Stack style={{ flex: 1, maxWidth: 332 }}>
-          <ProductSidebarInfo product={product} showReport />
+        <Stack
+          sx={mq({
+            flex: 1,
+            maxWidth: ['unset', 'unset', 768],
+            alignSelf: 'stretch'
+          })}
+        >
+          <PostList fkProduct={product.pkProduct} />
         </Stack>
       </Group>
     </Stack>
   ) : (
-    <Stack sx={{ gap: 20 }}>
+    <Stack sx={mq({ gap: [5, 10, 20] })}>
       <Card>
         <Stack sx={{ flex: 1, padding: 20, alignItems: 'center', gap: 10 }}>
-          <Skeleton height={45} width="25%" />
+          <Skeleton height={45} sx={mq({ width: ['75%', '50%', '25%'] })} />
           <Skeleton height={20} width={100} />
         </Stack>
       </Card>
       <Group
-        sx={{
-          gap: 20,
+        noWrap
+        sx={mq({
+          gap: [5, 10, 20],
           placeItems: 'start',
+          flexDirection: ['column', 'column', 'row-reverse'],
           justifyContent: 'center'
-        }}
+        })}
       >
-        <Stack style={{ flex: 1, maxWidth: 768 }}>
-          <PostList isLoading />
+        <Stack
+          sx={mq({
+            gap: 0,
+            flex: 1,
+            maxWidth: ['unset', 'unset', 332],
+            alignSelf: 'stretch'
+          })}
+        >
+          <Stack
+            sx={mq({
+              display: ['flex', 'flex', 'none'],
+              gap: 0,
+              flex: 1,
+              alignSelf: 'stretch'
+            })}
+          >
+            <Card
+              sx={mq({
+                padding: [
+                  '10px !important',
+                  '10px !important',
+                  '20px !important'
+                ]
+              })}
+            >
+              <Group sx={{ justifyContent: 'space-between' }}>
+                <Text weight={500}>Product Information</Text>
+                <ActionIcon
+                  color="dark"
+                  onClick={() =>
+                    setShowMobilePostSidebarInfo(!showMobilePostSidebarInfo)
+                  }
+                >
+                  {showMobilePostSidebarInfo ? <ChevronUp /> : <ChevronDown />}
+                </ActionIcon>
+              </Group>
+            </Card>
+            <Divider />
+          </Stack>
+
+          <Stack
+            sx={mq({
+              display: showMobilePostSidebarInfo
+                ? 'flex'
+                : ['none', 'none', 'flex'],
+              flex: 1,
+              maxWidth: ['unset', 'unset', 332],
+              gap: [0, 0, 20]
+            })}
+          >
+            <ProductSidebarInfo isLoading />
+          </Stack>
         </Stack>
 
-        <Stack style={{ flex: 1, maxWidth: 332 }}>
-          <ProductSidebarInfo isLoading />
+        <Stack
+          sx={mq({
+            flex: 1,
+            maxWidth: ['unset', 'unset', 768],
+            alignSelf: 'stretch'
+          })}
+        >
+          <PostList isLoading />
         </Stack>
       </Group>
     </Stack>
