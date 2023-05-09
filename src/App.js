@@ -79,7 +79,10 @@ const App = () => {
           </Stack>
         )}
       </Box>
-      <AuthModal isOpen={state.showAuthModal} />
+      <AuthModal
+        defaultView={state.defaultAuthModalView}
+        isOpen={state.showAuthModal}
+      />
     </AppShell>
   );
 };

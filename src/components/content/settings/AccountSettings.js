@@ -4,7 +4,7 @@ import { mq } from '../../../config/theme';
 import { Context as AuthContext } from '../../../providers/AuthProvider';
 
 const AccountSettings = () => {
-  const { state } = useContext(AuthContext);
+  const { state, toggleAuthModal } = useContext(AuthContext);
 
   return (
     <Stack sx={mq({ gap: 20, flex: 1 })}>
@@ -26,7 +26,12 @@ const AccountSettings = () => {
               Password must be at least 8 characters long
             </Text>
           </Stack>
-          <Button radius="xl">Change</Button>
+          <Button
+            onClick={() => toggleAuthModal(true, 'change-password')}
+            radius="xl"
+          >
+            Change
+          </Button>
         </Group>
       </Stack>
     </Stack>

@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { ActionIcon, Group, Stack } from '@mantine/core';
 import PropTypes from 'prop-types';
 import { X } from 'tabler-icons-react';
+import ChangePassword from './ChangePassword';
 import ConfirmAccount from './ConfirmAccount';
 import ConfirmAccountResend from './ConfirmAccountResend';
 import ForgotPassword from './ForgotPassword';
@@ -20,7 +21,7 @@ const AuthModal = ({ defaultView }) => {
 
   useEffect(() => {
     if (state.showAuthModal) {
-      setModalState({ view: 'login' });
+      setModalState({ view: defaultView ?? 'login' });
     }
   }, [state.showAuthModal]);
 
@@ -87,6 +88,10 @@ const AuthModal = ({ defaultView }) => {
             />
           ) : modalState.view === 'confirm-resend' ? (
             <ConfirmAccountResend
+              onModalViewChange={view => setModalState({ ...modalState, view })}
+            />
+          ) : modalState.view === 'change-password' ? (
+            <ChangePassword
               onModalViewChange={view => setModalState({ ...modalState, view })}
             />
           ) : (

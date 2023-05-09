@@ -10,6 +10,7 @@ Storage.configure(AWS_COGNITO_SETTINGS);
 const initialState = {
   username: '',
   showAuthModal: false,
+  defaultAuthModalView: '',
   isAuthenticated: false,
   isAdmin: false,
   tokenAttempted: false,
@@ -237,6 +238,56 @@ const resetPassword =
     }
   };
 
+const changePassword =
+  dispatch =>
+  async ({ oldPassword, newPassword }, onSuccessCallback, onErrorCallback) => {
+    try {
+      await Auth.currentAuthenticatedUser().then(user => {
+        return Auth.changePassword(user, oldPassword, newPassword);
+      });
+
+      dispatch({
+        type: 'SUCCESS',
+        payload: {
+          showAuthModal: false
+        }
+      });
+
+      if (onSuccessCallback) {
+        onSuccessCallback();
+      }
+    } catch (error) {
+      let errorMessage = '';
+      if (
+        error.message.startsWith(
+          "2 validation errors detected: Value at 'previousPassword'"
+        )
+      ) {
+        errorMessage = 'Invalid password';
+      } else {
+        switch (error.message) {
+          case 'Incorrect username or password.':
+            errorMessage = 'Invalid password';
+            break;
+          case 'Password did not conform with policy: Password not long enough':
+            errorMessage = 'Password not long enough';
+            break;
+          case 'Attempt limit exceeded, please try after some time.':
+            errorMessage =
+              'Attempt limit exceeded, please try after some time.';
+            break;
+          default:
+            errorMessage = 'Oops something went wrong';
+            break;
+        }
+      }
+      if (onErrorCallback) {
+        onErrorCallback(errorMessage);
+      }
+      dispatch({ type: 'ERROR', payload: error });
+    }
+  };
+
 const sendConfirmationCode =
   dispatch =>
   async ({ username }, onSuccessCallback, onErrorCallback) => {
@@ -296,12 +347,13 @@ const logout = dispatch => async () => {
   }
 };
 
-const toggleAuthModal = dispatch => async isOpen => {
+const toggleAuthModal = dispatch => async (isOpen, defaultAuthModalView) => {
   try {
     dispatch({
       type: 'SUCCESS',
       payload: {
-        showAuthModal: isOpen
+        showAuthModal: isOpen,
+        defaultAuthModalView
       }
     });
   } catch (error) {
@@ -382,6 +434,7 @@ const updateUserPrivacy =
 export const { Provider, Context } = createProvider(
   reducer,
   {
+    changePassword,
     clearError,
     confirmAccount,
     confirmAgeRequirements,
