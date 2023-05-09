@@ -67,38 +67,41 @@ const ProductSidebarInfo = ({ product, showReport, isLoading }) => {
           </Card>
           <Divider sx={mq({ display: ['flex', 'flex', 'none'] })} />
           {product.attributes.length > 0 && (
-            <Card style={{ padding: 0 }}>
-              <Group sx={mq({ padding: ['10px 15px', 15, 20] })}>
-                <Title order={4} sx={{ lineHeight: '20px' }}>
-                  Properties
-                </Title>
-              </Group>
-              <Divider sx={mq({ display: ['none', 'none', 'flex'] })} />
-              <Stack
-                sx={mq({
-                  padding: ['10px 15px', 15, 20],
-                  gap: 10,
-                  paddingTop: [0, 0, 20]
-                })}
-              >
-                <Table highlightOnHover striped withBorder withColumnBorders>
-                  <tbody>
-                    {product.attributes.map(attribute => (
-                      <tr key={attribute.fkProductAttributeType}>
-                        <td>
-                          <Text size={14} weight={500}>
-                            {attribute.attributeType}
-                          </Text>
-                        </td>
-                        <td>
-                          <Text size={14}>{attribute.value}</Text>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </Table>
-              </Stack>
-            </Card>
+            <>
+              <Card style={{ padding: 0 }}>
+                <Group sx={mq({ padding: ['10px 15px', 15, 20] })}>
+                  <Title order={4} sx={{ lineHeight: '20px' }}>
+                    Properties
+                  </Title>
+                </Group>
+                <Divider sx={mq({ display: ['none', 'none', 'flex'] })} />
+                <Stack
+                  sx={mq({
+                    padding: ['10px 15px', 15, 20],
+                    gap: 10,
+                    paddingTop: [0, 0, 20]
+                  })}
+                >
+                  <Table highlightOnHover striped withBorder withColumnBorders>
+                    <tbody>
+                      {product.attributes.map(attribute => (
+                        <tr key={attribute.fkProductAttributeType}>
+                          <td>
+                            <Text size={14} weight={500}>
+                              {attribute.attributeType}
+                            </Text>
+                          </td>
+                          <td>
+                            <Text size={14}>{attribute.value}</Text>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </Table>
+                </Stack>
+              </Card>
+              <Divider sx={mq({ display: ['flex', 'flex', 'none'] })} />
+            </>
           )}
         </>
       )}

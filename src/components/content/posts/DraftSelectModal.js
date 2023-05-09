@@ -27,7 +27,7 @@ const DraftSelectModal = ({
         </Group>
       }
     >
-      <Stack sx={{ gap: 0, minHeight: 250 }}>
+      <Stack sx={{ gap: 0, minHeight: 250, alignSelf: 'stretch', flex: 1 }}>
         {userPosts.length === 0 ? (
           <Stack sx={{ textAlign: 'center', margin: 'auto' }}>
             <Image fit="contain" height={125} src={penAndPaperImage} />

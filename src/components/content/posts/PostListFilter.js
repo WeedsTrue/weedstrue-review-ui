@@ -94,7 +94,7 @@ const PostListFilter = ({ onFilterChange, filterState }) => {
               );
             })}
           </Group>
-          <Stack sx={mq({ display: ['flex', 'none'] })}>
+          <Stack sx={mq({ display: ['flex', 'none'], flex: 1 })}>
             <Select
               data={FILTER_BUTTONS.map(b => ({
                 label: b.label,

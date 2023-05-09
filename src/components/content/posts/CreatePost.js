@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import {
+  ActionIcon,
   Button,
   Card,
   Divider,
@@ -14,6 +15,7 @@ import {
 } from '@mantine/core';
 import PropTypes from 'prop-types';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { ChevronDown, ChevronUp } from 'tabler-icons-react';
 import CreatePostImageList from './CreatePostImageList';
 import CreatePostImageModal from './CreatePostImageModal';
 import CreatePostReviewAdditions from './CreatePostReviewAdditions';
@@ -24,6 +26,7 @@ import {
   USER_POST_TYPE
 } from '../../../config/constants';
 import { USER_POST_EFFECT_TYPE } from '../../../config/effectConstants';
+import { mq } from '../../../config/theme';
 import {
   deleteFilesFromStorageRecursively,
   uploadFileToStorage
@@ -41,8 +44,9 @@ import ProductSidebarInfo from '../products/ProductSidebarInfo';
 const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
   const { postUuid } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
+  const [showMobilePostSidebarInfo, setShowMobilePostSidebarInfo] =
+    useState(false);
   const [showDeletePostModal, setShowDeletePostModal] = useState(false);
-
   const [forceSaveDraft, setForceSaveDraft] = useState(false);
   const hasSearched = useRef(false);
   const navigate = useNavigate();
@@ -394,24 +398,100 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
   return (
     !isPostItemLoading && (
       <Stack
-        sx={{ flex: 1, margin: '20px auto', width: '100%', maxWidth: 1100 }}
+        sx={mq({
+          flex: 1,
+
+          margin: [0, 0, '20px auto'],
+          width: '100%',
+          maxWidth: 1100
+        })}
       >
         <Group
-          sx={{
-            gap: 20,
+          sx={mq({
+            gap: [0, 0, 20],
             alignItems: 'start',
             justifyContent: 'center',
+            flexDirection: ['column', 'column', 'row-reverse'],
             flex: 1
-          }}
+          })}
         >
-          <Stack sx={{ gap: 40, flex: 2, maxWidth: 725 }}>
-            <Card shadow="xl" sx={{}}>
+          <Stack
+            sx={mq({
+              gap: 0,
+              maxWidth: ['unset', 'unset', 332],
+              alignSelf: 'stretch'
+            })}
+          >
+            <Stack
+              sx={mq({
+                display: ['flex', 'flex', 'none'],
+                gap: 0,
+                alignSelf: 'stretch'
+              })}
+            >
+              <Card
+                sx={mq({
+                  padding: [
+                    '10px !important',
+                    '10px !important',
+                    '20px !important'
+                  ]
+                })}
+              >
+                <Group noWrap sx={{ justifyContent: 'space-between' }}>
+                  <Text weight={500}>Product Information</Text>
+                  <ActionIcon
+                    color="dark"
+                    onClick={() =>
+                      setShowMobilePostSidebarInfo(!showMobilePostSidebarInfo)
+                    }
+                  >
+                    {showMobilePostSidebarInfo ? (
+                      <ChevronUp />
+                    ) : (
+                      <ChevronDown />
+                    )}
+                  </ActionIcon>
+                </Group>
+              </Card>
+              <Divider />
+            </Stack>
+            {postItem && (
+              <Stack
+                sx={mq({
+                  display: showMobilePostSidebarInfo
+                    ? 'flex'
+                    : ['none', 'none', 'flex'],
+                  flex: 1,
+                  maxWidth: ['unset', 'unset', 332],
+                  gap: [0, 0, 20]
+                })}
+              >
+                {postType === 'brand' ? (
+                  <BrandSidebarInfo brand={postItem} />
+                ) : (
+                  postType === 'product' && (
+                    <ProductSidebarInfo product={postItem} />
+                  )
+                )}
+              </Stack>
+            )}
+          </Stack>
+          <Stack
+            sx={mq({
+              gap: 40,
+              flex: 1,
+              maxWidth: ['unset', 'unset', 725],
+              alignSelf: 'stretch'
+            })}
+          >
+            <Card shadow="xl" sx={{ flex: 1, display: 'flex' }}>
               <FormSection
                 hideButtons
                 onSubmit={() => {
                   savePostPreflight(false);
                 }}
-                sx={{ gap: 20 }}
+                sx={{ gap: [10, 10, 20], flex: 1, alignSelf: 'stretch' }}
               >
                 <Group sx={{ justifyContent: 'space-between' }}>
                   <Title order={4}>
@@ -455,9 +535,16 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
                     </Button>
                   )}
                 </Group>
-                <Divider />
-                <Stack sx={{ gap: 10 }}>
-                  <Group sx={{ justifyContent: 'space-between' }}>
+                <Divider sx={mq({ marginBottom: [5, 5, 0] })} />
+                <Stack sx={{ flex: 1, gap: 10, alignSelf: 'stretch' }}>
+                  <Group
+                    sx={mq({
+                      justifyContent: 'space-between',
+                      gap: [10],
+                      flexDirection: ['column', 'row'],
+                      alignItems: 'stretch'
+                    })}
+                  >
                     <SearchInput
                       data={
                         (postItem && !hasSearched.current) ||
@@ -498,7 +585,7 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
                         }
                       }}
                       placeholder="Search a product..."
-                      sx={{ maxWidth: 300 }}
+                      sx={mq({ maxWidth: ['unset', 250], flex: 1 })}
                       value={postItemInfo.link}
                     />
                     <Select
@@ -513,6 +600,7 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
                           hasUnsavedChanges: true
                         })
                       }
+                      sx={mq({ maxWidth: ['unset', 250], flex: 1 })}
                       value={formState.fkUserPostType}
                     />
                   </Group>
@@ -663,7 +751,9 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
                   )}
                 </Stack>
 
-                <Divider />
+                <Divider
+                  sx={mq({ marginBottom: [5, 5, 0], marginTop: [5, 5, 0] })}
+                />
                 <Group sx={{ justifyContent: 'end' }}>
                   {postUuid ? (
                     <Button
@@ -709,17 +799,6 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
               </FormSection>
             </Card>
           </Stack>
-          {postItem && (
-            <Stack style={{ flex: 1, maxWidth: 332 }}>
-              {postType === 'brand' ? (
-                <BrandSidebarInfo brand={postItem} />
-              ) : (
-                postType === 'product' && (
-                  <ProductSidebarInfo product={postItem} />
-                )
-              )}
-            </Stack>
-          )}
         </Group>
         <CreatePostImageModal
           isOpen={formState.imageModal.isOpen}

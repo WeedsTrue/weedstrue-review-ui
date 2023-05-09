@@ -37,7 +37,7 @@ const ResponsiveModal = ({
       sx={{ overflow: 'hidden', ...rest.sx }}
       withCloseButton={false}
     >
-      <Stack sx={{ flex: 1, gap: 0 }}>
+      <Stack sx={{ flex: 1, gap: 0, minWidth: 0 }}>
         {!noHeader && (
           <Stack
             sx={{
