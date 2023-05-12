@@ -20,7 +20,7 @@ import PostMenu from './PostMenu';
 import UserPostImageCarousel from './UserPostImageCarousel';
 import { USER_POST_TYPE, USER_POST_TYPE_LIST } from '../../../config/constants';
 import { mq } from '../../../config/theme';
-import { getUserPostLink } from '../../../helpers/format';
+import { getUserPostLink, stripDateOfUTC } from '../../../helpers/format';
 import { reactToItem } from '../../../helpers/reactionHelper';
 import { Context as ReviewsContext } from '../../../providers/ReviewsProvider';
 import ShareLinkModal from '../../common/ShareLinkModal';
@@ -152,7 +152,7 @@ const PostListItem = ({ userPost }) => {
                     </Text>
                     <Point size={10} />
                     <Text color="grey" sx={{ fontSize: 12 }}>
-                      {dayjs(userPost.created).fromNow()}
+                      {dayjs(`${stripDateOfUTC(userPost.created)}Z`).fromNow()}
                     </Text>
                   </Group>
                 </Text>

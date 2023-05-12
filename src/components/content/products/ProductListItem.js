@@ -3,6 +3,7 @@ import {
   ActionIcon,
   Card,
   Group,
+  Image,
   Rating,
   Skeleton,
   Stack,
@@ -102,7 +103,11 @@ const ProductListItem = ({ product, showReport }) => {
           {product.name}
         </Title>
         <Rating fractions={2} readOnly value={product.rating}></Rating>
-        <Stack sx={{ flex: 1 }}></Stack>
+        <Stack sx={{ flex: 1 }}>
+          {product.images.length > 0 && (
+            <Image fit="contain" height={150} src={product.images[0].src} />
+          )}
+        </Stack>
         <Group>
           <Group sx={{ gap: 5, marginRight: 5 }}>
             <ActionIcon
