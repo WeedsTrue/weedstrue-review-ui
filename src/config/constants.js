@@ -9,7 +9,7 @@ import {
   Link
 } from 'tabler-icons-react';
 
-const PRODUCTION = false;
+const PRODUCTION = true;
 
 const AWS_COGNITO_SETTINGS = {
   Auth: {

@@ -44,10 +44,12 @@ const BrandList = ({ brands, isLoading }) => {
         {sortedBrands.map(s => (
           <Grid.Col
             key={s.title}
+            lg={4}
             md={4}
             sm={6}
             sx={mq({ paddingLeft: 40 })}
-            xl={12}
+            xl={4}
+            xs={12}
           >
             <Stack sx={{ gap: 20 }}>
               <Text id={s.title} weight={700}>

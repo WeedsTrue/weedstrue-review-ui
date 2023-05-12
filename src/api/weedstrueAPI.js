@@ -4,7 +4,7 @@ import { PRODUCTION } from '../config/constants';
 import { logger } from '../helpers/logger';
 
 const weedstrueAPI = axios.create({
-  baseURL: PRODUCTION ? '' : 'https://localhost:7264'
+  baseURL: PRODUCTION ? 'https://api.weedstrue.ca' : 'https://localhost:7264'
 });
 
 weedstrueAPI.interceptors.request.use(
@@ -13,9 +13,9 @@ weedstrueAPI.interceptors.request.use(
       const token = (await Auth.currentSession()).getIdToken().getJwtToken();
       if (token) {
         config.headers = {
+          'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`
         };
-        config.withCredentials = true;
       }
     } catch {}
     return config;

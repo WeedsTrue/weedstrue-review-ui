@@ -3,6 +3,7 @@ import { ActionIcon, Group, Stack, Text } from '@mantine/core';
 import dayjs from 'dayjs';
 import PropTypes from 'prop-types';
 import { Notes, Point, Trash } from 'tabler-icons-react';
+import { stripDateOfUTC } from '../../../helpers/format';
 const relativeTime = require('dayjs/plugin/relativeTime');
 
 const DraftSelectItem = ({ userPost, isBeingEdited, onDelete, onSelect }) => {
@@ -50,7 +51,8 @@ const DraftSelectItem = ({ userPost, isBeingEdited, onDelete, onSelect }) => {
             </>
           )}
           <Text sx={{ fontSize: 14, lineHeight: '16px' }}>
-            Draft Saved {dayjs(userPost.created).fromNow()}
+            Draft Saved{' '}
+            {dayjs(`${stripDateOfUTC(userPost.created)}Z`).fromNow()}
           </Text>
         </Group>
       </Stack>
