@@ -4,9 +4,8 @@ import PropTypes from 'prop-types';
 import CommentListItem from './CommentListItem';
 
 const CommentList = ({ userPost, comments, isLoading }) => {
-  const commentsSorted = comments.sort(
-    (a, b) => new Date(b.created) - new Date(a.created)
-  );
+  const commentsSorted =
+    comments?.sort((a, b) => new Date(b.created) - new Date(a.created)) ?? [];
   const postComments = commentsSorted.filter(c => !c.fkCommentParent);
   const commentReplies = commentsSorted.filter(c => c.fkCommentParent);
 

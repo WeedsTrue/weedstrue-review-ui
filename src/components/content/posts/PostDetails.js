@@ -8,6 +8,7 @@ import {
   Divider,
   Group,
   Rating,
+  Skeleton,
   Stack,
   Text,
   Title
@@ -94,6 +95,7 @@ const PostDetails = ({ postItem }) => {
   return (
     <Group
       sx={mq({
+        flex: [1, 1, 'unset'],
         padding: [0, 0, 20],
         gap: [0, 0, 20],
         placeItems: 'start',
@@ -102,11 +104,9 @@ const PostDetails = ({ postItem }) => {
         flexDirection: ['column', 'column', 'row-reverse']
       })}
     >
-      {hasFetched.current && !state.userPost.loading && userPost && (
+      {hasFetched.current && !state.userPost.loading && userPost ? (
         <>
-          <Stack
-            sx={mq({ display: ['flex', 'flex', 'none'], gap: 0, flex: 1 })}
-          >
+          <Stack sx={mq({ display: ['flex', 'flex', 'none'], gap: 0 })}>
             <Card
               sx={mq({
                 padding: [
@@ -472,6 +472,127 @@ const PostDetails = ({ postItem }) => {
                   comments={state.comments.value}
                   userPost={userPost}
                 />
+              </Stack>
+            </Card>
+          </Stack>
+        </>
+      ) : (
+        <>
+          <Stack sx={mq({ display: ['flex', 'flex', 'none'], gap: 0 })}>
+            <Card
+              sx={mq({
+                padding: [
+                  '10px !important',
+                  '10px !important',
+                  '20px !important'
+                ]
+              })}
+            >
+              <Group sx={{ justifyContent: 'space-between' }}>
+                <Skeleton height={24} width={'50%'} />
+              </Group>
+            </Card>
+            <Divider />
+          </Stack>
+          <Stack
+            style={{ flex: 1 }}
+            sx={mq({
+              display: showMobilePostSidebarInfo
+                ? 'flex'
+                : ['none', 'none', 'flex'],
+              flex: 1,
+              maxWidth: ['unset', 'unset', 332],
+              gap: [0, 0, 20]
+            })}
+          >
+            <ProductSidebarInfo />
+            <Divider sx={mq({ display: ['flex', 'flex', 'none'] })} />
+          </Stack>
+
+          <Stack
+            sx={mq({
+              gap: [0, 0, 40],
+              flex: 1,
+              maxWidth: ['unset', 'unset', 768]
+            })}
+          >
+            <Card
+              shadow="xl"
+              style={{ display: 'flex' }}
+              sx={mq({
+                flex: 1,
+                padding: [
+                  '10px !important',
+                  '10px !important',
+                  '20px !important'
+                ]
+              })}
+            >
+              <Stack sx={{ gap: 20, flex: 1 }}>
+                <Group sx={{ placeItems: 'start', flex: 1 }}>
+                  <Stack sx={mq({ gap: 10, flex: 1, alignSelf: 'stretch' })}>
+                    <Stack
+                      sx={mq({
+                        flex: 1,
+                        gap: 5,
+                        overflow: 'hidden',
+                        marginLeft: 5,
+                        minHeight: []
+                      })}
+                    >
+                      <Stack sx={{ gap: 5 }}>
+                        <Text
+                          color="grey"
+                          size={13}
+                          sx={{ flexWrap: 'nowrap', display: 'inline' }}
+                        >
+                          <Group sx={{ gap: 3, display: 'inline-flex' }}>
+                            <Skeleton height={14} width={150} />
+                            <Point size={10} />
+                            <Skeleton height={14} width={50} />
+                          </Group>
+                        </Text>
+                        <Group
+                          sx={{
+                            gap: 5,
+                            flexWrap: 'nowrap',
+                            overflow: 'hidden',
+                            justifyContent: 'space-between',
+                            alignItems: 'start'
+                          }}
+                        >
+                          <Skeleton height={24} width={'80%'} />
+                          <Skeleton
+                            height={26}
+                            radius={'xl'}
+                            sx={mq({
+                              display: ['none', 'none', 'flex'],
+                              minWidth: 100
+                            })}
+                            width={100}
+                          />
+                        </Group>
+                      </Stack>
+                      <Group
+                        sx={mq({
+                          display: ['flex', 'flex', 'none']
+                        })}
+                      >
+                        <Skeleton height={26} radius={'xl'} width={100} />
+                      </Group>
+                    </Stack>
+
+                    <Group>
+                      <Group sx={{ gap: 10 }}>
+                        <Skeleton height={26} radius={'xl'} width={100} />
+                        <Group sx={mq({ display: ['none', 'flex'] })}>
+                          <Skeleton height={26} radius={'xl'} width={75} />
+                        </Group>
+                        <Skeleton height={26} radius={'xl'} width={50} />
+                      </Group>
+                    </Group>
+                  </Stack>
+                </Group>
               </Stack>
             </Card>
           </Stack>
