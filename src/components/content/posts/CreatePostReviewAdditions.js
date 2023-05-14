@@ -190,7 +190,7 @@ const CreatePostReviewAdditions = ({
                         variant={isSelected ? 'filled' : 'outline'}
                       >
                         <Stack sx={{ gap: 0, placeItems: 'center' }}>
-                          <Feather />
+                          {<e.icon />}
                           <Text sx={{ fontSize: 12 }}>{e.label}</Text>
                         </Stack>
                       </Button>
@@ -230,7 +230,7 @@ const CreatePostReviewAdditions = ({
                         variant={isSelected ? 'filled' : 'outline'}
                       >
                         <Stack sx={{ gap: 0, placeItems: 'center' }}>
-                          <Feather />
+                          {<e.icon />}
                           <Text sx={{ fontSize: 12 }}>{e.label}</Text>
                         </Stack>
                       </Button>
