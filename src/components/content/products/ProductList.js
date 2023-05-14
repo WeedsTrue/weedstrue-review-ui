@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Card, Grid, Stack, Text, Title } from '@mantine/core';
 import PropTypes from 'prop-types';
 import ProductListFilter from './ProductListFilter';
@@ -7,6 +7,7 @@ import { mq } from '../../../config/theme';
 import { Context as ReviewsContext } from '../../../providers/ReviewsProvider';
 
 const ProductList = ({ isLoading, searchOnRender }) => {
+  const hasFetched = useRef(false);
   const { state, fetchProducts } = useContext(ReviewsContext);
   const [filterState, setFilterState] = useState({
     sortAction: 'trending',
@@ -20,6 +21,7 @@ const ProductList = ({ isLoading, searchOnRender }) => {
   useEffect(() => {
     if (searchOnRender) {
       fetchProducts({});
+      hasFetched.current = true;
     }
   }, [searchOnRender]);
 
@@ -51,7 +53,7 @@ const ProductList = ({ isLoading, searchOnRender }) => {
         />
       </Stack>
       <Stack sx={mq({ gap: [5, 10], marginTop: [0, 0, 5] })}>
-        {isLoading ? (
+        {!hasFetched.current || isLoading || state.products.loading ? (
           <Grid gutter="xl" sx={{ margin: 0 }}>
             <Grid.Col
               lg={3}

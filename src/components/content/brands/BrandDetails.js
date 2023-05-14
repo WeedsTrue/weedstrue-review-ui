@@ -62,7 +62,7 @@ const BrandDetails = ({ brand, isLoading }) => {
                 ]
               })}
             >
-              <Group nowrap sx={{ justifyContent: 'space-between' }}>
+              <Group noWrap sx={{ justifyContent: 'space-between' }}>
                 <Text weight={500}>Brand Information</Text>
                 <ActionIcon
                   color="dark"

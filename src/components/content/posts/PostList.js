@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import {
   ActionIcon,
   Avatar,
@@ -15,6 +15,7 @@ import { Photo, Link as LinkIcon } from 'tabler-icons-react';
 import PostListFilter from './PostListFilter';
 import PostListItem from './PostListItem';
 import { mq } from '../../../config/theme';
+import { Context as AuthContext } from '../../../providers/AuthProvider';
 import { Context as ReviewsContext } from '../../../providers/ReviewsProvider';
 
 const PostList = ({
@@ -27,7 +28,9 @@ const PostList = ({
   searchOnRender,
   noPostsAvailableTextOverride
 }) => {
+  const hasFetched = useRef(false);
   const navigate = useNavigate();
+  const { state: authState } = useContext(AuthContext);
   const { state, fetchUserPosts } = useContext(ReviewsContext);
   const [filterState, setFilterState] = useState({
     sortAction: 'trending',
@@ -39,7 +42,7 @@ const PostList = ({
   });
 
   useEffect(() => {
-    if (searchOnRender) {
+    if (searchOnRender && authState.tokenAttempted && !authState.loading) {
       setFilterState({
         ...filterState,
         isLoading: true
@@ -51,8 +54,9 @@ const PostList = ({
           isLoading: false
         })
       );
+      hasFetched.current = true;
     }
-  }, [searchOnRender]);
+  }, [searchOnRender, authState.tokenAttempted, authState.loading]);
 
   const onFilterChange = (name, value) => {
     const newState = {
@@ -117,7 +121,9 @@ const PostList = ({
         isLoading={isLoading}
         onFilterChange={onFilterChange}
       />
-      {isLoading ? (
+      {(searchOnRender && !hasFetched.current) ||
+      isLoading ||
+      state.userPosts.loading ? (
         <>
           <PostListItem />
           <PostListItem />

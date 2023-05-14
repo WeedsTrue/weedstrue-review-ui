@@ -9,7 +9,7 @@ const ShareLinkModal = ({ title, pathname, onClose, opened }) => {
   const onCopy = () => {
     navigator.clipboard.writeText(`${window.location.origin}${pathname}`);
 
-    triggerNotification('Copied link!', 'Success', 'green');
+    triggerNotification('Link copied!', 'Success', 'green');
   };
 
   return (
@@ -24,7 +24,7 @@ const ShareLinkModal = ({ title, pathname, onClose, opened }) => {
         <Group sx={mq({ gap: [10, 5] })}>
           <TextInput
             onChange={() => {}}
-            sx={{ flex: 1 }}
+            style={{ flex: 1 }}
             value={`${window.location.origin}${pathname}`}
           />
           <Button onClick={onCopy} sx={mq({ width: ['100%', 'unset'] })}>

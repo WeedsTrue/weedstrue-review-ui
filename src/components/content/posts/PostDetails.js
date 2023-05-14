@@ -135,6 +135,7 @@ const PostDetails = ({ postItem }) => {
             <Divider />
           </Stack>
           <Stack
+            style={{ flex: 1 }}
             sx={mq({
               display: showMobilePostSidebarInfo
                 ? 'flex'
