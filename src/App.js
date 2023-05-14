@@ -61,22 +61,16 @@ const App = () => {
       >
         {!isAgeVerified ? (
           <AgeVerificationView />
-        ) : hasAttemptedToken.current && !state.loading ? (
+        ) : (
           <Routes>
             <Route element={<BrandsView />} path="/brands/*" />
             <Route element={<CreatePost />} path="/submit" />
             <Route element={<ProductsView />} path="/products/*" />
             <Route element={<ProfileView />} path="/profile/*" />
-            {state.isAuthenticated && (
-              <Route element={<SettingsView />} path="/settings/*" />
-            )}
+            <Route element={<SettingsView />} path="/settings/*" />
             <Route element={<PostsView />} path="/" />
             <Route element={<Navigate replace to="/" />} path="*" />
           </Routes>
-        ) : (
-          <Stack sx={{ margin: 'auto', justifyContent: 'center' }}>
-            <Loader />
-          </Stack>
         )}
       </Box>
       <AuthModal

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
 import { Button, Card, Group, Menu, Stack } from '@mantine/core';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Dots } from 'tabler-icons-react';
@@ -42,6 +42,7 @@ const AUTH_TABS = [
 ];
 
 const ProfileDetails = () => {
+  const hasFetched = useRef(false);
   const navigate = useNavigate();
   const { username, view } = useParams();
   const { state: authState } = useContext(AuthContext);
@@ -53,6 +54,7 @@ const ProfileDetails = () => {
   useEffect(() => {
     if (username) {
       fetchUserProfile(username);
+      hasFetched.current = true;
     }
   }, [username]);
 
@@ -306,6 +308,7 @@ const ProfileDetails = () => {
               <PostList
                 fkUser={state.userProfile.value?.pkUser}
                 hidePostSubmit
+                isLoading={!hasFetched.current || state.userProfile.loading}
                 noPostsAvailableTextOverride="No Posts Available"
               />
             ) : view === 'comments' ? (

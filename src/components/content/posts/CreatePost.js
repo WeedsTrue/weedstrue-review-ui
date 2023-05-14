@@ -399,8 +399,7 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
     !isPostItemLoading && (
       <Stack
         sx={mq({
-          flex: 1,
-
+          flex: [1, 1, 'unset'],
           margin: [0, 0, '20px auto'],
           width: '100%',
           maxWidth: 1100
