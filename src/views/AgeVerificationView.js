@@ -9,6 +9,7 @@ import {
   Title
 } from '@mantine/core';
 import dayjs from 'dayjs';
+import { mq } from '../config/theme';
 import { Context as AuthContext } from '../providers/AuthProvider';
 
 const AgeVerificationView = () => {
@@ -42,9 +43,27 @@ const AgeVerificationView = () => {
   };
 
   return (
-    <Stack sx={{ margin: 'auto', width: '100%', maxWidth: 900 }}>
-      <Card>
-        <Stack sx={{ textAlign: 'center', gap: 30, padding: 40 }}>
+    <Stack
+      sx={{
+        margin: 'auto',
+        width: '100%',
+        maxWidth: 900,
+        flex: 1,
+        justifyContent: 'center'
+      }}
+    >
+      <Card
+        style={{ padding: 0 }}
+        sx={mq({ flex: [1, 1, 'unset'], display: 'flex' })}
+      >
+        <Stack
+          sx={mq({
+            flex: 1,
+            textAlign: 'center',
+            gap: [15, 30],
+            padding: [20, 40]
+          })}
+        >
           <Title order={1}>Welcome to WeedsTrue</Title>
           <Text>
             Ontario's one stop shop for information on all your government
@@ -53,69 +72,92 @@ const AgeVerificationView = () => {
           <Text size={18} weight={500}>
             This website is intended for those who are 19 years of age or older.
           </Text>
-          <Stack sx={{ gap: 10 }}>
-            <Text>Please enter your birth date to confirm you are of age</Text>
-            <Group sx={{ margin: 'auto' }}>
-              <TextInput
-                onChange={e => {
-                  const inputValue = e.currentTarget.value
-                    .replace(/\D/g, '')
-                    .substring(0, 2);
-                  setFormState({
-                    ...formState,
-                    month: inputValue
-                  });
-                  if (inputValue.length === 2) {
-                    dayInputRef.current.focus();
-                  }
-                }}
-                placeholder="MM"
-                sx={{ input: { textAlign: 'center' } }}
-                value={formState.month}
-              />
-              <TextInput
-                onChange={e => {
-                  const inputValue = e.currentTarget.value
-                    .replace(/\D/g, '')
-                    .substring(0, 2);
-                  setFormState({
-                    ...formState,
-                    day: inputValue
-                  });
-                  if (inputValue.length === 2) {
-                    yearInputRef.current.focus();
-                  }
-                }}
-                placeholder="DD"
-                ref={dayInputRef}
-                sx={{ input: { textAlign: 'center' } }}
-                value={formState.day}
-              />
-              <TextInput
-                onChange={e =>
-                  setFormState({
-                    ...formState,
-                    year: e.currentTarget.value
+          <Stack sx={mq({ gap: [10, 30] })}>
+            <Stack sx={{ gap: 10 }}>
+              <Text>
+                Please enter your birth date to confirm you are of age
+              </Text>
+              <Group
+                sx={mq({
+                  flexWrap: ['wrap', 'nowrap', 'nowrap'],
+                  margin: 'auto'
+                })}
+              >
+                <TextInput
+                  onChange={e => {
+                    const inputValue = e.currentTarget.value
                       .replace(/\D/g, '')
-                      .substring(0, 4)
-                  })
-                }
-                placeholder="YYYY"
-                ref={yearInputRef}
-                sx={{ input: { textAlign: 'center' } }}
-                value={formState.year}
-              />
-            </Group>
-            {formState.error && <Text color="red">{formState.error}</Text>}
+                      .substring(0, 2);
+                    setFormState({
+                      ...formState,
+                      month: inputValue
+                    });
+                    if (inputValue.length === 2) {
+                      dayInputRef.current.focus();
+                    }
+                  }}
+                  placeholder="MM"
+                  sx={mq({
+                    width: ['100%', 'unset', 'unset'],
+                    input: { textAlign: 'center' }
+                  })}
+                  value={formState.month}
+                />
+                <TextInput
+                  onChange={e => {
+                    const inputValue = e.currentTarget.value
+                      .replace(/\D/g, '')
+                      .substring(0, 2);
+                    setFormState({
+                      ...formState,
+                      day: inputValue
+                    });
+                    if (inputValue.length === 2) {
+                      yearInputRef.current.focus();
+                    }
+                  }}
+                  placeholder="DD"
+                  ref={dayInputRef}
+                  sx={mq({
+                    width: ['100%', 'unset', 'unset'],
+                    input: { textAlign: 'center' }
+                  })}
+                  value={formState.day}
+                />
+                <TextInput
+                  onChange={e =>
+                    setFormState({
+                      ...formState,
+                      year: e.currentTarget.value
+                        .replace(/\D/g, '')
+                        .substring(0, 4)
+                    })
+                  }
+                  placeholder="YYYY"
+                  ref={yearInputRef}
+                  sx={mq({
+                    width: ['100%', 'unset', 'unset'],
+                    input: { textAlign: 'center' }
+                  })}
+                  value={formState.year}
+                />
+              </Group>
+              {formState.error && <Text color="red">{formState.error}</Text>}
+            </Stack>
+            <Button
+              disabled={!formState.month || !formState.day || !formState.year}
+              onClick={verifyAge}
+              sx={mq({
+                margin: 'auto',
+                width: '100%',
+                maxWidth: ['unset', 250],
+                marginTop: 10
+              })}
+              variant="filled"
+            >
+              Verify
+            </Button>
           </Stack>
-          <Button
-            disabled={!formState.month || !formState.day || !formState.year}
-            onClick={verifyAge}
-            sx={{ margin: 'auto', width: '100%', maxWidth: 250, marginTop: 10 }}
-            variant="filled"
-          >
-            Verify
-          </Button>
         </Stack>
       </Card>
     </Stack>

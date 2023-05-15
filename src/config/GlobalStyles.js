@@ -16,7 +16,8 @@ const GlobalStyles = () => {
           display: 'flex',
           flexDirection: 'column',
           width: '100%',
-          flex: 1
+          flex: 1,
+          paddingBottom: 0
         },
         '.mantine-Select-itemsWrapper, 	.mantine-MultiSelect-itemsWrapper': {
           padding: '0px'

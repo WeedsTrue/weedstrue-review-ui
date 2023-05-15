@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useRef } from 'react';
-import { AppShell, Box, Loader, MantineProvider, Stack } from '@mantine/core';
+import { AppShell, Box, MantineProvider, Stack } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
 import dayjs from 'dayjs';
 import {
@@ -9,6 +9,7 @@ import {
   Routes
 } from 'react-router-dom';
 import AuthModal from './components/content/auth/AuthModal';
+import Footer from './components/content/navigation/Footer';
 import Header from './components/content/navigation/Header';
 import CreatePost from './components/content/posts/CreatePost';
 import GlobalStyles from './config/GlobalStyles';
@@ -20,6 +21,7 @@ import {
 import { Provider as ReviewsProvider } from './providers/ReviewsProvider';
 import AgeVerificationView from './views/AgeVerificationView';
 import BrandsView from './views/BrandsView';
+import InfoView from './views/InfoView';
 import PostsView from './views/PostsView';
 import ProductsView from './views/ProductsView';
 import ProfileView from './views/ProfileView';
@@ -42,14 +44,15 @@ const App = () => {
 
   return (
     <AppShell
-      // footer={<Footer />}
+      footer={<Footer />}
       header={isAgeVerified && <Header />}
       padding={0}
       style={{
         display: 'flex',
         flexDirection: 'column',
         minHeight: '100%',
-        width: '100%'
+        width: '100%',
+        justifyContent: 'space-between'
       }}
     >
       <Box
@@ -68,6 +71,7 @@ const App = () => {
             <Route element={<ProductsView />} path="/products/*" />
             <Route element={<ProfileView />} path="/profile/*" />
             <Route element={<SettingsView />} path="/settings/*" />
+            <Route element={<InfoView />} path="/info/*" />
             <Route element={<PostsView />} path="/" />
             <Route element={<Navigate replace to="/" />} path="*" />
           </Routes>
