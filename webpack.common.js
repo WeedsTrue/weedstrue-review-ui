@@ -90,7 +90,7 @@ module.exports = {
       title: 'WeedsTrue',
       template: './src/index.html',
       filename: 'index.html',
-      favicon: ''
+      favicon: './src/images/logo.png'
     }),
     isDevelopment && new webpack.HotModuleReplacementPlugin(),
     isDevelopment && new ReactRefreshWebpackPlugin()

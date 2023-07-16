@@ -17,7 +17,9 @@ const DeletePostModal = ({ opened, onClose, userPost, onDelete }) => {
       title={<Title order={3}>Delete Post</Title>}
     >
       <Stack sx={{ padding: 20 }}>
-        <Text>Are you sure you want to deleted the selected post?</Text>
+        <Text sx={{ textAlign: 'center' }} weight={500}>
+          Are you sure you want to deleted the selected post?
+        </Text>
       </Stack>
       <Divider />
       <Group sx={{ justifyContent: 'center', padding: 20 }}>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { ActionIcon, Button, Card, Group, Select, Stack } from '@mantine/core';
 import PropTypes from 'prop-types';
 import {
@@ -11,6 +11,7 @@ import {
 } from 'tabler-icons-react';
 import { PRODUCT_TYPES } from '../../../config/constants';
 import { mq } from '../../../config/theme';
+import { Context as ReviewsContext } from '../../../providers/ReviewsProvider';
 
 const FILTER_BUTTONS = [
   {
@@ -40,7 +41,20 @@ const FILTER_BUTTONS = [
 ];
 
 const ProductListFilter = ({ onFilterChange, filterState }) => {
+  const { state, fetchProductFilters } = useContext(ReviewsContext);
   const [showMobileFilter, setShowMobileFilter] = useState(false);
+
+  const productTypeOptions =
+    state.productFilters.value?.productTypes
+      ?.map(p => ({
+        label: p.value,
+        value: p.pkProductType.toString()
+      }))
+      .sort((a, b) => a.label.localeCompare(b.label)) ?? [];
+
+  useEffect(() => {
+    fetchProductFilters();
+  }, []);
 
   return (
     <Card
@@ -87,9 +101,7 @@ const ProductListFilter = ({ onFilterChange, filterState }) => {
           <Stack sx={mq({ display: ['none', 'none', 'none', 'flex'] })}>
             <Select
               clearable
-              data={PRODUCT_TYPES.sort((a, b) =>
-                a.label.localeCompare(b.label)
-              )}
+              data={productTypeOptions}
               onChange={value => onFilterChange('fkProductType', value)}
               placeholder="Filter by type..."
               value={filterState?.fkProductType}

@@ -72,7 +72,14 @@ const AgeVerificationView = () => {
           <Text size={18} weight={500}>
             This website is intended for those who are 19 years of age or older.
           </Text>
-          <Stack sx={mq({ gap: [10, 30] })}>
+          <Stack
+            component={'form'}
+            onSubmit={e => {
+              e.preventDefault();
+              verifyAge();
+            }}
+            sx={mq({ gap: [10, 30] })}
+          >
             <Stack sx={{ gap: 10 }}>
               <Text>
                 Please enter your birth date to confirm you are of age
@@ -146,13 +153,13 @@ const AgeVerificationView = () => {
             </Stack>
             <Button
               disabled={!formState.month || !formState.day || !formState.year}
-              onClick={verifyAge}
               sx={mq({
                 margin: 'auto',
                 width: '100%',
                 maxWidth: ['unset', 250],
                 marginTop: 10
               })}
+              type="submit"
               variant="filled"
             >
               Verify

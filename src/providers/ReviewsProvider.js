@@ -16,8 +16,9 @@ const initialState = {
   userPostDrafts: { value: [], loading: false, error: null },
   userProfile: { value: null, loading: false, error: null },
   userProfileComments: { value: [], loading: false, error: null },
-  products: { value: [], loading: false, error: null },
-  product: { value: null, loading: false, error: null }
+  product: { value: null, loading: false, error: null },
+  productFilters: { value: null, loading: false, error: null },
+  products: { value: [], loading: false, error: null }
 };
 
 const reducer = (state, action) => {
@@ -152,12 +153,6 @@ const fetchBrand = dispatch => async uuid => {
       stateName: 'brand',
       payload: { value: response.data }
     });
-
-    dispatch({
-      type: 'SUCCESS',
-      stateName: 'userPosts',
-      payload: { value: response.data.userPosts.data }
-    });
   } catch (e) {
     dispatch({
       type: 'ERROR',
@@ -167,24 +162,72 @@ const fetchBrand = dispatch => async uuid => {
   }
 };
 
+const fetchProductFilters = dispatch => async () => {
+  try {
+    dispatch({
+      type: 'FETCHING',
+      stateName: 'productFilters'
+    });
+
+    const response = await weedstrueAPI.get('/api/products/filters');
+    dispatch({
+      type: 'SUCCESS',
+      stateName: 'productFilters',
+      payload: { value: response.data }
+    });
+  } catch (e) {
+    dispatch({
+      type: 'ERROR',
+      stateName: 'productFilters',
+      payload: 'Oops something went wrong.'
+    });
+  }
+};
+
 const fetchProducts =
   dispatch =>
-  async ({ fkProductType, sortBy, orderBy }) => {
+  async (
+    { fkProductType, sortBy, orderBy, fkBrand, skip },
+    onSuccessCallback,
+    onErrorCallback
+  ) => {
     try {
-      dispatch({
-        type: 'FETCHING',
-        stateName: 'products'
-      });
-      const response = await weedstrueAPI.get('/api/products', {
-        params: { fkProductType, sortBy, orderBy }
-      });
+      if (!skip) {
+        dispatch({
+          type: 'FETCHING',
+          stateName: 'products'
+        });
+      }
 
-      dispatch({
-        type: 'SUCCESS',
-        stateName: 'products',
-        payload: { value: response.data }
+      const response = await weedstrueAPI.get('/api/products', {
+        params: {
+          fkProductType,
+          sortBy,
+          orderBy,
+          fkBrand,
+          skip
+        }
       });
+      if (skip) {
+        dispatch({
+          type: 'APPEND',
+          stateName: 'products',
+          payload: response.data.data
+        });
+      } else {
+        dispatch({
+          type: 'SUCCESS',
+          stateName: 'products',
+          payload: { value: response.data.data }
+        });
+      }
+      if (onSuccessCallback) {
+        onSuccessCallback(response.data.totalCount);
+      }
     } catch (e) {
+      if (onErrorCallback) {
+        onErrorCallback();
+      }
       dispatch({
         type: 'ERROR',
         stateName: 'products',
@@ -205,12 +248,6 @@ const fetchProduct = dispatch => async uuid => {
       type: 'SUCCESS',
       stateName: 'product',
       payload: { value: response.data }
-    });
-
-    dispatch({
-      type: 'SUCCESS',
-      stateName: 'userPosts',
-      payload: { value: response.data.userPosts.data }
     });
   } catch (e) {
     dispatch({
@@ -249,7 +286,7 @@ const fetchUserPosts =
       fkUserPostType,
       sortBy,
       orderBy,
-      lastUserPost,
+      skip,
       fkBrand,
       fkProduct,
       fkUser,
@@ -259,23 +296,26 @@ const fetchUserPosts =
     onErrorCallback
   ) => {
     try {
-      dispatch({
-        type: 'FETCHING',
-        stateName: 'userPosts'
-      });
+      if (!skip) {
+        dispatch({
+          type: 'FETCHING',
+          stateName: 'userPosts'
+        });
+      }
+
       const response = await weedstrueAPI.get('/api/userPosts', {
         params: {
           fkUserPostType,
           sortBy,
           orderBy,
-          lastUserPost,
+          skip,
           fkBrand,
           fkProduct,
           fkUser,
           showFollowingOnly
         }
       });
-      if (lastUserPost) {
+      if (skip) {
         dispatch({
           type: 'APPEND',
           stateName: 'userPosts',
@@ -813,12 +853,6 @@ const fetchUserProfile = dispatch => async username => {
       stateName: 'userProfile',
       payload: { value: response.data }
     });
-
-    dispatch({
-      type: 'SUCCESS',
-      stateName: 'userPosts',
-      payload: { value: response.data.userPosts.data }
-    });
   } catch (e) {
     dispatch({
       type: 'ERROR',
@@ -1088,6 +1122,7 @@ export const { Provider, Context } = createProvider(
     fetchBrand,
     fetchBrands,
     fetchProduct,
+    fetchProductFilters,
     fetchProducts,
     fetchUserDrafts,
     fetchUserFollowers,

@@ -10,10 +10,24 @@ const uploadFileToStorage = async (
   config = {}
 ) => {
   try {
-    const fileExtension = file.name.split('.').pop();
+    const fileExtension = file.name.split('.').pop().toLowerCase();
     const fileName = `${identifier}.${fileExtension}`;
 
-    const response = await Storage.put(fileName, file, config);
+    let contentType = null;
+    switch (fileExtension) {
+      case 'png':
+        contentType = 'image/png';
+        break;
+      case 'jpeg':
+        contentType = 'image/jpeg';
+        break;
+      default:
+        break;
+    }
+    const response = await Storage.put(fileName, file, {
+      contentType,
+      ...config
+    });
     logger(response);
     if (onSuccess) {
       onSuccess(`${S3_PUBLIC_URL}${response.key}`, fileName);

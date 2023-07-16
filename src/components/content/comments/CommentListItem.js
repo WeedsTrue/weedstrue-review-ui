@@ -15,6 +15,7 @@ import CommentMenu from './CommentMenu';
 import CreateComment from './CreateComment';
 import DeleteCommentModal from './DeleteCommentModal';
 import { mq } from '../../../config/theme';
+import { stripDateOfUTC } from '../../../helpers/format';
 import { reactToItem } from '../../../helpers/reactionHelper';
 import { Context as ReviewsContext } from '../../../providers/ReviewsProvider';
 import ShareLinkModal from '../../common/ShareLinkModal';
@@ -72,7 +73,8 @@ const CommentListItem = ({
       sx={{
         gap: 0,
         paddingLeft: profileSummaryView ? 25 : 0,
-        borderLeft: profileSummaryView ? 'dotted 1px lightgrey' : 'none'
+        borderLeft: profileSummaryView ? 'dotted 1px lightgrey' : 'none',
+        minWidth: 300
       }}
     >
       <Group
@@ -95,7 +97,7 @@ const CommentListItem = ({
           </Text>
           <Point size={5} />
           <Text color="grey" sx={{ fontSize: 12 }}>
-            {dayjs(comment.created).fromNow()}
+            {dayjs(stripDateOfUTC(`${comment.created}Z`)).fromNow()}
           </Text>
         </Group>
       </Group>
@@ -103,7 +105,6 @@ const CommentListItem = ({
         sx={{
           marginLeft: profileSummaryView ? 0 : 27,
           gap: 10,
-          overflow: 'hidden',
           borderLeft: profileSummaryView ? 'none' : 'solid 2px lightgrey',
           paddingLeft: profileSummaryView ? 0 : 30
         }}

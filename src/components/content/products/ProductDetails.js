@@ -98,7 +98,7 @@ const ProductDetails = ({ product, isLoading }) => {
             alignSelf: 'stretch'
           })}
         >
-          <PostList fkProduct={product.pkProduct} />
+          <PostList fkProduct={product.pkProduct} searchOnRender />
         </Stack>
       </Group>
     </Stack>

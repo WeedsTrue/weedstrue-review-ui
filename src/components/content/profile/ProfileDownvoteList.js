@@ -43,30 +43,30 @@ const ProfileDownvoteList = ({}) => {
           </Stack>
         </Card>
       ) : (
-        state.userNegativeReactionPosts.value.map(p => (
-          <PostListItem key={p.pkUserPost} userPost={p} />
-        ))
-      )}
-      {!filterState.isLoading &&
-        filterState.totalCount >
-          state.userNegativeReactionPosts.value.length && (
-          <Button
-            color="dark"
-            onClick={() =>
-              fetchUserPostReactionPosts({
-                isPositive: false,
-                lastUserPost:
-                  state.userNegativeReactionPosts.value[
+        <>
+          {state.userNegativeReactionPosts.value.map(p => (
+            <PostListItem key={p.pkUserPost} userPost={p} />
+          ))}
+          {filterState.totalCount >
+            state.userNegativeReactionPosts.value.length && (
+            <Button
+              color="dark"
+              onClick={() =>
+                fetchUserPostReactionPosts({
+                  isPositive: false,
+                  skip: state.userNegativeReactionPosts.value[
                     state.userNegativeReactionPosts.value.length - 1
                   ]
-              })
-            }
-            sx={{ margin: 'auto', marginTop: 10 }}
-            variant="outline"
-          >
-            Show More
-          </Button>
-        )}
+                })
+              }
+              sx={{ margin: 'auto', marginTop: 10 }}
+              variant="outline"
+            >
+              Show More
+            </Button>
+          )}
+        </>
+      )}
     </Stack>
   );
 };
