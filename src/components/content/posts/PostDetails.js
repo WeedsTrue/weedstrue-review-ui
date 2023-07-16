@@ -97,16 +97,24 @@ const PostDetails = ({ postItem }) => {
       sx={mq({
         flex: [1, 1, 'unset'],
         padding: [0, 0, 20],
+        minWidth: 0,
         gap: [0, 0, 20],
         placeItems: 'start',
         justifyContent: 'center',
         alignItems: 'stretch',
-        flexDirection: ['column', 'column', 'row-reverse']
+        flexDirection: ['column', 'column', 'row-reverse'],
+        width: '100%'
       })}
     >
       {hasFetched.current && !state.userPost.loading && userPost ? (
         <>
-          <Stack sx={mq({ display: ['flex', 'flex', 'none'], gap: 0 })}>
+          <Stack
+            sx={mq({
+              display: ['flex', 'flex', 'none'],
+              gap: 0,
+              width: '100%'
+            })}
+          >
             <Card
               sx={mq({
                 padding: [
@@ -141,6 +149,7 @@ const PostDetails = ({ postItem }) => {
                 ? 'flex'
                 : ['none', 'none', 'flex'],
               flex: 1,
+              minWidth: 0,
               maxWidth: ['unset', 'unset', 332],
               gap: [0, 0, 20]
             })}
@@ -159,12 +168,17 @@ const PostDetails = ({ postItem }) => {
             sx={mq({
               gap: [0, 0, 40],
               flex: 1,
-              maxWidth: ['unset', 'unset', 768]
+              minWidth: 0,
+              maxWidth: ['unset', 'unset', 768],
+              width: '100%'
             })}
           >
             <Card
               shadow="xl"
               sx={mq({
+                display: 'flex',
+                flex: 1,
+                minWidth: 0,
                 padding: [
                   '10px !important',
                   '10px !important',
@@ -172,7 +186,7 @@ const PostDetails = ({ postItem }) => {
                 ]
               })}
             >
-              <Stack sx={{ gap: 20, flex: 1 }}>
+              <Stack sx={{ gap: 20, flex: 1, minWidth: 0, overflow: 'hidden' }}>
                 <Group sx={{ placeItems: 'start', flex: 1 }}>
                   <Stack
                     sx={mq({
@@ -248,7 +262,10 @@ const PostDetails = ({ postItem }) => {
                               <>
                                 <Point size={10} />
                                 <Text color="grey" sx={{ fontSize: 12 }}>
-                                  Updated {dayjs(userPost.updated).fromNow()}
+                                  Updated{' '}
+                                  {dayjs(
+                                    `${stripDateOfUTC(userPost.updated)}Z`
+                                  ).fromNow()}
                                 </Text>
                               </>
                             )}

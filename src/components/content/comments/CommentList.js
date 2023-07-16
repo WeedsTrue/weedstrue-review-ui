@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Stack, Text } from '@mantine/core';
+import { Card, Group, Stack, Text } from '@mantine/core';
 import PropTypes from 'prop-types';
 import CommentListItem from './CommentListItem';
 
@@ -10,7 +10,14 @@ const CommentList = ({ userPost, comments, isLoading }) => {
   const commentReplies = commentsSorted.filter(c => c.fkCommentParent);
 
   return (
-    <Stack sx={{ flex: 1, gap: 15 }}>
+    <Group
+      sx={{
+        gap: 15,
+        minWidth: 0,
+        width: '100%',
+        overflow: 'auto'
+      }}
+    >
       {isLoading ? (
         <>
           <CommentListItem />
@@ -35,7 +42,7 @@ const CommentList = ({ userPost, comments, isLoading }) => {
           />
         ))
       )}
-    </Stack>
+    </Group>
   );
 };
 

@@ -43,30 +43,31 @@ const ProfileUpvoteList = ({}) => {
           </Stack>
         </Card>
       ) : (
-        state.userPositiveReactionPosts.value.map(p => (
-          <PostListItem key={p.pkUserPost} userPost={p} />
-        ))
+        <>
+          {state.userPositiveReactionPosts.value.map(p => (
+            <PostListItem key={p.pkUserPost} userPost={p} />
+          ))}
+          {filterState.totalCount >
+            state.userPositiveReactionPosts.value.length && (
+            <Button
+              color="dark"
+              onClick={() =>
+                fetchUserPostReactionPosts({
+                  isPositive: true,
+                  lastUserPost:
+                    state.userPositiveReactionPosts.value[
+                      state.userPositiveReactionPosts.value.length - 1
+                    ]
+                })
+              }
+              sx={{ margin: 'auto', marginTop: 10 }}
+              variant="outline"
+            >
+              Show More
+            </Button>
+          )}
+        </>
       )}
-      {!filterState.isLoading &&
-        filterState.totalCount >
-          state.userPositiveReactionPosts.value.length && (
-          <Button
-            color="dark"
-            onClick={() =>
-              fetchUserPostReactionPosts({
-                isPositive: true,
-                lastUserPost:
-                  state.userPositiveReactionPosts.value[
-                    state.userPositiveReactionPosts.value.length - 1
-                  ]
-              })
-            }
-            sx={{ margin: 'auto', marginTop: 10 }}
-            variant="outline"
-          >
-            Show More
-          </Button>
-        )}
     </Stack>
   );
 };

@@ -418,6 +418,7 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
             sx={mq({
               gap: 0,
               maxWidth: ['unset', 'unset', 332],
+              flex: postType ? 1 : 'unset',
               alignSelf: 'stretch'
             })}
           >
@@ -457,11 +458,11 @@ const CreatePost = ({ postItem, postType, isPostItemLoading }) => {
             </Stack>
             {postItem && (
               <Stack
+                style={{ flex: 1 }}
                 sx={mq({
                   display: showMobilePostSidebarInfo
                     ? 'flex'
                     : ['none', 'none', 'flex'],
-                  flex: 1,
                   maxWidth: ['unset', 'unset', 332],
                   gap: [0, 0, 20]
                 })}

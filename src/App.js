@@ -13,7 +13,8 @@ import Footer from './components/content/navigation/Footer';
 import Header from './components/content/navigation/Header';
 import CreatePost from './components/content/posts/CreatePost';
 import GlobalStyles from './config/GlobalStyles';
-import { theme } from './config/theme';
+import { mq, theme } from './config/theme';
+import { ScrollToTop } from './helpers/hooks';
 import {
   Provider as AuthProvider,
   Context as AuthContext
@@ -56,11 +57,13 @@ const App = () => {
       }}
     >
       <Box
-        sx={{
+        sx={mq({
           flex: 1,
           flexDirection: 'column',
-          display: 'flex'
-        }}
+          display: 'flex',
+          marginBottom: [0, 0, 20],
+          minWidth: 0
+        })}
       >
         {!isAgeVerified ? (
           <AgeVerificationView />
@@ -92,6 +95,7 @@ export default () => (
         <Notifications position="top-right" />
         <GlobalStyles />
         <Router>
+          <ScrollToTop />
           <App />
         </Router>
       </MantineProvider>

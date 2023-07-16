@@ -98,7 +98,7 @@ const BrandDetails = ({ brand, isLoading }) => {
             alignSelf: 'stretch'
           })}
         >
-          <PostList fkBrand={brand.pkBrand} />
+          <PostList fkBrand={brand.pkBrand} searchOnRender />
         </Stack>
       </Group>
     </Stack>

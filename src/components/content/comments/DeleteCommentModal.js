@@ -17,7 +17,7 @@ const DeleteCommentModal = ({ opened, onClose, comment, onDelete }) => {
       title={<Title order={3}>Delete Comment</Title>}
     >
       <Stack sx={{ padding: 20 }}>
-        <Text sx={{ textAlign: 'center' }}>
+        <Text sx={{ textAlign: 'center' }} weight={500}>
           Are you sure you want to deleted the selected comment?
         </Text>
       </Stack>

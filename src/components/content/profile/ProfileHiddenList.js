@@ -43,28 +43,29 @@ const ProfileHiddenList = ({}) => {
           </Stack>
         </Card>
       ) : (
-        state.userHiddenPosts.value.map(p => (
-          <PostListItem key={p.pkUserPost} userPost={p} />
-        ))
+        <>
+          {state.userHiddenPosts.value.map(p => (
+            <PostListItem key={p.pkUserPost} userPost={p} />
+          ))}
+          {filterState.totalCount > state.userHiddenPosts.value.length && (
+            <Button
+              color="dark"
+              onClick={() =>
+                fetchUserHiddenPosts({
+                  lastUserPost:
+                    state.userHiddenPosts.value[
+                      state.userHiddenPosts.value.length - 1
+                    ]
+                })
+              }
+              sx={{ margin: 'auto', marginTop: 10 }}
+              variant="outline"
+            >
+              Show More
+            </Button>
+          )}
+        </>
       )}
-      {!filterState.isLoading &&
-        filterState.totalCount > state.userHiddenPosts.value.length && (
-          <Button
-            color="dark"
-            onClick={() =>
-              fetchUserHiddenPosts({
-                lastUserPost:
-                  state.userHiddenPosts.value[
-                    state.userHiddenPosts.value.length - 1
-                  ]
-              })
-            }
-            sx={{ margin: 'auto', marginTop: 10 }}
-            variant="outline"
-          >
-            Show More
-          </Button>
-        )}
     </Stack>
   );
 };

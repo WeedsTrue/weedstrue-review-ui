@@ -1,26 +1,38 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { Card, Grid, Stack, Text, Title } from '@mantine/core';
+import { Button, Card, Grid, Stack, Text, Title } from '@mantine/core';
 import PropTypes from 'prop-types';
 import ProductListFilter from './ProductListFilter';
 import ProductListItem from './ProductListItem';
 import { mq } from '../../../config/theme';
 import { Context as ReviewsContext } from '../../../providers/ReviewsProvider';
 
-const ProductList = ({ isLoading, searchOnRender }) => {
+const ProductList = ({ fkBrand, searchOnRender }) => {
   const hasFetched = useRef(false);
   const { state, fetchProducts } = useContext(ReviewsContext);
   const [filterState, setFilterState] = useState({
-    sortAction: 'trending',
     sortBy: 'trending',
-    fkUserPostType: null,
-    lastUserPost: null,
+    fkProductType: null,
+    skip: null,
     totalCount: 0,
-    isLoading: false
+    isLoading: false,
+    showMoreLoading: false
   });
 
   useEffect(() => {
     if (searchOnRender) {
-      fetchProducts({});
+      setFilterState({
+        ...filterState,
+        isLoading: true
+      });
+      fetchProducts({ ...filterState, fkBrand }, totalCount =>
+        setFilterState({
+          ...filterState,
+          totalCount,
+          isLoading: false,
+          skip: null,
+          showMoreLoading: false
+        })
+      );
       hasFetched.current = true;
     }
   }, [searchOnRender]);
@@ -31,11 +43,15 @@ const ProductList = ({ isLoading, searchOnRender }) => {
       [name]: value,
       isLoading: true
     };
+    newState.showMoreLoading = !!newState.skip;
     setFilterState(newState);
-    fetchProducts({ ...newState }, totalCount =>
+    fetchProducts({ ...newState, fkBrand }, totalCount =>
       setFilterState({
         ...newState,
-        totalCount
+        totalCount,
+        isLoading: false,
+        skip: null,
+        showMoreLoading: false
       })
     );
   };
@@ -53,7 +69,7 @@ const ProductList = ({ isLoading, searchOnRender }) => {
         />
       </Stack>
       <Stack sx={mq({ gap: [5, 10], marginTop: [0, 0, 5] })}>
-        {!hasFetched.current || isLoading || state.products.loading ? (
+        {!hasFetched.current || state.products.loading ? (
           <Grid gutter="xl" sx={{ margin: 0 }}>
             <Grid.Col
               lg={3}
@@ -121,25 +137,40 @@ const ProductList = ({ isLoading, searchOnRender }) => {
             </Stack>
           </Card>
         ) : (
-          <Grid gutter="xl" sx={{ margin: 0 }}>
-            {state.products.value.map(p => (
-              <Grid.Col
-                key={p.pkProduct}
-                lg={3}
-                md={4}
-                sm={6}
-                sx={mq({
-                  padding: ['5px 0px', 10],
-                  paddingBottom: [0, 0, 10]
-                })}
-                to={`/products/${p.uuid}`}
-                xl={3}
-                xs={12}
+          <>
+            <Grid gutter="xl" sx={{ margin: 0 }}>
+              {state.products.value.map(p => (
+                <Grid.Col
+                  key={p.pkProduct}
+                  lg={3}
+                  md={4}
+                  sm={6}
+                  sx={mq({
+                    padding: ['5px 0px', 10],
+                    paddingBottom: [0, 0, 10]
+                  })}
+                  to={`/products/${p.uuid}`}
+                  xl={3}
+                  xs={12}
+                >
+                  <ProductListItem product={p} />
+                </Grid.Col>
+              ))}
+            </Grid>
+            {filterState.totalCount > state.products.value.length && (
+              <Button
+                color="blue"
+                loading={filterState.showMoreLoading}
+                onClick={() =>
+                  onFilterChange('skip', state.products.value.length)
+                }
+                sx={{ margin: 'auto', marginTop: 10 }}
+                variant="outline"
               >
-                <ProductListItem product={p} />
-              </Grid.Col>
-            ))}
-          </Grid>
+                Show More
+              </Button>
+            )}
+          </>
         )}
       </Stack>
     </Stack>
@@ -147,7 +178,7 @@ const ProductList = ({ isLoading, searchOnRender }) => {
 };
 
 ProductList.propTypes = {
-  isLoading: PropTypes.bool,
+  fkBrand: PropTypes.number,
   searchOnRender: PropTypes.bool
 };
 

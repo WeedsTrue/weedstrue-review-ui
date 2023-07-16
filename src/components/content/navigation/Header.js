@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import {
   Header as MantineHeader,
   Avatar,
@@ -19,12 +19,23 @@ import { ChevronDown, Leaf, Logout, User, X } from 'tabler-icons-react';
 import { links } from './links';
 import { mq } from '../../../config/theme';
 import { Context as AuthContext } from '../../../providers/AuthProvider';
+import { Context as ReviewsContext } from '../../../providers/ReviewsProvider';
+import CustomSearchItem from '../../common/CustomSearchItem';
+import SearchInput from '../../common/SearchInput';
 
 const Header = () => {
+  const hasSearched = useRef(false);
   const navigate = useNavigate();
   const { state, logout, toggleAuthModal } = useContext(AuthContext);
+  const { fetchUserPostProductOptions } = useContext(ReviewsContext);
   const { pathname } = useLocation();
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+  const [searchData, setSearchData] = useState({ brands: [], products: [] });
+
+  useEffect(() => {
+    setSearchData({ brands: [], products: [] });
+  }, [pathname]);
+
   return (
     <MantineHeader
       fixed
@@ -33,13 +44,19 @@ const Header = () => {
     >
       <Group sx={{ flex: 1, flexWrap: 'nowrap' }}>
         <Group
-          sx={{
-            gap: 20,
+          sx={mq({
+            gap: [10, 10, 20],
             flex: 1,
-            flexWrap: 'nowrap'
-          }}
+            flexWrap: 'nowrap',
+            justifyContent: 'space-between'
+          })}
         >
-          <Group sx={{ flex: 1 }}>
+          <Group
+            sx={mq({
+              flex: ['unset', 'unset', 'unset', 'unset', 1],
+              maxWidth: 200
+            })}
+          >
             <Link
               style={{
                 textDecoration: 'none',
@@ -54,104 +71,173 @@ const Header = () => {
                 }}
               >
                 <Leaf color="dodgerblue" size={40} />
-                <Text sx={mq({ fontSize: 20 })} weight={700}>
+                <Text
+                  sx={mq({
+                    fontSize: 20,
+                    display: ['none', 'none', 'flex']
+                  })}
+                  weight={700}
+                >
                   WeedsTrue
                 </Text>
               </Group>
             </Link>
           </Group>
           <Group
+            noWrap
             sx={mq({
               flex: 3,
-              gap: 50,
+              maxWidth: 1400,
+              gap: [20, 20, 20, 20, 50],
+              justifyContent: 'space-between'
+            })}
+          >
+            <Group
+              noWrap
+              sx={mq({
+                flex: ['unset', 'unset', 'unset', 1],
+                gap: 50,
+                justifyContent: 'center',
+                display: ['none', 'none', 'none', 'flex']
+              })}
+            >
+              <Group
+                noWrap
+                sx={mq({
+                  flex: 1,
+                  gap: [10, 10, 10, 10, 30],
+                  maxWidth: 500
+                })}
+              >
+                {links.public.map(link => (
+                  <Stack key={link.to} sx={{ width: 125 }}>
+                    <Text
+                      component={Link}
+                      sx={{
+                        margin: 'auto',
+                        padding: '5px 10px',
+                        fontSize: 18,
+                        lineHeight: '18px',
+                        fontWeight: link.isSelected(pathname) ? 700 : 500,
+                        borderBottom: link.isSelected(pathname)
+                          ? 'solid 2px black'
+                          : 'none',
+                        '&:hover': {
+                          fontWeight: 700,
+                          borderBottom: 'solid 2px black'
+                        }
+                      }}
+                      to={link.to}
+                    >
+                      {link.label}
+                    </Text>
+                  </Stack>
+                ))}
+              </Group>
+            </Group>
+            <Group sx={{ flex: 1, justifyContent: 'center' }}>
+              <SearchInput
+                data={[
+                  ...searchData.brands.map(b => ({
+                    label: b.name,
+                    value: `/brands/${b.uuid}`
+                  })),
+                  ...searchData.products.map(p => ({
+                    label: p.name,
+                    description: p.brand.name,
+                    value: `/products/${p.uuid}`
+                  }))
+                ].sort((a, b) => a.label.localeCompare(b.label))}
+                itemComponent={CustomSearchItem}
+                onChange={value => {
+                  navigate(`${value}`);
+                  hasSearched.current = false;
+                }}
+                onSearch={searchTerm => {
+                  if (searchTerm && searchTerm.length > 3) {
+                    fetchUserPostProductOptions(searchTerm, searchData =>
+                      setSearchData(searchData)
+                    );
+                    hasSearched.current = true;
+                  }
+                }}
+                placeholder="Search for products or brands..."
+                sx={mq({ flex: 1, maxWidth: ['unset', 'unset', 450] })}
+              />
+            </Group>
+          </Group>
+          <Group
+            sx={mq({
+              flex: ['unset', 'unset', 'unset', 'unset', 1],
+              maxWidth: 200,
+              marginRight: 5,
+              justifyContent: 'end',
               display: ['none', 'none', 'none', 'flex']
             })}
           >
-            {links.public.map(link => (
-              <Stack key={link.to} sx={{ width: 125 }}>
-                <Text
-                  component={Link}
-                  sx={{
-                    margin: 'auto',
-                    padding: '5px 10px',
-                    fontSize: 18,
-                    lineHeight: '18px',
-                    fontWeight: link.isSelected(pathname) ? 700 : 500,
-                    borderBottom: link.isSelected(pathname)
-                      ? 'solid 2px black'
-                      : 'none',
-                    '&:hover': {
-                      fontWeight: 700,
-                      borderBottom: 'solid 2px black'
+            {state.isAuthenticated ? (
+              <Menu shadow="md" width={200}>
+                <Menu.Target>
+                  <Button
+                    rightIcon={<ChevronDown />}
+                    sx={mq({})}
+                    variant="outline"
+                  >
+                    <Group sx={{ gap: 10 }}>
+                      <Avatar
+                        color="blue"
+                        radius={100}
+                        size={29}
+                        src={state.userData.avatar}
+                      >
+                        <Text>{state.userData.username[0].toUpperCase()}</Text>
+                      </Avatar>
+                      <Text>My Account</Text>
+                    </Group>
+                  </Button>
+                </Menu.Target>
+
+                <Menu.Dropdown>
+                  <Menu.Item
+                    icon={<User />}
+                    onClick={() =>
+                      navigate(`profile/${state.userData.username}`)
                     }
-                  }}
-                  to={link.to}
-                >
-                  {link.label}
-                </Text>
-              </Stack>
-            ))}
+                  >
+                    My Profile
+                  </Menu.Item>
+                  <Menu.Divider />
+                  {links.public.map(link => (
+                    <Menu.Item
+                      icon={link.icon}
+                      key={link.to}
+                      onClick={() => navigate(link.to)}
+                    >
+                      {link.label}
+                    </Menu.Item>
+                  ))}
+
+                  <Menu.Divider />
+                  <Menu.Item
+                    icon={<Logout size={20} />}
+                    onClick={() => logout()}
+                  >
+                    Logout
+                  </Menu.Item>
+                </Menu.Dropdown>
+              </Menu>
+            ) : (
+              <Button
+                onClick={() => toggleAuthModal(true)}
+                sx={mq({ width: ['unset', 'unset', 125] })}
+                variant="filled"
+              >
+                Log In
+              </Button>
+            )}
           </Group>
         </Group>
-        <Group
-          sx={mq({ marginRight: 5, display: ['none', 'none', 'none', 'flex'] })}
-        >
-          {state.isAuthenticated ? (
-            <Menu shadow="md" width={200}>
-              <Menu.Target>
-                <Button
-                  rightIcon={<ChevronDown />}
-                  sx={mq({})}
-                  variant="outline"
-                >
-                  <Group sx={{ gap: 10 }}>
-                    <Avatar
-                      color="blue"
-                      radius={100}
-                      size={29}
-                      src={state.userData.avatar}
-                    >
-                      <Text>{state.userData.username[0].toUpperCase()}</Text>
-                    </Avatar>
-                    <Text>My Account</Text>
-                  </Group>
-                </Button>
-              </Menu.Target>
 
-              <Menu.Dropdown>
-                <Menu.Item
-                  icon={<User />}
-                  onClick={() => navigate(`profile/${state.userData.username}`)}
-                >
-                  My Profile
-                </Menu.Item>
-                <Menu.Divider />
-                {links.public.map(link => (
-                  <Menu.Item
-                    icon={link.icon}
-                    key={link.to}
-                    onClick={() => navigate(link.to)}
-                  >
-                    {link.label}
-                  </Menu.Item>
-                ))}
-
-                <Menu.Divider />
-                <Menu.Item icon={<Logout size={20} />} onClick={() => logout()}>
-                  Logout
-                </Menu.Item>
-              </Menu.Dropdown>
-            </Menu>
-          ) : (
-            <Button
-              onClick={() => toggleAuthModal(true)}
-              sx={mq({ width: ['unset', 'unset', 125] })}
-              variant="filled"
-            >
-              Log In
-            </Button>
-          )}
-        </Group>
         <Group
           sx={mq({ marginRight: 5, display: ['flex', 'flex', 'flex', 'none'] })}
         >

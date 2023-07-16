@@ -71,7 +71,7 @@ const ProfileSocialLinkModal = ({
       {showDelete ? (
         <Stack sx={{ gap: 0 }}>
           <Stack sx={{ padding: 20 }}>
-            <Text sx={{ textAlign: 'center' }}>
+            <Text sx={{ textAlign: 'center' }} weight={500}>
               Are you sure you want to remove the selected social link?
             </Text>
           </Stack>

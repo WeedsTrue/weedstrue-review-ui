@@ -83,7 +83,7 @@ const USER_POST_TYPE_LIST = [
 
 const PRODUCT_ATTRIBUTE_TYPE = [
   {
-    value: 1,
+    value: 25,
     inputValue: 'thc',
     label: 'THC %',
     displayType: 'percentage',
@@ -91,7 +91,7 @@ const PRODUCT_ATTRIBUTE_TYPE = [
     userPostType: 'product-review'
   },
   {
-    value: 2,
+    value: 26,
     inputValue: 'cbd',
     label: 'CBD %',
     displayType: 'percentage',
@@ -99,7 +99,7 @@ const PRODUCT_ATTRIBUTE_TYPE = [
     userPostType: 'product-review'
   },
   {
-    value: 3,
+    value: 28,
     inputValue: 'terps',
     label: 'TERPS %',
     displayType: 'percentage',

@@ -310,6 +310,7 @@ const ProfileDetails = () => {
                 hidePostSubmit
                 isLoading={!hasFetched.current || state.userProfile.loading}
                 noPostsAvailableTextOverride="No Posts Available"
+                searchOnRender
               />
             ) : view === 'comments' ? (
               <ProfileCommentsList pkUser={state.userProfile.value?.pkUser} />

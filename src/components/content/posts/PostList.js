@@ -36,7 +36,7 @@ const PostList = ({
     sortAction: 'trending',
     sortBy: 'trending',
     fkUserPostType: null,
-    lastUserPost: null,
+    skip: null,
     totalCount: 0,
     isLoading: false
   });
@@ -47,12 +47,16 @@ const PostList = ({
         ...filterState,
         isLoading: true
       });
-      fetchUserPosts({ ...filterState, showFollowingOnly }, totalCount =>
-        setFilterState({
-          ...filterState,
-          totalCount,
-          isLoading: false
-        })
+      fetchUserPosts(
+        { ...filterState, fkUser, fkBrand, fkProduct, showFollowingOnly },
+        totalCount =>
+          setFilterState({
+            ...filterState,
+            totalCount,
+            isLoading: false,
+            skip: null,
+            showMoreLoading: false
+          })
       );
       hasFetched.current = true;
     }
@@ -64,13 +68,17 @@ const PostList = ({
       [name]: value,
       isLoading: true
     };
+    newState.showMoreLoading = !!newState.skip;
     setFilterState(newState);
     fetchUserPosts(
       { ...newState, fkUser, fkBrand, fkProduct, showFollowingOnly },
       totalCount =>
         setFilterState({
           ...newState,
-          totalCount
+          totalCount,
+          isLoading: false,
+          skip: null,
+          showMoreLoading: false
         })
     );
   };
@@ -141,24 +149,24 @@ const PostList = ({
           </Stack>
         </Card>
       ) : (
-        state.userPosts.value.map(p => (
-          <PostListItem key={p.pkUserPost} userPost={p} />
-        ))
-      )}
-      {!isLoading && filterState.totalCount > state.userPosts.value.length && (
-        <Button
-          color="dark"
-          onClick={() =>
-            onFilterChange(
-              'lastUserPost',
-              state.userPosts.value[state.userPosts.value.length - 1].pkUserPost
-            )
-          }
-          sx={{ margin: 'auto', marginTop: 10 }}
-          variant="outline"
-        >
-          Show More
-        </Button>
+        <>
+          {state.userPosts.value.map(p => (
+            <PostListItem key={p.pkUserPost} userPost={p} />
+          ))}
+          {filterState.totalCount > state.userPosts.value.length && (
+            <Button
+              color="blue"
+              loading={filterState.showMoreLoading}
+              onClick={() =>
+                onFilterChange('skip', state.userPosts.value.length)
+              }
+              sx={{ margin: '10px auto' }}
+              variant="outline"
+            >
+              Show More
+            </Button>
+          )}
+        </>
       )}
     </Stack>
   );
