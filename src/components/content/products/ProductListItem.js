@@ -16,10 +16,12 @@ import PropTypes from 'prop-types';
 import { Link, useNavigate } from 'react-router-dom';
 import { AlertCircle, Leaf } from 'tabler-icons-react';
 import { reactToItem } from '../../../helpers/reactionHelper';
+import { Context as AuthContext } from '../../../providers/AuthProvider';
 import { Context as ReviewsContext } from '../../../providers/ReviewsProvider';
 import ReportContentModal from '../reports/ReportContentModal';
 
 const ProductListItem = ({ product, showReport }) => {
+  const { state: authState, toggleAuthModal } = useContext(AuthContext);
   const { createProductReaction } = useContext(ReviewsContext);
   const [showReportModal, setShowReportModal] = useState(false);
   const [reactionState, setReactionState] = useState({
@@ -37,18 +39,22 @@ const ProductListItem = ({ product, showReport }) => {
     (reactionState.value < 0 && !reactionState.deleted);
 
   const createReaction = isPositive => {
-    reactToItem(
-      {
-        isUpvoted,
-        isDownVoted,
-        fkProduct: product.pkProduct,
-        isPositive,
-        deleted: reactionState.deleted
-      },
-      product?.userReaction,
-      createProductReaction,
-      setReactionState
-    );
+    if (authState.isAuthenticated) {
+      reactToItem(
+        {
+          isUpvoted,
+          isDownVoted,
+          fkProduct: product.pkProduct,
+          isPositive,
+          deleted: reactionState.deleted
+        },
+        product?.userReaction,
+        createProductReaction,
+        setReactionState
+      );
+    } else {
+      toggleAuthModal(true);
+    }
   };
 
   const navigate = useNavigate();
@@ -72,7 +78,13 @@ const ProductListItem = ({ product, showReport }) => {
           <Tooltip label="Report">
             <ActionIcon
               color="red"
-              onClick={() => setShowReportModal(true)}
+              onClick={() => {
+                if (authState.isAuthenticated) {
+                  setShowReportModal(true);
+                } else {
+                  toggleAuthModal(true);
+                }
+              }}
               sx={{ position: 'absolute', right: -10, top: -10 }}
               variant="outline"
             >
@@ -103,9 +115,19 @@ const ProductListItem = ({ product, showReport }) => {
           {product.name}
         </Title>
         <Rating fractions={2} readOnly value={product.rating}></Rating>
-        <Stack sx={{ flex: 1 }}>
+        <Stack sx={{ flex: 1, alignSelf: 'stretch', padding: '0px 20px' }}>
           {product.images.length > 0 && (
-            <Image fit="contain" height={150} src={product.images[0].src} />
+            <Image
+              fit="contain"
+              height={150}
+              placeholder={
+                <Text align="center" size={12} weight={500}>
+                  No Image Available
+                </Text>
+              }
+              src={product.images[0].src}
+              withPlaceholder
+            />
           )}
         </Stack>
         <Group>

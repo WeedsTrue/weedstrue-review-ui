@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import {
   Avatar,
   Button,
@@ -16,9 +16,11 @@ import { Calendar, Star } from 'tabler-icons-react';
 import ProfileSidebarInfoProfileActionButton from './ProfileSidebarInfoProfileActionButton';
 import ProfileSocialLink from './ProfileSocialLink';
 import { mq } from '../../../config/theme';
+import { Context as AuthContext } from '../../../providers/AuthProvider';
 import ReportContentModal from '../reports/ReportContentModal';
 
 const ProfileSidebarInfo = ({ isCurrentUsersProfile, user, isLoading }) => {
+  const { state: authState, toggleAuthModal } = useContext(AuthContext);
   const [followState, setFollowState] = useState({
     isLoading: false,
     isFollowing: false,
@@ -48,7 +50,13 @@ const ProfileSidebarInfo = ({ isCurrentUsersProfile, user, isLoading }) => {
             {!isCurrentUsersProfile && (
               <Button
                 color="dark"
-                onClick={() => setShowReportModal(true)}
+                onClick={() => {
+                  if (authState.isAuthenticated) {
+                    setShowReportModal(true);
+                  } else {
+                    toggleAuthModal(true);
+                  }
+                }}
                 sx={{ position: 'absolute', top: -90, right: 0 }}
                 variant="outline"
               >

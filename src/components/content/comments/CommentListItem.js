@@ -17,6 +17,7 @@ import DeleteCommentModal from './DeleteCommentModal';
 import { mq } from '../../../config/theme';
 import { stripDateOfUTC } from '../../../helpers/format';
 import { reactToItem } from '../../../helpers/reactionHelper';
+import { Context as AuthContext } from '../../../providers/AuthProvider';
 import { Context as ReviewsContext } from '../../../providers/ReviewsProvider';
 import ShareLinkModal from '../../common/ShareLinkModal';
 import ReportContentModal from '../reports/ReportContentModal';
@@ -29,6 +30,7 @@ const CommentListItem = ({
   fkUser
 }) => {
   dayjs.extend(relativeTime);
+  const { state: authState, toggleAuthModal } = useContext(AuthContext);
   const { createCommentReaction } = useContext(ReviewsContext);
   const [showSharePostModal, setShowSharePostModal] = useState(false);
   const [showDeleteCommentModal, setShowDeleteCommentModal] = useState(false);
@@ -53,19 +55,23 @@ const CommentListItem = ({
     (reactionState.value < 0 && !reactionState.deleted);
 
   const createReaction = isPositive => {
-    reactToItem(
-      {
-        isUpvoted,
-        isDownVoted,
-        fkComment: comment.pkComment,
-        fkUserPostReaction: comment.userReaction?.pkUserReaction,
-        isPositive,
-        deleted: reactionState.deleted
-      },
-      comment.userReaction,
-      createCommentReaction,
-      setReactionState
-    );
+    if (authState.isAuthenticated) {
+      reactToItem(
+        {
+          isUpvoted,
+          isDownVoted,
+          fkComment: comment.pkComment,
+          fkUserPostReaction: comment.userReaction?.pkUserReaction,
+          isPositive,
+          deleted: reactionState.deleted
+        },
+        comment.userReaction,
+        createCommentReaction,
+        setReactionState
+      );
+    } else {
+      toggleAuthModal(true);
+    }
   };
 
   return (
@@ -206,7 +212,11 @@ const CommentListItem = ({
                           setShowDeleteCommentModal(true);
                           break;
                         case 'REPORT':
-                          setShowReportModal(true);
+                          if (authState.isAuthenticated) {
+                            setShowReportModal(true);
+                          } else {
+                            toggleAuthModal(true);
+                          }
                           break;
                         case 'SHARE':
                           setShowSharePostModal(true);

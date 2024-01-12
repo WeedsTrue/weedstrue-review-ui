@@ -10,7 +10,7 @@ import {
   TextInput
 } from '@mantine/core';
 import PropTypes from 'prop-types';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Photo, Link as LinkIcon } from 'tabler-icons-react';
 import PostListFilter from './PostListFilter';
 import PostListItem from './PostListItem';
@@ -30,7 +30,7 @@ const PostList = ({
 }) => {
   const hasFetched = useRef(false);
   const navigate = useNavigate();
-  const { state: authState } = useContext(AuthContext);
+  const { state: authState, toggleAuthModal } = useContext(AuthContext);
   const { state, fetchUserPosts } = useContext(ReviewsContext);
   const [filterState, setFilterState] = useState({
     sortAction: 'trending',
@@ -83,6 +83,14 @@ const PostList = ({
     );
   };
 
+  const onCreatePost = () => {
+    if (authState.isAuthenticated) {
+      navigate('submit');
+    } else {
+      toggleAuthModal(true);
+    }
+  };
+
   return (
     <Stack sx={mq({ flex: 1, gap: [5, 10, 15] })}>
       {!hidePostSubmit && (
@@ -101,7 +109,7 @@ const PostList = ({
               styles={{ placeholderIcon: { height: '100%', width: '100%' } }}
             />
             <TextInput
-              onClick={() => navigate('submit')}
+              onClick={onCreatePost}
               placeholder="Create Post"
               style={{
                 flex: 1
@@ -114,10 +122,10 @@ const PostList = ({
                 }
               }}
             />
-            <ActionIcon component={Link} size={36} to="submit">
+            <ActionIcon onClick={onCreatePost} size={36}>
               <Photo />
             </ActionIcon>
-            <ActionIcon component={Link} size={36} to="submit">
+            <ActionIcon onClick={onCreatePost} size={36}>
               <LinkIcon />
             </ActionIcon>
           </Group>

@@ -2,6 +2,7 @@ import React, { useContext, useState } from 'react';
 import { Button, Group, Stack, Textarea } from '@mantine/core';
 import PropTypes from 'prop-types';
 import { triggerNotification } from '../../../helpers/notificationHelper';
+import { Context as AuthContext } from '../../../providers/AuthProvider';
 import { Context as ReviewsContext } from '../../../providers/ReviewsProvider';
 
 const CreateComment = ({
@@ -10,6 +11,7 @@ const CreateComment = ({
   onSuccess,
   onCancel
 }) => {
+  const { state: authState, toggleAuthModal } = useContext(AuthContext);
   const { createComment } = useContext(ReviewsContext);
   const [formState, setFormState] = useState({
     content: '',
@@ -49,16 +51,25 @@ const CreateComment = ({
           }
         );
       }}
-      sx={{ gap: 0, flex: 1 }}
+      style={{ gap: 0, flex: 1 }}
     >
       <Textarea
         minRows={4}
-        onChange={e =>
-          setFormState({
-            ...formState,
-            content: e.currentTarget.value.substring(0, 500)
-          })
-        }
+        onChange={e => {
+          if (authState.isAuthenticated) {
+            setFormState({
+              ...formState,
+              content: e.currentTarget.value.substring(0, 500)
+            });
+          } else {
+            toggleAuthModal(true);
+          }
+        }}
+        onClick={() => {
+          if (!authState.isAuthenticated) {
+            toggleAuthModal(true);
+          }
+        }}
         placeholder="What are your thoughts?"
         required
         styles={{
@@ -68,7 +79,7 @@ const CreateComment = ({
         value={formState.content}
       />
       <Group
-        sx={{
+        style={{
           border: 'solid 1px lightgrey',
           borderTop: 'none',
           justifyContent: 'end',

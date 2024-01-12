@@ -26,9 +26,9 @@ const CommentList = ({ userPost, comments, isLoading }) => {
           <CommentListItem />
         </>
       ) : comments.length === 0 ? (
-        <Card>
+        <Card sx={{ flex: 1 }}>
           <Stack sx={{ padding: 60 }}>
-            <Text sx={{ margin: 'auto' }} weight={500}>
+            <Text sx={{ textAlign: 'center' }} weight={500}>
               Be the first to comment!
             </Text>
           </Stack>

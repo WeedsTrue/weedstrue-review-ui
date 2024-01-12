@@ -31,6 +31,7 @@ import { USER_POST_TYPE, USER_POST_TYPE_LIST } from '../../../config/constants';
 import { mq } from '../../../config/theme';
 import { stripDateOfUTC } from '../../../helpers/format';
 import { reactToItem } from '../../../helpers/reactionHelper';
+import { Context as AuthContext } from '../../../providers/AuthProvider';
 import { Context as ReviewsContext } from '../../../providers/ReviewsProvider';
 import ShareLinkModal from '../../common/ShareLinkModal';
 import BrandSidebarInfo from '../brands/BrandSidebarInfo';
@@ -46,6 +47,7 @@ const PostDetails = ({ postItem }) => {
   const navigate = useNavigate();
   dayjs.extend(relativeTime);
   const hasFetched = useRef(false);
+  const { state: authState, toggleAuthModal } = useContext(AuthContext);
   const { state, fetchUserPost, createUserPostReaction } =
     useContext(ReviewsContext);
   const [showMobilePostSidebarInfo, setShowMobilePostSidebarInfo] =
@@ -78,18 +80,22 @@ const PostDetails = ({ postItem }) => {
   }, []);
 
   const createReaction = isPositive => {
-    reactToItem(
-      {
-        isUpvoted,
-        isDownVoted,
-        fkUserPost: userPost.pkUserPost,
-        isPositive,
-        deleted: reactionState.deleted
-      },
-      userPost?.userReaction,
-      createUserPostReaction,
-      setReactionState
-    );
+    if (authState.isAuthenticated) {
+      reactToItem(
+        {
+          isUpvoted,
+          isDownVoted,
+          fkUserPost: userPost.pkUserPost,
+          isPositive,
+          deleted: reactionState.deleted
+        },
+        userPost?.userReaction,
+        createUserPostReaction,
+        setReactionState
+      );
+    } else {
+      toggleAuthModal(true);
+    }
   };
 
   return (
@@ -187,7 +193,7 @@ const PostDetails = ({ postItem }) => {
               })}
             >
               <Stack sx={{ gap: 20, flex: 1, minWidth: 0, overflow: 'hidden' }}>
-                <Group sx={{ placeItems: 'start', flex: 1 }}>
+                <Group sx={{ placeItems: 'start' }}>
                   <Stack
                     sx={mq({
                       gap: 0,
@@ -461,7 +467,11 @@ const PostDetails = ({ postItem }) => {
                                     setShowDeletePostModal(true);
                                     break;
                                   case 'REPORT':
-                                    setShowReportModal(true);
+                                    if (authState.isAuthenticated) {
+                                      setShowReportModal(true);
+                                    } else {
+                                      toggleAuthModal(true);
+                                    }
                                     break;
                                   default:
                                     break;

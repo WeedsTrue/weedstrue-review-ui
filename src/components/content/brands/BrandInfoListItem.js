@@ -14,10 +14,12 @@ import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { AlertCircle, Leaf } from 'tabler-icons-react';
 import { reactToItem } from '../../../helpers/reactionHelper';
+import { Context as AuthContext } from '../../../providers/AuthProvider';
 import { Context as ReviewsContext } from '../../../providers/ReviewsProvider';
 import ReportContentModal from '../reports/ReportContentModal';
 
 const BrandInfoListItem = ({ brand, showReport }) => {
+  const { state: authState, toggleAuthModal } = useContext(AuthContext);
   const { createBrandReaction } = useContext(ReviewsContext);
   const [showReportModal, setShowReportModal] = useState(false);
   const [reactionState, setReactionState] = useState({
@@ -35,19 +37,23 @@ const BrandInfoListItem = ({ brand, showReport }) => {
     (reactionState.value < 0 && !reactionState.deleted);
 
   const createReaction = isPositive => {
-    reactToItem(
-      {
-        isUpvoted,
-        isDownVoted,
-        fkBrand: brand.pkBrand,
-        fkUserPostReaction: brand.userReaction?.pkUserReaction,
-        isPositive,
-        deleted: reactionState.deleted
-      },
-      brand?.userReaction,
-      createBrandReaction,
-      setReactionState
-    );
+    if (authState.isAuthenticated) {
+      reactToItem(
+        {
+          isUpvoted,
+          isDownVoted,
+          fkBrand: brand.pkBrand,
+          fkUserPostReaction: brand.userReaction?.pkUserReaction,
+          isPositive,
+          deleted: reactionState.deleted
+        },
+        brand?.userReaction,
+        createBrandReaction,
+        setReactionState
+      );
+    } else {
+      toggleAuthModal(true);
+    }
   };
 
   return brand ? (
@@ -70,7 +76,13 @@ const BrandInfoListItem = ({ brand, showReport }) => {
           <Tooltip label="Report">
             <ActionIcon
               color="red"
-              onClick={() => setShowReportModal(true)}
+              onClick={() => {
+                if (authState.isAuthenticated) {
+                  setShowReportModal(true);
+                } else {
+                  toggleAuthModal(true);
+                }
+              }}
               sx={{ position: 'absolute', right: -10, top: -10 }}
               variant="outline"
             >
